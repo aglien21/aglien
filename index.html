@@ -247,13 +247,44 @@ body.printing header,body.printing .wrap,body.printing nav,body.printing .fab{di
         <div class="muted" id="rentSub"></div></div>
       <button class="btn sec sm" onclick="chYear(1)">›</button>
     </div>
+    <div class="card" id="arrCard" style="display:none;border-color:#5b2a30;background:#2a1a1e">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <div>
+          <div style="font-size:12px;color:#ffb4b4;font-weight:700">BORXH I PRAPAMBETUR</div>
+          <div class="big" id="arrV" style="color:#ff8a8a;font-size:22px">0</div>
+          <div class="muted" id="arrT" style="font-size:12px"></div>
+        </div>
+        <button class="btn sm" style="flex:0 0 auto" onclick="bulkForm()">Paguaj</button>
+      </div>
+    </div>
+
     <div class="card" style="padding:12px">
       <label style="margin-top:0">Qiraja mujore (parazgjedhje)</label>
       <div class="row">
         <input id="rentAmt" type="number" inputmode="decimal" placeholder="p.sh. 30000">
         <button class="btn sm" style="flex:0 0 auto" onclick="saveRentAmt()">Ruaj</button>
       </div>
+      <label>Kam hyrë në shtëpi nga</label>
+      <div class="row">
+        <input id="rentStart" type="month" placeholder="2025-11">
+        <button class="btn sm" style="flex:0 0 auto" onclick="saveRentStart()">Ruaj</button>
+      </div>
+      <p class="muted" style="margin:8px 0 0;font-size:11.5px">
+        Muajt para kësaj date nuk llogariten si borxh.</p>
     </div>
+
+    <div class="card" id="depCard">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+        <div>
+          <div class="muted">Kapari (garancia)</div>
+          <div class="big" id="depV" style="font-size:22px">0</div>
+          <div class="muted" id="depT" style="font-size:12px;margin-top:2px"></div>
+        </div>
+        <div style="text-align:right"><span id="depTag"></span></div>
+      </div>
+      <button class="btn sec full sm" style="margin-top:12px" onclick="depForm()">Menaxho kaparin</button>
+    </div>
+
     <div id="rentList"></div>
     <button class="btn sec full sm" style="margin:0 0 12px" onclick="repForm('rent')">📄 Shkarko raportin e qirasë (PDF)</button>
   </div>
@@ -550,6 +581,42 @@ const rentPaid=r=>(r?.payments||[]).reduce((s,p)=>s+(+p.amount||0),0);
 function saveRentAmt(){
   db.collection("users").doc(UID).set({rent:+$("rentAmt").value||0},{merge:true});toast("U ruajt");
 }
+function saveRentStart(){
+  var v=$("rentStart").value||"";
+  db.collection("users").doc(UID).set({rentStart:v},{merge:true});toast("U ruajt");
+}
+
+/* muaji i parë që llogaritet: fillimi i qirasë, ose muaji më i hershëm me të dhëna */
+function firstRentKey(){
+  if(SET.rentStart) return SET.rentStart;
+  var keys=RENT.map(function(r){return r.id;}).sort();
+  if(keys.length) return keys[0];
+  return rentKey(new Date().getFullYear(),0);
+}
+function keyAdd(k,n){
+  var a=k.split("-"), y=+a[0], m=+a[1]-1+n;
+  y+=Math.floor(m/12); m=((m%12)+12)%12;
+  return rentKey(y,m);
+}
+function keyLabel(k){var a=k.split("-");return MON[+a[1]-1]+" "+a[0];}
+
+/* Të gjithë muajt e pashlyer nga fillimi deri sot, më të vjetërit të parët */
+function unpaidMonths(){
+  var start=firstRentKey();
+  var now=rentKey(new Date().getFullYear(),new Date().getMonth());
+  var out=[], k=start, guard=0;
+  while(k<=now && guard<600){
+    var r=RENT.find(function(x){return x.id===k;});
+    var due=(r&&r.amount!=null?r.amount:SET.rent)||0;
+    var rest=due-rentPaid(r);
+    if(due>0&&rest>0) out.push({key:k,due:due,rest:rest});
+    k=keyAdd(k,1); guard++;
+  }
+  return out;
+}
+function arrearsTotal(){
+  return unpaidMonths().reduce(function(s,x){return s+x.rest;},0);
+}
 function saveCur(){
   db.collection("users").doc(UID).set({currency:($("curInp").value.trim()||"LEK")},{merge:true});toast("U ruajt");
 }
@@ -594,54 +661,166 @@ function rentPayDel(k,ts){
 
 /* pagesë që mbulon disa muaj njëherësh */
 function bulkForm(){
-  let opts="";
-  for(let y=YEAR-1;y<=YEAR+1;y++)for(let m=0;m<12;m++)
-    opts+=`<option value="${rentKey(y,m)}" ${y===YEAR&&m===0?"selected":""}>${MON[m]} ${y}</option>`;
-  openM(`<h3>Pagesë për disa muaj</h3>
-  <p class="muted">Ndaje një shumë automatikisht ndër muajt e pashlyer.</p>
-  <label>Fillo nga muaji</label><select id="b_from">${opts}</select>
-  <label>Shuma totale e paguar</label><input id="b_a" type="number" inputmode="decimal" placeholder="p.sh. 90000">
-  <label>Mënyra e pagesës</label>
-  <div class="seg" id="b_m">
-    <button class="on" data-m="cash" onclick="segPick(this)">💵 Cash</button>
-    <button data-m="bank" onclick="segPick(this)">🏦 Bankë</button>
-  </div>
-  <label>Data</label><input id="b_d" type="date" value="${today()}">
-  <div class="row" style="margin-top:16px">
-    <button class="btn sec" onclick="closeM()">Anulo</button>
-    <button class="btn" onclick="bulkSave()">Shpërnda pagesën</button>
-  </div>`);
+  var un=unpaidMonths();
+  var tot=un.reduce(function(s,x){return s+x.rest;},0);
+  var lst=un.length
+    ? un.map(function(x){return '<div class="pay"><span>'+keyLabel(x.key)
+        +'</span><span><b>'+fmt(x.rest)+'</b></span></div>';}).join("")
+    : '<p class="muted">Nuk ke asnj\u00eb muaj t\u00eb pashlyer.</p>';
+  openM('<h3>Pages\u00eb e qiras\u00eb</h3>'
+  +'<p class="muted">Shuma shkon <b>gjithmon\u00eb te muaji m\u00eb i vjet\u00ebr i papaguar</b>, edhe nga viti i kaluar. '
+  +'Nëse tepron, vazhdon te muajt n\u00eb vijim.</p>'
+  +(un.length?'<div style="background:var(--card2);border-radius:12px;padding:10px;margin-top:10px">'
+    +'<div class="muted" style="font-weight:700;margin-bottom:4px">T\u00eb prapambetura \u00b7 '+fmt(tot)+'</div>'
+    +lst+'</div>':'')
+  +'<label>Shuma q\u00eb po paguaj</label>'
+  +'<input id="b_a" type="number" inputmode="decimal" value="'+(tot>0?tot:"")+'" oninput="bulkPreview()">'
+  +'<div class="muted" id="b_prev" style="margin-top:8px;font-size:12px"></div>'
+  +'<label>M\u00ebnyra e pages\u00ebs</label>'
+  +'<div class="seg" id="b_m">'
+  +'<button class="on" data-m="cash" onclick="segPick(this)">\ud83d\udcb5 Cash</button>'
+  +'<button data-m="bank" onclick="segPick(this)">\ud83c\udfe6 Bank\u00eb</button></div>'
+  +'<label>Data e pages\u00ebs</label><input id="b_d" type="date" value="'+today()+'">'
+  +'<label>Sh\u00ebnim</label><input id="b_no" placeholder="opsionale">'
+  +'<div class="row" style="margin-top:16px">'
+  +'<button class="btn sec" onclick="closeM()">Anulo</button>'
+  +'<button class="btn" onclick="bulkSave()">Ruaj pages\u00ebn</button></div>');
+  bulkPreview();
 }
-async function bulkSave(){
-  let left=+$("b_a").value||0; if(!left){alert("Vendos shumën.");return;}
-  const [sy,sm]=$("b_from").value.split("-").map(Number);
-  const meth=$("b_m").querySelector(".on").dataset.m, dt=$("b_d").value, ts=Date.now();
-  let y=sy,m=sm-1,i=0;
-  const batch=db.batch();
-  while(left>0&&i<36){
-    const k=rentKey(y,m),r=RENT.find(x=>x.id===k);
-    const due=(r&&r.amount!=null?r.amount:SET.rent)||0;
-    const rest=due-rentPaid(r);
-    if(rest>0){
-      const pay=Math.min(rest,left);left-=pay;
-      const ps=[...(r?.payments||[]),{amount:pay,method:meth,date:dt,note:"pagesë e përbashkët",ts:ts+i}];
-      batch.set(col("rent").doc(k),{amount:due,payments:ps},{merge:true});
-    }
-    m++;if(m>11){m=0;y++}i++;
+
+/* si do të shpërndahet shuma */
+function allocate(amount){
+  var left=amount, plan=[], un=unpaidMonths(), i;
+  for(i=0;i<un.length&&left>0;i++){
+    var pay=Math.min(un[i].rest,left);
+    left-=pay;
+    plan.push({key:un[i].key,due:un[i].due,pay:pay,full:pay>=un[i].rest});
   }
-  await batch.commit();closeM();
-  toast(left>0?("U shpërnda, tepricë "+fmt(left)):"Pagesa u shpërnda");
+  // teprica shkon te muajt e ardhshëm
+  var k = un.length ? keyAdd(un[un.length-1].key,1)
+                    : keyAdd(rentKey(new Date().getFullYear(),new Date().getMonth()),0);
+  var guard=0;
+  while(left>0&&guard<60){
+    var r=RENT.find(function(x){return x.id===k;});
+    var due=(r&&r.amount!=null?r.amount:SET.rent)||0;
+    var rest=due-rentPaid(r);
+    if(due>0&&rest>0){
+      var pay2=Math.min(rest,left); left-=pay2;
+      plan.push({key:k,due:due,pay:pay2,full:pay2>=rest});
+    }
+    k=keyAdd(k,1); guard++;
+  }
+  return {plan:plan,left:left};
+}
+
+function bulkPreview(){
+  var a=+$("b_a").value||0;
+  if(!a){$("b_prev").innerHTML="";return;}
+  var res=allocate(a);
+  if(!res.plan.length){$("b_prev").innerHTML="Asgj\u00eb p\u00ebr t\u00eb mbuluar.";return;}
+  var txt=res.plan.map(function(x){
+    return keyLabel(x.key)+" \u2192 "+fmt(x.pay)+(x.full?"":" (pjes\u00ebrisht)");}).join("<br>");
+  $("b_prev").innerHTML="<b>Do t\u00eb mbulohen:</b><br>"+txt
+    +(res.left>0?"<br><span style='color:#fcc65a'>Tepric\u00eb e pashp\u00ebrndar\u00eb: "+fmt(res.left)+"</span>":"");
+}
+
+async function bulkSave(){
+  var amt=+$("b_a").value||0;
+  if(!amt){alert("Vendos sh\u00ebnim shum\u00ebn.");return;}
+  var res=allocate(amt);
+  if(!res.plan.length){alert("Nuk ka muaj p\u00ebr t\u00eb mbuluar.");return;}
+  var meth=$("b_m").querySelector(".on").dataset.m;
+  var dt=$("b_d").value, no=$("b_no").value.trim(), ts=Date.now();
+  var batch=db.batch();
+  res.plan.forEach(function(x,i){
+    var r=RENT.find(function(q){return q.id===x.key;});
+    var ps=(r&&r.payments?r.payments.slice():[]);
+    ps.push({amount:x.pay,method:meth,date:dt,
+      note:no||(res.plan.length>1?"pages\u00eb e p\u00ebrbashk\u00ebt":""),ts:ts+i});
+    batch.set(col("rent").doc(x.key),{amount:x.due,payments:ps},{merge:true});
+  });
+  await batch.commit();
+  closeM();
+  toast(res.left>0?("U shp\u00ebrnda, tepric\u00eb "+fmt(res.left)):"Pagesa u shp\u00ebrnda");
+}
+
+/* ---------------- KAPARI ---------------- */
+function depForm(){
+  var d=SET.deposit||{};
+  openM('<h3>Kapari (garancia)</h3>'
+  +'<p class="muted">Paraja q\u00eb ke l\u00ebn\u00eb si garanci dhe q\u00eb merret mbrapsht kur e l\u00eb sht\u00ebpin\u00eb.</p>'
+  +'<label>Shuma e kaparit</label>'
+  +'<input id="d_a" type="number" inputmode="decimal" value="'+(d.amount||"")+'" placeholder="p.sh. 30000">'
+  +'<label>Data kur e pagova</label><input id="d_d" type="date" value="'+(d.date||today())+'">'
+  +'<label>M\u00ebnyra</label>'
+  +'<div class="seg" id="d_m">'
+  +'<button class="'+(d.method!=="bank"?"on":"")+'" data-m="cash" onclick="segPick(this)">\ud83d\udcb5 Cash</button>'
+  +'<button class="'+(d.method==="bank"?"on":"")+'" data-m="bank" onclick="segPick(this)">\ud83c\udfe6 Bank\u00eb</button></div>'
+  +'<label>Gjendja</label>'
+  +'<div class="seg" id="d_s">'
+  +'<button class="'+(d.status!=="returned"?"on":"")+'" data-m="held" onclick="segPick(this)">Te pronari</button>'
+  +'<button class="'+(d.status==="returned"?"on":"")+'" data-m="returned" onclick="segPick(this)">U kthye</button></div>'
+  +'<label>Sh\u00ebnim</label><input id="d_no" value="'+esc(d.note||"")+'" placeholder="opsionale">'
+  +'<div class="row" style="margin-top:16px">'
+  +'<button class="btn sec" onclick="closeM()">Anulo</button>'
+  +'<button class="btn" onclick="depSave()">Ruaj</button></div>'
+  +(d.amount?'<button class="btn danger full sm" style="margin-top:10px" onclick="depDel()">Fshi kaparin</button>':''));
+}
+function depSave(){
+  var o={amount:+$("d_a").value||0,date:$("d_d").value,
+    method:$("d_m").querySelector(".on").dataset.m,
+    status:$("d_s").querySelector(".on").dataset.m,
+    note:$("d_no").value.trim()};
+  if(!o.amount){alert("Vendos shum\u00ebn e kaparit.");return;}
+  db.collection("users").doc(UID).set({deposit:o},{merge:true});
+  closeM();toast("Kapari u ruajt");
+}
+function depDel(){
+  if(!confirm("T\u00eb fshihet kapari?"))return;
+  db.collection("users").doc(UID).set({deposit:null},{merge:true});
+  closeM();toast("U fshi");
 }
 
 function renderRent(){
   $("yNow").textContent=YEAR;$("yLbl").textContent=new Date().getFullYear();
+  if(document.activeElement!==$("rentStart")) $("rentStart").value=SET.rentStart||"";
+
+  // banner i borxhit të prapambetur
+  var un=unpaidMonths();
+  var arr=un.reduce(function(s,x){return s+x.rest;},0);
+  if(arr>0){
+    $("arrCard").style.display="block";
+    $("arrV").textContent=fmt(arr);
+    $("arrT").textContent=un.length===1
+      ? "1 muaj i pashlyer \u00b7 "+keyLabel(un[0].key)
+      : un.length+" muaj t\u00eb pashlyer \u00b7 nga "+keyLabel(un[0].key);
+  }else{ $("arrCard").style.display="none"; }
+
+  // kapari
+  var dep=SET.deposit||{};
+  if(dep.amount){
+    $("depV").textContent=fmt(dep.amount);
+    $("depT").textContent="Paguar m\u00eb "+(dep.date||"")+" \u00b7 "+(dep.method==="bank"?"Bank\u00eb":"Cash");
+    $("depTag").innerHTML=dep.status==="returned"
+      ? '<span class="tag t-ok">U KTHYE</span>'
+      : '<span class="tag t-info">TE PRONARI</span>';
+  }else{
+    $("depV").textContent=fmt(0);
+    $("depT").textContent="Nuk ke regjistruar kapar.";
+    $("depTag").innerHTML="";
+  }
+
+  var startK=firstRentKey();
   let tot=0,paid=0,html="";
   for(let m=0;m<12;m++){
     const r=rentOf(YEAR,m);
-    const due=(r&&r.amount!=null?r.amount:SET.rent)||0;
+    const k=rentKey(YEAR,m);
+    const before=k<startK;
+    const due=before?0:((r&&r.amount!=null?r.amount:SET.rent)||0);
     const p=rentPaid(r),rest=due-p;
     tot+=due;paid+=p;
-    const st=due<=0?'<span class="tag t-info">—</span>'
+    const st=before?'<span class="tag t-info">para fillimit</span>'
+      :due<=0?'<span class="tag t-info">—</span>'
       :rest<=0?'<span class="tag t-ok">PAGUAR</span>'
       :p>0?'<span class="tag t-part">PJESËRISHT</span>':'<span class="tag t-no">PAPAGUAR</span>';
     const meths=[...new Set((r?.payments||[]).map(x=>x.method))].map(x=>x==="bank"?"🏦":"💵").join(" ");
@@ -656,7 +835,7 @@ function renderRent(){
       <div class="bar"><i style="width:${due?Math.min(100,p/due*100):0}%"></i></div>
     </div>`;
   }
-  $("rentList").innerHTML=html+`<button class="btn sec full" style="margin:6px 0 10px" onclick="bulkForm()">💸 Pagesë për disa muaj njëherësh</button>`;
+  $("rentList").innerHTML=html+`<button class="btn sec full" style="margin:6px 0 10px" onclick="bulkForm()">💸 Pagesë (mbulon të prapambeturat)</button>`;
   $("rentSub").textContent="Paguar "+fmt(paid)+" nga "+fmt(tot);
 }
 
@@ -908,9 +1087,17 @@ function pdfRent(y){
         <td>${esc(x.note||"")}</td><td class="r">${fmt(x.amount)}</td></tr>`;});
   }
   const rest=tot-paid;
+  const un=unpaidMonths();
+  const arr=un.reduce((s,x)=>s+x.rest,0);
+  const dep=SET.deposit||{};
   prn("Raporti i qirasë "+y,`
   <h1>Qiraja e shtëpisë — ${y}</h1>
   <div class="sub">Raport i veçuar: nuk përfshin borxhet dhe shpenzimet</div>
+  ${arr>0?`<div class="box"><div class="l">Borxh i prapambetur (të gjithë vitet)</div>
+    <div class="v neg">${fmt(arr)}</div>
+    <div class="l" style="margin-top:6px;text-transform:none;letter-spacing:0">
+      ${un.length} muaj të pashlyer, nga ${keyLabel(un[0].key)}</div></div>`
+   :`<div class="box"><div class="l">Gjendja</div><div class="v pos">Pa borxhe të prapambetura</div></div>`}
   <div class="grid">
     <div class="g"><div class="l">Detyrimi vjetor</div><div class="v">${fmt(tot)}</div></div>
     <div class="g"><div class="l">Paguar</div><div class="v pos">${fmt(paid)}</div></div>
@@ -922,9 +1109,27 @@ function pdfRent(y){
   <h2>Historiku i pagesave</h2>
   ${pays?`<table><tr><th>Data e pagesës</th><th>Për muajin</th><th>Mënyra</th><th>Shënim</th><th class="r">Shuma</th></tr>${pays}
     <tr class="tot"><td colspan="4">GJITHSEJ PAGUAR</td><td class="r">${fmt(paid)}</td></tr></table>`
-   :`<p><small>Asnjë pagesë e regjistruar për ${y}.</small></p>`}`);
+   :`<p><small>Asnjë pagesë e regjistruar për ${y}.</small></p>`}
+
+  ${un.length?`<h2>Muajt e pashlyer (të gjithë vitet)</h2>
+    <table><tr><th>Muaji</th><th class="r">Detyrimi</th><th class="r">Mbetur</th></tr>
+    ${un.map(x=>`<tr><td>${keyLabel(x.key)}</td><td class="r">${fmt(x.due)}</td><td class="r"><b>${fmt(x.rest)}</b></td></tr>`).join("")}
+    <tr class="tot"><td>TOTALI I PRAPAMBETUR</td><td class="r"></td><td class="r">${fmt(arr)}</td></tr></table>`:""}
+
+  <h2>Kapari (garancia)</h2>
+  ${dep.amount?`<table>
+    <tr><td>Shuma e kaparit</td><td class="r"><b>${fmt(dep.amount)}</b></td></tr>
+    <tr><td>Data e pagesës</td><td class="r">${dep.date||"—"}</td></tr>
+    <tr><td>Mënyra</td><td class="r">${dep.method==="bank"?"Bankë":"Cash"}</td></tr>
+    <tr><td>Gjendja</td><td class="r">${dep.status==="returned"?"U kthye":"Te pronari"}</td></tr>
+    ${dep.note?`<tr><td>Shënim</td><td class="r">${esc(dep.note)}</td></tr>`:""}
+    <tr class="tot"><td>${dep.status==="returned"?"U kthye — pa detyrim":"Për të marrë mbrapsht në fund"}</td>
+      <td class="r ${dep.status==="returned"?"":"pos"}">${dep.status==="returned"?"—":fmt(dep.amount)}</td></tr>
+  </table>
+  ${dep.status!=="returned"?`<p><small>Kapari kthehet kur të lësh shtëpinë, me kusht që të mos ketë pagesa të prapambetura.${arr>0?" Aktualisht ke "+fmt(arr)+" borxh të prapambetur.":""}</small></p>`:""}`
+  :`<p><small>Nuk ke regjistruar kapar.</small></p>`}`);
 }
 go("home");
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3cb183a4f2dedd7',t:'MTc4OTY3OTM5NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3eba8ed2dd1ed47',t:'MTc5MDAyMDg2Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
