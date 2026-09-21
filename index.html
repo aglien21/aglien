@@ -7,7 +7,7 @@
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Llogaritë">
 <meta name="theme-color" content="#0f1115">
 <link rel="manifest" href="manifest.json">
@@ -18,11 +18,17 @@
   --txt:#e9edf5; --dim:#96a0b5; --acc:#3b82f6; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
 }
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
- background:var(--bg);color:var(--txt);padding-bottom:92px}
+ background:var(--bg);color:var(--txt);padding-bottom:92px;
+ -webkit-text-size-adjust:100%;overscroll-behavior-y:none}
 h1,h2,h3{margin:0}
-.wrap{max-width:720px;margin:0 auto;padding:14px}
+.wrap{max-width:720px;margin:0 auto;padding:14px;
+ padding-left:calc(14px + env(safe-area-inset-left));
+ padding-right:calc(14px + env(safe-area-inset-right))}
 header{position:sticky;top:0;z-index:20;background:rgba(15,17,21,.92);backdrop-filter:blur(10px);
- border-bottom:1px solid var(--line);padding:12px 14px;display:flex;align-items:center;gap:10px}
+ border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;
+ padding:12px 14px;padding-top:calc(12px + env(safe-area-inset-top));
+ padding-left:calc(14px + env(safe-area-inset-left));
+ padding-right:calc(14px + env(safe-area-inset-right))}
 header h1{font-size:18px;flex:1}
 .btn{border:0;border-radius:12px;padding:11px 14px;font-size:15px;font-weight:600;
  background:var(--acc);color:#fff;cursor:pointer}
@@ -60,8 +66,9 @@ nav button.on{color:var(--acc)}
  background:var(--acc);color:#fff;font-size:30px;border:0;box-shadow:0 8px 24px rgba(59,130,246,.45);z-index:25;cursor:pointer}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:none;align-items:flex-end;justify-content:center}
 .modal.on{display:flex}
-.sheet{background:var(--card);width:100%;max-width:720px;border-radius:20px 20px 0 0;padding:16px;
- max-height:92vh;overflow:auto;border:1px solid var(--line)}
+.sheet{background:var(--card);width:100%;max-width:720px;border-radius:20px 20px 0 0;
+ padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom));
+ max-height:88vh;overflow:auto;border:1px solid var(--line)}
 .sheet h3{font-size:17px;margin-bottom:4px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .seg{display:flex;background:var(--card2);border-radius:12px;padding:3px;border:1px solid var(--line)}
@@ -73,7 +80,8 @@ nav button.on{color:var(--acc)}
 .empty{text-align:center;color:var(--dim);padding:40px 16px;font-size:14px}
 .pay{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px dashed var(--line)}
 .pay:last-child{border:0}
-.center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
+.center{min-height:100vh;display:flex;align-items:center;justify-content:center;
+ padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:110px;background:#fff;color:#111;
  padding:11px 18px;border-radius:99px;font-size:14px;font-weight:600;z-index:99;opacity:0;transition:.25s;pointer-events:none}
 .toast.on{opacity:1}
@@ -81,13 +89,59 @@ details summary{cursor:pointer;color:var(--dim);font-size:13px}
 
 /* ---- raporti / printimi ---- */
 #printArea{display:none}
-#printBar{position:fixed;top:0;left:0;right:0;z-index:60;background:var(--card);
- border-bottom:1px solid var(--line);padding:10px 12px;display:flex;align-items:center;gap:10px}
+#printBar{position:fixed;top:0;left:0;width:100%;max-width:100%;box-sizing:border-box;
+ z-index:70;background:var(--card);border-bottom:1px solid var(--line);
+ padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top));
+ display:flex;align-items:center;gap:10px}
+#printBar button{flex:0 0 auto}
 #rptInner{background:#fff;color:#111}
-body.printing #printArea{display:block;background:#fff;color:#111;
- padding:60px 14px 40px;position:absolute;top:0;left:0;right:0;min-height:100vh;z-index:55}
+body.printing{overflow-x:hidden}
+body.printing #printArea{display:block;background:#fff;color:#111;box-sizing:border-box;
+ width:100%;max-width:100%;overflow-x:hidden;
+ padding:calc(64px + env(safe-area-inset-top)) 12px calc(96px + env(safe-area-inset-bottom));
+ position:absolute;top:0;left:0;min-height:100vh;z-index:55}
 body.printing header,body.printing .wrap,body.printing nav,body.printing .fab{display:none!important}
-.rpt{max-width:760px;margin:0 auto;font-size:12.5px;line-height:1.45}
+
+/* butoni pluskues — gjithmonë i dukshem, edhe në portret */
+#pdfFab{display:none;position:fixed;left:50%;transform:translateX(-50%);
+ bottom:calc(18px + env(safe-area-inset-bottom));z-index:75;
+ background:var(--acc);color:#fff;border:0;border-radius:99px;
+ padding:15px 30px;font-size:16px;font-weight:700;
+ box-shadow:0 8px 26px rgba(59,130,246,.5);cursor:pointer}
+#pdfFab:disabled{opacity:.6}
+body.printing #pdfFab{display:block}
+
+.rpt{max-width:760px;margin:0 auto;font-size:12.5px;line-height:1.45;
+ width:100%;box-sizing:border-box}
+.rpt table{table-layout:fixed;word-wrap:break-word}
+/* gjatë krijimit të PDF: tabela e plotë, pa rrëshqitje, e ngjeshur sa të hyjë */
+.rpt.pdfmode table{display:table!important;table-layout:fixed!important;
+  overflow:visible!important;white-space:normal!important;width:100%!important;font-size:11px!important}
+.rpt.pdfmode th{font-size:9px!important;padding:5px 4px!important;white-space:normal!important}
+.rpt.pdfmode td{padding:5px 4px!important;white-space:normal!important}
+.rpt.pdfmode .r{white-space:nowrap!important}
+
+
+/* në ekrane të ngushta: të hyjë i tëri brenda */
+@media screen and (max-width:700px){
+  .rpt{font-size:11px}
+  .rpt h1{font-size:16px}
+  .rpt h2{font-size:12.5px}
+  .rpt .grid{flex-wrap:wrap;gap:7px}
+  .rpt .g{flex:1 1 30%;min-width:0;padding:7px}
+  .rpt .g .v{font-size:12.5px}
+  .rpt .box .v{font-size:21px}
+
+  /* tabelat rrëshqasin anës, pa ngjeshur tekstin */
+  .rpt table{table-layout:auto;display:block;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;white-space:nowrap;font-size:11px}
+  .rpt th{font-size:9px;padding:5px 7px;letter-spacing:0}
+  .rpt td{padding:5px 7px}
+  .rpt .r{white-space:nowrap}
+  .rpt .pill{font-size:8.5px;padding:1px 5px}
+  .rpt table::-webkit-scrollbar{height:4px}
+  .rpt table::-webkit-scrollbar-thumb{background:#ccc;border-radius:9px}
+}
 .rpt h1{font-size:19px;margin:0 0 2px;color:#111}
 .rpt .sub{color:#666;font-size:11px;margin-bottom:14px}
 .rpt h2{font-size:14px;margin:18px 0 7px;padding-bottom:4px;border-bottom:2px solid #111;color:#111}
@@ -111,7 +165,7 @@ body.printing header,body.printing .wrap,body.printing nav,body.printing .fab{di
 @media print{
   @page{size:A4;margin:12mm}
   body{background:#fff!important}
-  #printBar{display:none!important}
+  #printBar,#pdfFab{display:none!important}
   body.printing #printArea{padding:0;position:static;min-height:0}
   .rpt tr{page-break-inside:avoid}
   .rpt h2{page-break-after:avoid}
@@ -348,6 +402,7 @@ service cloud.firestore {
   <button class="btn sm" id="pdfBtn" onclick="prnGo()">Shkarko PDF</button>
 </div>
 <div id="printArea"></div>
+<button id="pdfFab" onclick="prnGo()">⬇ Shkarko PDF</button>
 
 <!-- MODAL -->
 <div class="modal" id="modal" onclick="if(event.target===this)closeM()">
@@ -976,24 +1031,45 @@ function slug(t){
 function prnGo(){
   var el=document.getElementById("rptInner");
   if(!el){return;}
-  var btn=document.getElementById("pdfBtn");
+  var btns=[document.getElementById("pdfBtn"),document.getElementById("pdfFab")];
+  function setBtn(t,dis){
+    btns.forEach(function(b){ if(b){ b.disabled=dis; b.textContent=t; } });
+  }
   if(typeof html2pdf==="undefined"){
-    try{ window.print(); }catch(e){ alert("Nuk u ngarkua mjeti i PDF-s\u00eb. Kontrollo internetin."); }
+    try{ window.print(); }
+    catch(e){ alert("Nuk u ngarkua mjeti i PDF-s\u00eb. Kontrollo internetin dhe rifresko faqen."); }
     return;
   }
-  if(btn){btn.disabled=true;btn.textContent="Duke krijuar...";}
+  setBtn("Duke krijuar...",true);
+
+  // rendero gjithmonë në gjërësi fikse, që PDF të dalë njësoj
+  var W=690;
+  var prevW=el.style.width, prevMax=el.style.maxWidth, prevFs=el.style.fontSize;
+  el.style.width=W+"px"; el.style.maxWidth="none"; el.style.fontSize="12.5px";
+  el.classList.add("pdfmode");
+
+  function restore(){
+    el.style.width=prevW; el.style.maxWidth=prevMax; el.style.fontSize=prevFs;
+    el.classList.remove("pdfmode");
+  }
+
   html2pdf().set({
     margin:[10,8,12,8],
     filename:slug(RPT_TITLE)+"-"+today()+".pdf",
     image:{type:"jpeg",quality:0.98},
-    html2canvas:{scale:2,backgroundColor:"#ffffff",useCORS:true,scrollY:0},
+    html2canvas:{scale:2,backgroundColor:"#ffffff",useCORS:true,scrollY:0,
+                 windowWidth:W,width:W},
     jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},
     pagebreak:{mode:["css","legacy"]}
   }).from(el).save().then(function(){
-    if(btn){btn.disabled=false;btn.textContent="Shkarko PDF";}
+    restore();
+    setBtn("\u2b07 Shkarko PDF",false);
+    var b=document.getElementById("pdfBtn"); if(b)b.textContent="Shkarko PDF";
     toast("PDF u shkarkua");
   }).catch(function(e){
-    if(btn){btn.disabled=false;btn.textContent="Shkarko PDF";}
+    restore();
+    setBtn("\u2b07 Shkarko PDF",false);
+    var b2=document.getElementById("pdfBtn"); if(b2)b2.textContent="Shkarko PDF";
     alert("Nuk u krijua dot PDF: "+e.message);
   });
 }
