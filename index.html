@@ -83,6 +83,7 @@ details summary{cursor:pointer;color:var(--dim);font-size:13px}
 #printArea{display:none}
 #printBar{position:fixed;top:0;left:0;right:0;z-index:60;background:var(--card);
  border-bottom:1px solid var(--line);padding:10px 12px;display:flex;align-items:center;gap:10px}
+#rptInner{background:#fff;color:#111}
 body.printing #printArea{display:block;background:#fff;color:#111;
  padding:60px 14px 40px;position:absolute;top:0;left:0;right:0;min-height:100vh;z-index:55}
 body.printing header,body.printing .wrap,body.printing nav,body.printing .fab{display:none!important}
@@ -175,35 +176,24 @@ body.printing header,body.printing .wrap,body.printing nav,body.printing .fab{di
   <div id="v-home" class="view on">
 
     <div class="card" id="balCard">
-      <div class="muted">Gjendja aktuale (cash në dorë)</div>
+      <div class="muted">Gjendja ime</div>
       <div class="big" id="balV">0</div>
       <div class="muted" id="balNote" style="margin-top:2px"></div>
 
-      <div id="balBar" style="display:flex;height:12px;border-radius:99px;overflow:hidden;
+      <div id="balBar" style="display:flex;height:10px;border-radius:99px;overflow:hidden;
         background:var(--card2);margin-top:14px"></div>
-      <div id="balLeg" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:10px"></div>
 
-      <table style="width:100%;border-collapse:collapse;margin-top:14px;font-size:13.5px">
-        <tr><td style="padding:7px 0;color:var(--dim)">Arkëtuar nga borxhet</td>
-            <td style="padding:7px 0;text-align:right;color:#5ee89b;font-weight:700" id="bIn">0</td></tr>
-        <tr><td style="padding:7px 0;color:var(--dim)">Paguar borxhet e mia</td>
-            <td style="padding:7px 0;text-align:right;color:#ff8a8a;font-weight:700" id="bOut">− 0</td></tr>
-        <tr><td style="padding:7px 0;color:var(--dim)">Shpenzime</td>
-            <td style="padding:7px 0;text-align:right;color:#fcc65a;font-weight:700" id="bExp">− 0</td></tr>
-        <tr style="border-top:2px solid var(--line)">
-            <td style="padding:9px 0;font-weight:700">GJENDJA</td>
-            <td style="padding:9px 0;text-align:right;font-weight:800;font-size:16px" id="bTot">0</td></tr>
-      </table>
-
-      <div class="grid2" style="margin-top:12px">
-        <div class="stat"><div class="l">Ende për të marrë</div>
-          <div class="v" id="bWait" style="color:#8ab4ff;font-size:16px">0</div></div>
-        <div class="stat"><div class="l">Ende për të dhënë</div>
-          <div class="v" id="bOwe" style="color:#ff8a8a;font-size:16px">0</div></div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <div style="flex:1"><div style="font-size:11px;color:var(--dim)">Hyrë</div>
+          <div id="bIn" style="font-size:15px;font-weight:700;color:#5ee89b">0</div></div>
+        <div style="flex:1"><div style="font-size:11px;color:var(--dim)">Dalë</div>
+          <div id="bOut" style="font-size:15px;font-weight:700;color:#ff8a8a">0</div></div>
       </div>
-      <div class="muted" id="projNote" style="margin-top:10px;font-size:12px"></div>
 
-      <button class="btn sec full sm" style="margin-top:12px" onclick="repForm('fin')">Shkarko bilancin (PDF)</button>
+      <div id="bPend" class="muted" style="margin-top:12px;padding-top:10px;
+        border-top:1px solid var(--line);font-size:12.5px"></div>
+
+      <button class="btn sec full sm" style="margin-top:12px" onclick="repForm('fin')">Raporti në PDF</button>
     </div>
 
     <div class="card">
@@ -354,8 +344,8 @@ service cloud.firestore {
 
 <div id="printBar" style="display:none">
   <button class="btn sec sm" onclick="prnClose()">✕ Mbyll</button>
-  <div style="flex:1;text-align:center;font-size:11.5px;color:var(--dim)">Shtyp <b>Printo</b> → zgjidh <b>Save as PDF</b></div>
-  <button class="btn sm" onclick="prnGo()">Printo / PDF</button>
+  <div style="flex:1"></div>
+  <button class="btn sm" id="pdfBtn" onclick="prnGo()">Shkarko PDF</button>
 </div>
 <div id="printArea"></div>
 
@@ -368,6 +358,7 @@ service cloud.firestore {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 /* ---------- helpers ---------- */
 const $=id=>document.getElementById(id);
@@ -883,7 +874,6 @@ function renderExp(){
 
 /* ================= RENDER ================= */
 function renderHome(){
-  // Para që kanë hyrë realisht: pagesat e marra nga ata që më kanë borxh
   var cashIn=0, cashOut=0, waiting=0, owing=0;
   DEBTS.forEach(function(d){
     var paid=paidOf(d), amt=(+d.amount||0), rest=amt-paid;
@@ -891,39 +881,25 @@ function renderHome(){
     else { cashIn+=paid; if(rest>0) waiting+=rest; }
   });
   var expTot=EXP.reduce(function(s,e){return s+(+e.amount||0);},0);
-
-  // GJENDJA = para të arkëtuara − para të paguara − shpenzime
-  var bal=cashIn-cashOut-expTot;
+  var outAll=cashOut+expTot;
+  var bal=cashIn-outAll;
 
   $("balV").textContent=(bal>=0?"+":"\u2212")+fmt(Math.abs(bal));
   $("balV").style.color=bal>=0?"#5ee89b":"#ff8a8a";
   $("balNote").textContent=bal>=0?"Je n\u00eb plus":"Ke dal\u00eb me minus";
-
   $("bIn").textContent=fmt(cashIn);
-  $("bOut").textContent="\u2212 "+fmt(cashOut);
-  $("bExp").textContent="\u2212 "+fmt(expTot);
-  $("bTot").textContent=(bal>=0?"+":"\u2212")+fmt(Math.abs(bal));
-  $("bTot").style.color=bal>=0?"#5ee89b":"#ff8a8a";
+  $("bOut").textContent=fmt(outAll);
 
-  $("bWait").textContent=fmt(waiting);
-  $("bOwe").textContent=fmt(owing);
-
-  var proj=bal+waiting-owing;
-  $("projNote").textContent="Nëse arkëtohet e shlyhet gjithçka: "
-    +(proj>=0?"+":"\u2212")+fmt(Math.abs(proj));
-
-  // Shiriti: hyrje kundrejt daljeve
-  var out=cashOut+expTot;
-  var tot=cashIn+out;
+  var tot=cashIn+outAll;
   $("balBar").innerHTML=tot>0
     ? '<div style="width:'+(cashIn/tot*100)+'%;background:#22c55e"></div>'
-     +'<div style="width:'+(cashOut/tot*100)+'%;background:#ef4444"></div>'
-     +'<div style="width:'+(expTot/tot*100)+'%;background:#f59e0b"></div>'
+     +'<div style="width:'+(outAll/tot*100)+'%;background:#ef4444"></div>'
     : "";
-  $("balLeg").innerHTML=
-     '<span class="lg"><i style="background:#22c55e"></i>Hyrje '+fmt(cashIn)+'</span>'
-    +'<span class="lg"><i style="background:#ef4444"></i>Borxhe t\u00eb paguara '+fmt(cashOut)+'</span>'
-    +'<span class="lg"><i style="background:#f59e0b"></i>Shpenzime '+fmt(expTot)+'</span>';
+
+  var bits=[];
+  if(waiting>0) bits.push('P\u00ebr t\u00eb marr\u00eb <b style="color:#8ab4ff">'+fmt(waiting)+'</b>');
+  if(owing>0)   bits.push('P\u00ebr t\u00eb dh\u00ebn\u00eb <b style="color:#ff8a8a">'+fmt(owing)+'</b>');
+  $("bPend").innerHTML=bits.length?bits.join(" \u00b7 "):"Asnj\u00eb borxh i hapur.";
 }
 
 function render(){
@@ -974,10 +950,12 @@ function repForm(kind){
     </div>`);
   }
 }
+var RPT_TITLE="raport";
 function prn(title,body){
   closeM();
+  RPT_TITLE=title;
   var host=document.getElementById("printArea");
-  host.innerHTML='<div class="rpt">'+body
+  host.innerHTML='<div class="rpt" id="rptInner">'+body
     +'<div class="foot">Krijuar me '+new Date().toLocaleString("sq-AL")+' - Llogarite e Mia</div></div>';
   document.getElementById("printBar").style.display="flex";
   document.body.classList.add("printing");
@@ -990,7 +968,35 @@ function prnClose(){
   document.getElementById("printArea").innerHTML="";
   document.title="Llogarite e Mia";
 }
-function prnGo(){ window.print(); }
+function slug(t){
+  return String(t).toLowerCase()
+    .replace(/[\u00eb\u00ea]/g,"e").replace(/[\u00e7]/g,"c")
+    .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+}
+function prnGo(){
+  var el=document.getElementById("rptInner");
+  if(!el){return;}
+  var btn=document.getElementById("pdfBtn");
+  if(typeof html2pdf==="undefined"){
+    try{ window.print(); }catch(e){ alert("Nuk u ngarkua mjeti i PDF-s\u00eb. Kontrollo internetin."); }
+    return;
+  }
+  if(btn){btn.disabled=true;btn.textContent="Duke krijuar...";}
+  html2pdf().set({
+    margin:[10,8,12,8],
+    filename:slug(RPT_TITLE)+"-"+today()+".pdf",
+    image:{type:"jpeg",quality:0.98},
+    html2canvas:{scale:2,backgroundColor:"#ffffff",useCORS:true,scrollY:0},
+    jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},
+    pagebreak:{mode:["css","legacy"]}
+  }).from(el).save().then(function(){
+    if(btn){btn.disabled=false;btn.textContent="Shkarko PDF";}
+    toast("PDF u shkarkua");
+  }).catch(function(e){
+    if(btn){btn.disabled=false;btn.textContent="Shkarko PDF";}
+    alert("Nuk u krijua dot PDF: "+e.message);
+  });
+}
 
 function pdfFin(){
   const a=$("rp_a").value||"0000-01-01", b=$("rp_b").value||"9999-12-31";
@@ -1131,5 +1137,5 @@ function pdfRent(y){
 }
 go("home");
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3eba8ed2dd1ed47',t:'MTc5MDAyMDg2Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
