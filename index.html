@@ -531,6 +531,17 @@ function openAdd(){VIEW==="debt"?debtForm():expForm();}
 
 /* ================= BORXHE ================= */
 const paidOf=d=>(d.payments||[]).reduce((s,p)=>s+(+p.amount||0),0);
+/* teprica e paguar mbi shumën e borxhit */
+const creditRaw=d=>Math.max(0,paidOf(d)-(+d.amount||0));
+/* sa kredi është përdorur (mallra/shërbime të marra) */
+const creditUsed=d=>(d.uses||[]).reduce((s,u)=>s+(+u.amount||0),0);
+/* kredia që i ka mbetur */
+const creditOf=d=>Math.max(0,creditRaw(d)-creditUsed(d));
+/* shënimi i fundit i lënë për kredinë */
+function creditNote(d){
+  var ps=(d.payments||[]).filter(function(x){return x.cnote;});
+  return ps.length?ps[ps.length-1].cnote:(d.creditNote||"");
+}
 
 function debtForm(id){
   const d=DEBTS.find(x=>x.id===id)||{};
@@ -562,10 +573,18 @@ function debtSave(id){
 function debtDel(id){if(confirm("Të fshihet?")){col("debts").doc(id).delete();closeM();toast("U fshi");}}
 
 function payForm(id){
-  const d=DEBTS.find(x=>x.id===id);const rest=(d.amount||0)-paidOf(d);
+  const d=DEBTS.find(x=>x.id===id);
+  const rest=(d.amount||0)-paidOf(d);
+  const cr=creditOf(d);
   openM(`<h3>Regjistro pagesë</h3>
-  <p class="muted">${esc(d.name)} — mbetur ${fmt(rest)}</p>
-  <label>Shuma e paguar</label><input id="p_a" type="number" inputmode="decimal" value="${rest>0?rest:""}">
+  <p class="muted">${esc(d.name)} — ${rest>0?("mbetur "+fmt(rest)):("kredi "+fmt(cr))}</p>
+  <label>Shuma e paguar</label>
+  <input id="p_a" type="number" inputmode="decimal" value="${rest>0?rest:""}" oninput="payPrev('${id}')">
+  <div id="p_prev" style="margin-top:8px"></div>
+  <div id="p_cwrap" style="display:none">
+    <label>Shënim për kredinë (për çfarë mbetet)</label>
+    <input id="p_cn" value="${esc(creditNote(d))}" placeholder="p.sh. parapagim për dyqanin">
+  </div>
   <label>Mënyra e pagesës</label>
   <div class="seg" id="p_m">
     <button class="on" data-m="cash" onclick="segPick(this)">💵 Cash</button>
@@ -577,18 +596,127 @@ function payForm(id){
     <button class="btn sec" onclick="closeM()">Anulo</button>
     <button class="btn" onclick="paySave('${id}')">Shto pagesën</button>
   </div>`);
+  payPrev(id);
 }
+
+/* tregon sa mbulon borxhin dhe sa mbetet kredi */
+function payPrev(id){
+  var d=DEBTS.find(function(x){return x.id===id;});
+  var a=+$("p_a").value||0;
+  var rest=Math.max(0,(d.amount||0)-paidOf(d));
+  var cover=Math.min(a,rest), extra=a-cover;
+  var box=$("p_prev"), cw=$("p_cwrap");
+  if(!a){ box.innerHTML=""; cw.style.display=creditOf(d)>0?"block":"none"; return; }
+  var html="";
+  if(cover>0) html+='<div class="muted">Mbulon borxhin: <b style="color:#5ee89b">'+fmt(cover)+'</b></div>';
+  if(extra>0){
+    html+='<div style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.35);'
+      +'border-radius:10px;padding:9px;margin-top:6px;font-size:13px">'
+      +'⭐ Teprica <b style="color:#8ab4ff">'+fmt(extra)+'</b> ruhet si <b>kredi</b> për më vonë.</div>';
+  }
+  box.innerHTML=html;
+  cw.style.display=(extra>0||creditOf(d)>0)?"block":"none";
+}
+
 function segPick(b){b.parentNode.querySelectorAll("button").forEach(x=>x.classList.remove("on"));b.classList.add("on");}
 function paySave(id){
   const a=+$("p_a").value||0;if(!a){alert("Vendos shumën.");return;}
   const m=$("p_m").querySelector(".on").dataset.m;
   const d=DEBTS.find(x=>x.id===id);
-  const ps=[...(d.payments||[]),{amount:a,method:m,date:$("p_d").value,note:$("p_no").value.trim(),ts:Date.now()}];
-  col("debts").doc(id).update({payments:ps});closeM();toast("Pagesa u shtua");
+  const rest=Math.max(0,(d.amount||0)-paidOf(d));
+  const extra=Math.max(0,a-rest);
+  const cn=$("p_cn")?$("p_cn").value.trim():"";
+  const rec={amount:a,method:m,date:$("p_d").value,note:$("p_no").value.trim(),ts:Date.now()};
+  if(extra>0){ rec.credit=extra; if(cn) rec.cnote=cn; }
+  const ps=[...(d.payments||[]),rec];
+  const upd={payments:ps};
+  if(cn) upd.creditNote=cn;
+  col("debts").doc(id).update(upd);
+  closeM();
+  toast(extra>0?("Kredi "+fmt(extra)):"Pagesa u shtua");
 }
-function payDel(id,ts){
-  const d=DEBTS.find(x=>x.id===id);
-  col("debts").doc(id).update({payments:(d.payments||[]).filter(p=>p.ts!==ts)});toast("Pagesa u hoq");
+
+/* ndrysho vetëm shënimin e kredisë */
+function creditForm(id){
+  var d=DEBTS.find(function(x){return x.id===id;});
+  var raw=creditRaw(d), used=creditUsed(d), left=creditOf(d);
+  var hist=(d.uses||[]).slice().sort(function(a,b){return b.ts-a.ts;}).map(function(u){
+    return '<div class="pay"><span>'+(u.date||"")+(u.note?' \u00b7 '+esc(u.note):'')
+      +'</span><span><b>\u2212'+fmt(u.amount)+'</b> '
+      +'<a onclick="useDel(\''+id+'\','+u.ts+')" style="color:#ff8a8a;cursor:pointer">\u2715</a></span></div>';
+  }).join("");
+
+  openM('<h3>Kredi \u00b7 '+esc(d.name)+'</h3>'
+  +'<div style="background:var(--card2);border-radius:12px;padding:12px;margin-top:8px">'
+  +'<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0">'
+  +'<span class="muted">Kredi gjithsej</span><b>'+fmt(raw)+'</b></div>'
+  +'<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0">'
+  +'<span class="muted">P\u00ebrdorur</span><b style="color:#ff8a8a">\u2212'+fmt(used)+'</b></div>'
+  +'<div style="display:flex;justify-content:space-between;font-size:15px;padding:7px 0 0;'
+  +'margin-top:5px;border-top:1px solid var(--line)">'
+  +'<b>I mbetur</b><b style="color:#8ab4ff">'+fmt(left)+'</b></div></div>'
+
+  +(left>0
+    ? '<label>Mori nj\u00eb mall / sh\u00ebrbim \u2014 zbrit nga kredia</label>'
+      +'<input id="u_a" type="number" inputmode="decimal" placeholder="sa kushtoi" '
+      +'value="'+left+'" oninput="usePrev(\''+id+'\')">'
+      +'<div id="u_prev" class="muted" style="margin-top:6px;font-size:12.5px"></div>'
+      +'<label>\u00c7far\u00eb mori</label>'
+      +'<input id="u_no" placeholder="p.sh. 2 kg kafe">'
+      +'<label>Data</label><input id="u_d" type="date" value="'+today()+'">'
+      +'<button class="btn full" style="margin-top:14px" onclick="useSave(\''+id+'\')">'
+      +'Zbrit nga kredia</button>'
+    : '<p class="muted" style="margin-top:12px">Kredia \u00ebsht\u00eb shterur.</p>')
+
+  +(hist?'<div style="margin-top:16px"><div class="muted" style="font-weight:700;margin-bottom:4px">'
+    +'Historiku i p\u00ebrdorimit</div>'+hist+'</div>':'')
+
+  +'<label style="margin-top:16px">Sh\u00ebnim p\u00ebr kredin\u00eb</label>'
+  +'<input id="c_n" value="'+esc(creditNote(d))+'" placeholder="p.sh. parapagim p\u00ebr dyqanin">'
+  +'<div class="row" style="margin-top:14px">'
+  +'<button class="btn sec" onclick="closeM()">Mbyll</button>'
+  +'<button class="btn sec" onclick="creditSave(\''+id+'\')">Ruaj sh\u00ebnimin</button></div>');
+  if(left>0) usePrev(id);
+}
+
+function usePrev(id){
+  var d=DEBTS.find(function(x){return x.id===id;});
+  var left=creditOf(d), a=+$("u_a").value||0;
+  var el=$("u_prev"); if(!el) return;
+  if(!a){ el.innerHTML=""; return; }
+  if(a>left){
+    el.innerHTML='<span style="color:#fcc65a">Kredia mbulon vet\u00ebm '+fmt(left)
+      +'. Do t\u00eb zbritet kaq.</span>';
+  }else{
+    el.innerHTML='Mbetet <b style="color:#8ab4ff">'+fmt(left-a)+'</b> kredi.';
+  }
+}
+
+function useSave(id){
+  var d=DEBTS.find(function(x){return x.id===id;});
+  var left=creditOf(d);
+  var a=+$("u_a").value||0;
+  if(!a){ alert("Vendos sa kushtoi."); return; }
+  if(a>left) a=left;
+  var us=(d.uses||[]).slice();
+  us.push({amount:a,note:$("u_no").value.trim(),date:$("u_d").value,ts:Date.now()});
+  var upd={uses:us};
+  var cn=$("c_n")?$("c_n").value.trim():"";
+  if(cn) upd.creditNote=cn;
+  col("debts").doc(id).update(upd);
+  closeM();
+  toast("U zbrit "+fmt(a));
+}
+
+function useDel(id,ts){
+  var d=DEBTS.find(function(x){return x.id===id;});
+  col("debts").doc(id).update({uses:(d.uses||[]).filter(function(u){return u.ts!==ts;})});
+  closeM(); toast("U hoq");
+}
+
+function creditSave(id){
+  col("debts").doc(id).update({creditNote:$("c_n").value.trim()});
+  closeM();toast("U ruajt");
 }
 
 function renderDebts(){
@@ -596,7 +724,10 @@ function renderDebts(){
     .sort((a,b)=>(b.date||"").localeCompare(a.date||""));
   $("debtList").innerHTML=list.length?list.map(d=>{
     const p=paidOf(d),rest=(d.amount||0)-p,full=rest<=0,pct=Math.min(100,(d.amount?p/d.amount*100:0));
-    const tag=full?'<span class="tag t-ok">PAGUAR</span>':p>0?'<span class="tag t-part">PJESËRISHT</span>':'<span class="tag t-no">PAPAGUAR</span>';
+    const cr=creditOf(d);
+    const tag=cr>0?'<span class="tag t-info">KREDI</span>'
+      :full?'<span class="tag t-ok">PAGUAR</span>'
+      :p>0?'<span class="tag t-part">PJESËRISHT</span>':'<span class="tag t-no">PAPAGUAR</span>';
     return `<div class="item">
       <div class="top">
         <div><div class="name">${esc(d.name)}</div>
@@ -604,9 +735,18 @@ function renderDebts(){
         ${d.note?`<div class="muted" style="margin-top:3px">📝 ${esc(d.note)}</div>`:""}</div>
         <div style="text-align:right">${tag}
           <div style="font-weight:800;font-size:17px;margin-top:5px">${fmt(d.amount)}</div>
-          ${!full?`<div class="muted">mbetur ${fmt(rest)}</div>`:""}</div>
+          ${!full?`<div class="muted">mbetur ${fmt(rest)}</div>`:""}
+          ${cr>0?`<div class="muted" style="color:#8ab4ff">kredi ${fmt(cr)}</div>`:""}</div>
       </div>
       <div class="bar"><i style="width:${pct}%"></i></div>
+      ${(cr>0||creditUsed(d)>0)?`<div onclick="event.stopPropagation();creditForm('${d.id}')"
+        style="margin-top:9px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);
+        border-radius:10px;padding:8px 10px;cursor:pointer;display:flex;
+        justify-content:space-between;align-items:center;gap:8px">
+        <span style="font-size:12.5px">⭐ ${cr>0?"Kredi për më vonë":"Kredia u shterua"}
+          ${creditNote(d)?`<br><span class="muted">${esc(creditNote(d))}</span>`:""}
+          ${creditUsed(d)>0?`<br><span class="muted">përdorur ${fmt(creditUsed(d))} nga ${fmt(creditRaw(d))}</span>`:`<br><span class="muted">shtyp për ta përdorur</span>`}</span>
+        <b style="color:${cr>0?"#8ab4ff":"var(--dim)"};white-space:nowrap">${fmt(cr)}</b></div>`:""}
       ${(d.payments||[]).length?`<details style="margin-top:9px"><summary>${d.payments.length} pagesa · ${fmt(p)}</summary>
         ${d.payments.sort((x,y)=>y.ts-x.ts).map(x=>`<div class="pay">
           <span>${x.method==="bank"?"🏦 Bankë":"💵 Cash"} · ${x.date||""}${x.note?" · "+esc(x.note):""}</span>
@@ -951,9 +1091,11 @@ function renderHome(){
      +'<div style="width:'+(outAll/tot*100)+'%;background:#ef4444"></div>'
     : "";
 
+  var credit=DEBTS.reduce(function(s,d){return s+creditOf(d);},0);
   var bits=[];
   if(waiting>0) bits.push('P\u00ebr t\u00eb marr\u00eb <b style="color:#8ab4ff">'+fmt(waiting)+'</b>');
   if(owing>0)   bits.push('P\u00ebr t\u00eb dh\u00ebn\u00eb <b style="color:#ff8a8a">'+fmt(owing)+'</b>');
+  if(credit>0)  bits.push('Kredi <b style="color:#8ab4ff">'+fmt(credit)+'</b>');
   $("bPend").innerHTML=bits.length?bits.join(" \u00b7 "):"Asnj\u00eb borxh i hapur.";
 }
 
@@ -1093,17 +1235,21 @@ function pdfFin(){
   const proj=bal+inRest-outRest;
 
   const st=d=>{const r=(d.amount||0)-paidOf(d);
+    if(creditOf(d)>0) return '<span class="pill">KREDI</span>';
     return r<=0?'<span class="pill">PAGUAR</span>':paidOf(d)>0?'<span class="pill">PJESËRISHT</span>':'<span class="pill">PAPAGUAR</span>';};
   const meth=d=>{const m=[...new Set((d.payments||[]).map(p=>p.method))];
     return m.length?m.map(x=>x==="bank"?"Bankë":"Cash").join(", "):"—";};
-  const tbl=(l,lbl)=>l.length?`<table><tr><th>Emri</th><th>Data</th><th>Mënyra</th><th>Statusi</th><th class="r">Shuma</th><th class="r">Paguar</th><th class="r">Mbetur</th></tr>
+  const tbl=(l,lbl)=>l.length?`<table><tr><th>Emri</th><th>Data</th><th>Mënyra</th><th>Statusi</th><th class="r">Shuma</th><th class="r">Paguar</th><th class="r">Mbetur</th><th class="r">Kredi</th></tr>
     ${l.sort((x,y)=>(x.date||"").localeCompare(y.date||"")).map(d=>`<tr><td><b>${esc(d.name)}</b>${d.note?`<br><small>${esc(d.note)}</small>`:""}</td>
       <td>${d.date||""}</td><td>${meth(d)}</td><td>${st(d)}</td>
-      <td class="r">${fmt(d.amount)}</td><td class="r">${fmt(paidOf(d))}</td><td class="r"><b>${fmt(Math.max(0,(d.amount||0)-paidOf(d)))}</b></td></tr>`).join("")}
-    <tr class="tot"><td colspan="4">${lbl}</td><td class="r">${fmt(sum(l,d=>+d.amount||0))}</td><td class="r">${fmt(sum(l,paidOf))}</td><td class="r">${fmt(sum(l,d=>Math.max(0,(d.amount||0)-paidOf(d))))}</td></tr></table>`
+      <td class="r">${fmt(d.amount)}</td><td class="r">${fmt(paidOf(d))}</td><td class="r"><b>${fmt(Math.max(0,(d.amount||0)-paidOf(d)))}</b></td>
+      <td class="r">${creditOf(d)>0?fmt(creditOf(d)):"—"}</td></tr>`).join("")}
+    <tr class="tot"><td colspan="4">${lbl}</td><td class="r">${fmt(sum(l,d=>+d.amount||0))}</td><td class="r">${fmt(sum(l,paidOf))}</td><td class="r">${fmt(sum(l,d=>Math.max(0,(d.amount||0)-paidOf(d))))}</td><td class="r">${fmt(sum(l,creditOf))}</td></tr></table>`
     :`<p><small>Asnjë zë.</small></p>`;
 
   const cats={};E.forEach(e=>cats[e.cat||"Tjetër"]=(cats[e.cat||"Tjetër"]||0)+(+e.amount||0));
+  const CRED=D.filter(d=>creditRaw(d)>0);
+  const credTot=CRED.reduce((s,d)=>s+creditOf(d),0);
 
   prn("Bilanci financiar",`
   <h1>Bilanc financiar — Borxhe dhe Shpenzime</h1>
@@ -1130,6 +1276,18 @@ function pdfFin(){
 
   <h2>1. Më kanë borxh mua (${IN.length})</h2>${tbl(IN,"TOTALI")}
   <h2>2. Kam borxh unë (${OUT.length})</h2>${tbl(OUT,"TOTALI")}
+
+  ${CRED.length?`<h2>Kredi / parapagime (${CRED.length})</h2>
+   <table><tr><th>Emri</th><th>Për çfarë</th><th class="r">Gjithsej</th><th class="r">Përdorur</th><th class="r">Mbetur</th></tr>
+   ${CRED.map(d=>`<tr><td><b>${esc(d.name)}</b>${(d.uses||[]).length?`<br><small>${d.uses.map(u=>esc((u.date||"")+(u.note?" "+u.note:""))+" −"+fmt(u.amount)).join("<br>")}</small>`:""}</td>
+     <td>${esc(creditNote(d)||"—")}</td>
+     <td class="r">${fmt(creditRaw(d))}</td>
+     <td class="r">${creditUsed(d)>0?fmt(creditUsed(d)):"—"}</td>
+     <td class="r"><b>${fmt(creditOf(d))}</b></td></tr>`).join("")}
+   <tr class="tot"><td colspan="2">TOTALI</td>
+     <td class="r">${fmt(CRED.reduce((s,d)=>s+creditRaw(d),0))}</td>
+     <td class="r">${fmt(CRED.reduce((s,d)=>s+creditUsed(d),0))}</td>
+     <td class="r">${fmt(credTot)}</td></tr></table>`:""}
 
   <h2>3. Shpenzimet (${E.length})</h2>
   ${E.length?`<table><tr><th>Përshkrimi</th><th>Kategoria</th><th>Data</th><th>Mënyra</th><th class="r">Shuma</th></tr>
@@ -1213,5 +1371,5 @@ function pdfRent(y){
 }
 go("home");
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a434eb31082df474',t:'MTc5MDc4OTA0MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
