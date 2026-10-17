@@ -57,6 +57,48 @@ nav button{flex:1;background:none;border:0;color:var(--dim);font-size:10.5px;fon
 nav button .ic{font-size:20px;line-height:1}
 nav button.on{color:var(--acc)}
 .view{display:none}.view.on{display:block}
+
+/* Borxhet: ndarje e qarte sipas drejtimit */
+.debt-type-switch{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.debt-type-tab{min-width:0;min-height:91px;text-align:left;display:flex;flex-direction:column;
+  justify-content:space-between;gap:5px;padding:10px 11px;border:1px solid var(--line);
+  border-radius:14px;background:var(--card);color:var(--txt);cursor:pointer}
+.debt-type-tab .kicker{font-size:10px;font-weight:800;letter-spacing:.35px;color:var(--dim)}
+.debt-type-tab strong{font-size:15px;line-height:1.15;display:block}
+.debt-type-tab .summary{font-size:11.5px;line-height:1.25;color:var(--dim)}
+.debt-type-tab .summary b{color:var(--txt);font-size:12px}
+.debt-type-tab.on.in{background:rgba(59,130,246,.14);border-color:rgba(59,130,246,.65)}
+.debt-type-tab.on.in strong{color:#8ab4ff}
+.debt-type-tab.on.out{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.55)}
+.debt-type-tab.on.out strong{color:#ff9c9c}
+.debt-filter-label{font-size:12px;font-weight:700;margin:0 2px 6px}
+.debt-direction{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:5px}
+.debt-kind{display:inline-flex;align-items:center;border-radius:999px;padding:4px 7px;
+  font-size:10.5px;font-weight:800;letter-spacing:.15px;line-height:1.2}
+.debt-kind.in{background:rgba(59,130,246,.15);color:#9cc2ff}
+.debt-kind.out{background:rgba(239,68,68,.15);color:#ffaaaa}
+
+/* Shënimet dhe dosjet */
+.notes-intro{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.notes-intro h2{font-size:17px}
+.notes-cloud{margin-top:9px;font-size:12px;color:var(--dim);line-height:1.4}
+.folder-card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
+.folder-open{width:100%;min-width:0;display:flex;align-items:center;gap:11px;padding:14px;
+  border:0;background:transparent;color:var(--txt);text-align:left;font:inherit;cursor:pointer}
+.folder-icon{font-size:25px;line-height:1}
+.folder-info{flex:1;min-width:0}
+.folder-info b{display:block;font-size:15px;overflow-wrap:anywhere}
+.folder-info small{display:block;color:var(--dim);font-size:12px;margin-top:3px}
+.folder-arrow{font-size:24px;color:var(--dim);line-height:1}
+.note-preview{white-space:pre-wrap;overflow-wrap:anywhere;max-height:112px;overflow:hidden;
+  color:var(--dim);font-size:13.5px;line-height:1.45;margin-top:8px}
+.note-date{font-size:11.5px;color:var(--dim);margin-top:3px}
+@media(max-width:390px){
+  nav button{font-size:9.5px;padding-left:1px;padding-right:1px}
+  nav button .ic{font-size:19px}
+  .debt-type-tab{padding:9px;min-height:88px}
+  .debt-type-tab strong{font-size:14px}
+}
 .item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
 .item .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .name{font-weight:700;font-size:16px}
@@ -160,7 +202,20 @@ body.printing #pdfFab{display:block}
 .rpt .g .v{font-size:15px;font-weight:700;margin-top:2px}
 .rpt .pos{color:#0a7a35}.rpt .neg{color:#b3261e}
 .rpt .pill{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:9px;border:1px solid #bbb;color:#333}
-.rpt .foot{margin-top:22px;color:#888;font-size:10px;border-top:1px solid #ddd;padding-top:6px}
+.rpt .rent-status-paid{background:#e8f5ec;border-color:#8ac69a;color:#176b36}
+.rpt .rent-status-partial{background:#fff4d6;border-color:#e7c35d;color:#795600}
+.rpt .rent-status-due{background:#fdebed;border-color:#e49aa0;color:#9d1f2a}
+.rpt .rent-status-before{background:#eaf2ff;border-color:#aac4ef;color:#315a91}
+.rpt .rent-status-empty{background:#f1f3f6;border-color:#c9cdd4;color:#555}
+.rpt tr.rent-pay-head td{background:#e8f1ff;color:#173e72;border-top:2px solid #3474c4;font-weight:700;page-break-after:avoid;break-after:avoid}
+.rpt tr.rent-pay-month td{background:#f7faff}
+.rpt .rent-month-label{color:#155ba6;font-weight:700}
+.rpt .rent-method{display:inline-block;border-radius:10px;padding:2px 6px;font-size:9px;font-weight:700}
+.rpt .rent-method-cash{background:#fff1cf;color:#765000}
+.rpt .rent-method-bank{background:#dff2ff;color:#075487}
+.rpt.rent-report.pdfmode td.r{padding-right:12px!important}
+.rpt.rent-report.pdfmode th:last-child{padding-right:12px!important}
+.rpt .foot{ margin-top:22px;color:#888;font-size:10px;border-top:1px solid #ddd;padding-top:6px}
 .rpt small{color:#666}
 @media print{
   @page{size:A4;margin:12mm}
@@ -274,9 +329,23 @@ body.printing #pdfFab{display:block}
 
   <!-- BORXHE -->
   <div id="v-debt" class="view">
-    <div class="seg" style="margin-bottom:12px">
-      <button class="on" data-f="open" onclick="fDebt('open',this)">Papaguar</button>
-      <button data-f="paid" onclick="fDebt('paid',this)">Paguar</button>
+    <div class="muted" style="font-weight:700;margin:0 2px 7px">Zgjidh cilat borxhe dëshiron të shohësh:</div>
+    <div class="debt-type-switch" role="group" aria-label="Ndarja e borxheve">
+      <button type="button" id="debtTypeIn" class="debt-type-tab on in" aria-pressed="true" onclick="setDebtType('in')">
+        <span class="kicker">TË MË PAGUAJNË</span>
+        <strong>Më kanë borxh mua</strong>
+        <span class="summary"><b id="debtInTotal">0 LEK</b> · <span id="debtInCount">0 borxhe të hapura</span></span>
+      </button>
+      <button type="button" id="debtTypeOut" class="debt-type-tab out" aria-pressed="false" onclick="setDebtType('out')">
+        <span class="kicker">UNË PAGUAJ</span>
+        <strong>Unë u kam borxh</strong>
+        <span class="summary"><b id="debtOutTotal">0 LEK</b> · <span id="debtOutCount">0 borxhe të hapura</span></span>
+      </button>
+    </div>
+    <div class="debt-filter-label muted">Statusi i pagesës</div>
+    <div class="seg" id="debtStatusTabs" style="margin-bottom:12px">
+      <button class="on" data-f="open" onclick="fDebt('open',this)">Të papaguara</button>
+      <button data-f="paid" onclick="fDebt('paid',this)">Të paguara</button>
       <button data-f="all" onclick="fDebt('all',this)">Të gjitha</button>
     </div>
     <div id="debtList"></div>
@@ -344,6 +413,11 @@ body.printing #pdfFab{display:block}
     <button class="btn sec full sm" style="margin:4px 0 12px" onclick="repForm('fin')">📄 Shkarko bilancin (PDF)</button>
   </div>
 
+  <!-- SHËNIME -->
+  <div id="v-notes" class="view">
+    <div id="notesArea"></div>
+  </div>
+
   <!-- CILËSIME -->
   <div id="v-set" class="view">
     <div class="card">
@@ -388,10 +462,11 @@ service cloud.firestore {
 <button class="fab" id="fab" onclick="openAdd()">+</button>
 
 <nav>
-  <button class="on" data-v="home" onclick="go('home')"><span class="ic">📊</span>Përmbledhje</button>
+  <button class="on" data-v="home" onclick="go('home')"><span class="ic">📊</span>Kreu</button>
   <button data-v="debt" onclick="go('debt')"><span class="ic">🤝</span>Borxhe</button>
   <button data-v="rent" onclick="go('rent')"><span class="ic">🏠</span>Qiraja</button>
   <button data-v="exp" onclick="go('exp')"><span class="ic">🧾</span>Shpenzime</button>
+  <button data-v="notes" onclick="go('notes')"><span class="ic">📝</span>Shënime</button>
   <button data-v="set" onclick="go('set')"><span class="ic">⚙️</span>Cilësime</button>
 </nav>
 </div>
@@ -493,9 +568,9 @@ function doAuth(){
 function logout(){auth.signOut();}
 
 /* ---------- state ---------- */
-let DEBTS=[],RENT=[],EXP=[],SET={currency:"LEK",rent:0};
+let DEBTS=[],RENT=[],EXP=[],FOLDERS=[],NOTES=[],SET={currency:"LEK",rent:0};
 let YEAR=new Date().getFullYear(), MIDX=new Date().getMonth(), MYEAR=new Date().getFullYear();
-let VIEW="home", DF="open";
+let VIEW="home", DF="open", DTYPE="in", OPEN_FOLDER_ID=null;
 const col=n=>db.collection("users").doc(UID).collection(n);
 
 function start(){
@@ -508,6 +583,8 @@ function start(){
   col("debts").onSnapshot(s=>{DEBTS=s.docs.map(d=>({id:d.id,...d.data()}));render();});
   col("rent").onSnapshot(s=>{RENT=s.docs.map(d=>({id:d.id,...d.data()}));render();});
   col("expenses").onSnapshot(s=>{EXP=s.docs.map(d=>({id:d.id,...d.data()}));render();});
+  col("noteFolders").onSnapshot(s=>{FOLDERS=s.docs.map(d=>({id:d.id,...d.data()}));render();});
+  col("notes").onSnapshot(s=>{NOTES=s.docs.map(d=>({id:d.id,...d.data()}));render();});
 }
 
 /* ---------- nav ---------- */
@@ -516,11 +593,13 @@ function go(v){
   document.querySelectorAll(".view").forEach(e=>e.classList.remove("on"));
   $("v-"+v).classList.add("on");
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
-  $("title").textContent={home:"Përmbledhje",debt:"Borxhe",rent:"Qiraja e shtëpisë",exp:"Shpenzime",set:"Cilësime"}[v];
+  $("title").textContent={home:"Përmbledhje",debt:"Borxhe",rent:"Qiraja e shtëpisë",exp:"Shpenzime",notes:"Shënime",set:"Cilësime"}[v];
   $("fab").style.display=(v==="debt"||v==="exp")?"block":"none";
+  if(v==="notes")renderNotes();
   window.scrollTo(0,0);
 }
 function fDebt(f,b){DF=f;b.parentNode.querySelectorAll("button").forEach(x=>x.classList.remove("on"));b.classList.add("on");renderDebts();}
+function setDebtType(t){DTYPE=t==="out"?"out":"in";renderDebts();}
 function chYear(d){YEAR+=d;renderRent();}
 function chMon(d){MIDX+=d;if(MIDX>11){MIDX=0;MYEAR++}if(MIDX<0){MIDX=11;MYEAR--}renderExp();}
 
@@ -544,15 +623,15 @@ function creditNote(d){
 }
 
 function debtForm(id){
-  const d=DEBTS.find(x=>x.id===id)||{};
+  const d=DEBTS.find(x=>x.id===id)||{type:DTYPE};
   openM(`<h3>${id?"Ndrysho borxhin":"Borxh i ri"}</h3>
-  <p class="muted">Dikush që të ka borxh ty, ose që i ke borxh ti.</p>
+  <p class="muted">Regjistro qartë kush duhet të paguajë kë.</p>
   <label>Emri i personit</label><input id="f_n" value="${esc(d.name||"")}" placeholder="p.sh. Arben">
   <label>Shuma</label><input id="f_a" type="number" inputmode="decimal" value="${d.amount||""}" placeholder="0">
-  <label>Lloji</label>
+  <label>Lloji i borxhit — zgjidh drejtimin</label>
   <select id="f_t">
-    <option value="in" ${d.type!=="out"?"selected":""}>Më ka borxh mua</option>
-    <option value="out" ${d.type==="out"?"selected":""}>I kam borxh unë</option>
+    <option value="in" ${d.type!=="out"?"selected":""}>Më kanë borxh mua (duhet të marr)</option>
+    <option value="out" ${d.type==="out"?"selected":""}>Unë u kam borxh (duhet të paguaj)</option>
   </select>
   <label>Data</label><input id="f_d" type="date" value="${d.date||today()}">
   <label>Shënim</label><input id="f_no" value="${esc(d.note||"")}" placeholder="opsionale">
@@ -719,20 +798,47 @@ function creditSave(id){
   closeM();toast("U ruajt");
 }
 
+function renderDebtSwitch(){
+  var incoming=DEBTS.filter(function(d){return d.type!=="out";});
+  var outgoing=DEBTS.filter(function(d){return d.type==="out";});
+  function stats(list){
+    var open=list.filter(function(d){return (+d.amount||0)>paidOf(d);});
+    return {count:open.length,total:open.reduce(function(sum,d){
+      return sum+Math.max(0,(+d.amount||0)-paidOf(d));
+    },0)};
+  }
+  var a=stats(incoming), b=stats(outgoing);
+  $("debtInTotal").textContent=fmt(a.total);
+  $("debtInCount").textContent=a.count===1?"1 borxh i hapur":a.count+" borxhe të hapura";
+  $("debtOutTotal").textContent=fmt(b.total);
+  $("debtOutCount").textContent=b.count===1?"1 borxh i hapur":b.count+" borxhe të hapura";
+  $("debtTypeIn").classList.toggle("on",DTYPE!=="out");
+  $("debtTypeOut").classList.toggle("on",DTYPE==="out");
+  $("debtTypeIn").setAttribute("aria-pressed",DTYPE!=="out"?"true":"false");
+  $("debtTypeOut").setAttribute("aria-pressed",DTYPE==="out"?"true":"false");
+}
+
 function renderDebts(){
-  const list=DEBTS.filter(d=>{const p=paidOf(d)>=(d.amount||0);return DF==="all"||(DF==="paid"?p:!p);})
-    .sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  renderDebtSwitch();
+  const list=DEBTS.filter(d=>{
+    const sameType=DTYPE==="out"?d.type==="out":d.type!=="out";
+    const paid=paidOf(d)>=(d.amount||0);
+    return sameType&&(DF==="all"||(DF==="paid"?paid:!paid));
+  }).sort((a,b)=>(b.date||"").localeCompare(a.date||""));
   $("debtList").innerHTML=list.length?list.map(d=>{
     const p=paidOf(d),rest=(d.amount||0)-p,full=rest<=0,pct=Math.min(100,(d.amount?p/d.amount*100:0));
     const cr=creditOf(d);
+    const direction=d.type==="out"?"out":"in";
+    const directionText=d.type==="out"?"UNË U KAM BORXH":"MË KANË BORXH MUA";
     const tag=cr>0?'<span class="tag t-info">KREDI</span>'
       :full?'<span class="tag t-ok">PAGUAR</span>'
       :p>0?'<span class="tag t-part">PJESËRISHT</span>':'<span class="tag t-no">PAPAGUAR</span>';
     return `<div class="item">
       <div class="top">
         <div><div class="name">${esc(d.name)}</div>
-        <div class="muted">${d.type==="out"?"I kam borxh unë":"Më ka borxh"} · ${d.date||""}</div>
-        ${d.note?`<div class="muted" style="margin-top:3px">📝 ${esc(d.note)}</div>`:""}</div>
+        <div class="debt-direction"><span class="debt-kind ${direction}">${directionText}</span>
+          <span class="muted" style="font-size:12px">${esc(d.date||"")}</span></div>
+        ${d.note?`<div class="muted" style="margin-top:5px">📝 ${esc(d.note)}</div>`:""}</div>
         <div style="text-align:right">${tag}
           <div style="font-weight:800;font-size:17px;margin-top:5px">${fmt(d.amount)}</div>
           ${!full?`<div class="muted">mbetur ${fmt(rest)}</div>`:""}
@@ -748,7 +854,7 @@ function renderDebts(){
           ${creditUsed(d)>0?`<br><span class="muted">përdorur ${fmt(creditUsed(d))} nga ${fmt(creditRaw(d))}</span>`:`<br><span class="muted">shtyp për ta përdorur</span>`}</span>
         <b style="color:${cr>0?"#8ab4ff":"var(--dim)"};white-space:nowrap">${fmt(cr)}</b></div>`:""}
       ${(d.payments||[]).length?`<details style="margin-top:9px"><summary>${d.payments.length} pagesa · ${fmt(p)}</summary>
-        ${d.payments.sort((x,y)=>y.ts-x.ts).map(x=>`<div class="pay">
+        ${d.payments.slice().sort((x,y)=>y.ts-x.ts).map(x=>`<div class="pay">
           <span>${x.method==="bank"?"🏦 Bankë":"💵 Cash"} · ${x.date||""}${x.note?" · "+esc(x.note):""}</span>
           <span><b>${fmt(x.amount)}</b> <a onclick="payDel('${d.id}',${x.ts})" style="color:#ff8a8a;cursor:pointer">✕</a></span>
         </div>`).join("")}</details>`:""}
@@ -756,7 +862,8 @@ function renderDebts(){
         ${!full?`<button class="btn sm" onclick="payForm('${d.id}')">+ Pagesë</button>`:""}
         <button class="btn sec sm" onclick="debtForm('${d.id}')">Ndrysho</button>
       </div></div>`;
-  }).join(""):`<div class="empty">Asnjë borxh këtu.<br>Shtyp <b>+</b> për të shtuar.</div>`;
+  }).join(""):`<div class="empty">${DF==="open"?"Nuk ka borxhe të hapura në këtë ndarje.":DF==="paid"?"Nuk ka borxhe të paguara në këtë ndarje.":"Nuk ka borxhe të regjistruara në këtë ndarje."}<br>
+      <button class="btn sm" style="margin-top:12px" onclick="debtForm()">+ Shto në këtë ndarje</button></div>`;
 }
 
 /* ================= QIRAJA ================= */
@@ -836,7 +943,12 @@ function rentSave(k){
   const r=RENT.find(x=>x.id===k);
   const due=+$("r_due").value||0, a=+$("r_a").value||0;
   const ps=[...(r?.payments||[])];
-  if(a>0)ps.push({amount:a,method:$("r_m").querySelector(".on").dataset.m,date:$("r_d").value,note:$("r_no").value.trim(),ts:Date.now()});
+  if(a>0){
+    const ts=Date.now();
+    const groupId="rent-"+ts+"-"+Math.random().toString(36).slice(2,8);
+    ps.push({amount:a,method:$("r_m").querySelector(".on").dataset.m,date:$("r_d").value,
+      note:$("r_no").value.trim(),ts:ts,groupId:groupId});
+  }
   col("rent").doc(k).set({amount:due,payments:ps},{merge:true});closeM();toast("U ruajt");
 }
 function rentPayDel(k,ts){
@@ -917,12 +1029,13 @@ async function bulkSave(){
   if(!res.plan.length){alert("Nuk ka muaj p\u00ebr t\u00eb mbuluar.");return;}
   var meth=$("b_m").querySelector(".on").dataset.m;
   var dt=$("b_d").value, no=$("b_no").value.trim(), ts=Date.now();
+  var groupId="rent-bulk-"+ts+"-"+Math.random().toString(36).slice(2,8);
   var batch=db.batch();
   res.plan.forEach(function(x,i){
     var r=RENT.find(function(q){return q.id===x.key;});
     var ps=(r&&r.payments?r.payments.slice():[]);
     ps.push({amount:x.pay,method:meth,date:dt,
-      note:no||(res.plan.length>1?"pages\u00eb e p\u00ebrbashk\u00ebt":""),ts:ts+i});
+      note:no||(res.plan.length>1?"pages\u00eb e p\u00ebrbashk\u00ebt":""),ts:ts+i,groupId:groupId});
     batch.set(col("rent").doc(x.key),{amount:x.due,payments:ps},{merge:true});
   });
   await batch.commit();
@@ -1067,6 +1180,122 @@ function renderExp(){
     :`<div class="empty">Asnjë shpenzim këtë muaj.</div>`);
 }
 
+/* ================= SHËNIME ================= */
+function notesOpenFolder(id){OPEN_FOLDER_ID=id;renderNotes();window.scrollTo(0,0);}
+function notesBack(){OPEN_FOLDER_ID=null;renderNotes();}
+function notesDate(value){
+  var d=value&&typeof value.toDate==="function"?value.toDate():new Date(+value||0);
+  return Number.isNaN(d.getTime())?"":d.getDate()+" "+MON[d.getMonth()]+" "+d.getFullYear();
+}
+
+function folderForm(id){
+  var f=FOLDERS.find(function(x){return x.id===id;})||{};
+  openM(`<h3>${id?"Ndrysho dosjen":"Dosje e re"}</h3>
+    <p class="muted">Dosjet të ndihmojnë t'i organizosh shënimet sipas temës.</p>
+    <label>Emri i dosjes</label><input id="folder_name" value="${esc(f.name||"")}" placeholder="p.sh. Ide, Punë, Shtëpi">
+    <div class="row" style="margin-top:16px">
+      <button class="btn sec" onclick="closeM()">Anulo</button>
+      <button class="btn" onclick="folderSave('${id||""}')">Ruaj dosjen</button>
+    </div>`);
+}
+function folderSave(id){
+  var name=$("folder_name").value.trim();
+  if(!name){alert("Shkruaj emrin e dosjes.");return;}
+  var now=Date.now(), data={name:name,updatedAt:now};
+  var write=id?col("noteFolders").doc(id).update(data)
+              :col("noteFolders").add(Object.assign({createdAt:now},data));
+  write.then(function(){closeM();toast("Dosja u ruajt në cloud");})
+    .catch(function(e){alert("Dosja nuk u ruajt. Kontrollo internetin dhe provo përsëri. "+(e.message||""));});
+}
+async function folderDel(id){
+  var f=FOLDERS.find(function(x){return x.id===id;});
+  if(!f)return;
+  var children=NOTES.filter(function(n){return n.folderId===id;});
+  var count=children.length;
+  if(!confirm('Të fshihet dosja "'+f.name+'" dhe '+count+(count===1?' shënimi i saj':' shënimet e saj')+'? Ky veprim nuk kthehet.'))return;
+  try{
+    await Promise.all(children.map(function(n){return col("notes").doc(n.id).delete();}));
+    await col("noteFolders").doc(id).delete();
+    if(OPEN_FOLDER_ID===id)OPEN_FOLDER_ID=null;
+    toast("Dosja dhe shënimet u fshinë");
+  }catch(e){alert("Dosja nuk u fshi plotësisht. Kontrollo internetin dhe provo përsëri. "+(e.message||""));}
+}
+
+function noteForm(id,folderId){
+  var n=NOTES.find(function(x){return x.id===id;})||{};
+  var target=folderId||n.folderId||OPEN_FOLDER_ID;
+  var folder=FOLDERS.find(function(x){return x.id===target;});
+  if(!folder){toast("Hap fillimisht një dosje.");return;}
+  openM(`<h3>${id?"Ndrysho shënimin":"Shënim i ri"}</h3>
+    <p class="muted">Dosja: <b>${esc(folder.name)}</b></p>
+    <label>Titulli</label><input id="note_title" value="${esc(n.title||"")}" placeholder="p.sh. Ide për projektin">
+    <label>Shënimi</label><textarea id="note_body" rows="9" placeholder="Shkruaj shënimin këtu...">${esc(n.content||"")}</textarea>
+    <p class="muted" style="font-size:11.5px;margin:7px 0 0">Ruhet në cloud dhe mund ta hapësh nga pajisjet e tua.</p>
+    <div class="row" style="margin-top:16px">
+      <button class="btn sec" onclick="closeM()">Anulo</button>
+      <button class="btn" onclick="noteSave('${id||""}','${target}')">Ruaj shënimin</button>
+    </div>
+    ${id?`<button class="btn danger full sm" style="margin-top:10px" onclick="noteDel('${id}')">Fshi shënimin</button>`:""}`);
+}
+function noteSave(id,folderId){
+  var title=$("note_title").value.trim(), content=$("note_body").value.trim();
+  if(!title&&!content){alert("Shkruaj titullin ose përmbajtjen e shënimit.");return;}
+  if(!FOLDERS.some(function(f){return f.id===folderId;})){alert("Kjo dosje nuk u gjet. Kthehu te dosjet dhe provo përsëri.");return;}
+  if(!title){
+    var first=content.split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean)[0]||"Shënim";
+    title=first.length>60?first.slice(0,57)+"...":first;
+  }
+  var now=Date.now(), data={title:title,content:content,folderId:folderId,updatedAt:now};
+  var write=id?col("notes").doc(id).update(data)
+              :col("notes").add(Object.assign({createdAt:now},data));
+  write.then(function(){closeM();toast("Shënimi u ruajt në cloud");})
+    .catch(function(e){alert("Shënimi nuk u ruajt. Kontrollo internetin dhe provo përsëri. "+(e.message||""));});
+}
+function noteDel(id){
+  var n=NOTES.find(function(x){return x.id===id;});
+  if(!confirm('Të fshihet shënimi "'+(n&&n.title||"")+'"?'))return;
+  col("notes").doc(id).delete().then(function(){closeM();toast("Shënimi u fshi");})
+    .catch(function(e){alert("Shënimi nuk u fshi. Provo përsëri. "+(e.message||""));});
+}
+function renderNotes(){
+  var area=$("notesArea");
+  if(!area)return;
+  var folder=FOLDERS.find(function(f){return f.id===OPEN_FOLDER_ID;});
+  if(OPEN_FOLDER_ID&&!folder)OPEN_FOLDER_ID=null;
+  if(!OPEN_FOLDER_ID){
+    var folders=FOLDERS.slice().sort(function(a,b){return (a.name||"").localeCompare(b.name||"");});
+    var rows=folders.map(function(f){
+      var count=NOTES.filter(function(n){return n.folderId===f.id;}).length;
+      return '<div class="folder-card"><button class="folder-open" onclick="notesOpenFolder(\''+f.id+'\')">'
+        +'<span class="folder-icon">📁</span><span class="folder-info"><b>'+esc(f.name||"Dosje pa emër")+'</b>'
+        +'<small>'+count+(count===1?' shënim':' shënime')+'</small></span><span class="folder-arrow">›</span></button></div>';
+    }).join("");
+    area.innerHTML='<div class="card"><div class="notes-intro"><div><h2>Dosjet e mia</h2>'
+      +'<div class="muted" style="font-size:12px;margin-top:3px">Organizo shënimet sipas temës.</div></div>'
+      +'<button class="btn sm" onclick="folderForm()">+ Dosje</button></div>'
+      +'<div class="notes-cloud">☁️ Dosjet dhe shënimet ruhen në cloud dhe sinkronizohen mes pajisjeve.</div></div>'
+      +(folders.length?rows:'<div class="empty">Nuk ke ende dosje.<br>Krijo një dosje për të filluar.</div>');
+    return;
+  }
+  var notes=NOTES.filter(function(n){return n.folderId===folder.id;}).slice().sort(function(a,b){
+    return (+b.updatedAt||+b.createdAt||0)-(+a.updatedAt||+a.createdAt||0);
+  });
+  var noteRows=notes.map(function(n){
+    return '<div class="item"><div class="top"><div style="flex:1;min-width:0">'
+      +'<div class="name">'+esc(n.title||"Shënim pa titull")+'</div>'
+      +'<div class="note-date">Ndryshuar: '+notesDate(n.updatedAt||n.createdAt)+'</div></div>'
+      +'<button class="btn sec sm" onclick="noteForm(\''+n.id+'\',\''+folder.id+'\')">Hap</button></div>'
+      +(n.content?'<div class="note-preview">'+esc(n.content)+'</div>':'')+'</div>';
+  }).join("");
+  area.innerHTML='<button class="btn sec sm" style="margin-bottom:10px" onclick="notesBack()">← Dosjet</button>'
+    +'<div class="card"><div class="top"><div style="min-width:0"><div class="name" style="font-size:18px;overflow-wrap:anywhere">📁 '+esc(folder.name)+'</div>'
+    +'<div class="muted" style="margin-top:4px">'+notes.length+(notes.length===1?' shënim':' shënime')+'</div></div></div>'
+    +'<div class="row" style="margin-top:12px"><button class="btn sec sm" onclick="folderForm(\''+folder.id+'\')">Ndrysho dosjen</button>'
+    +'<button class="btn danger sm" onclick="folderDel(\''+folder.id+'\')">Fshi dosjen</button></div></div>'
+    +'<button class="btn full" style="margin-bottom:12px" onclick="noteForm(\'\',\''+folder.id+'\')">+ Shënim i ri</button>'
+    +(notes.length?noteRows:'<div class="empty">Kjo dosje është bosh.<br>Shto shënimin e parë.</div>');
+}
+
 /* ================= RENDER ================= */
 function renderHome(){
   var cashIn=0, cashOut=0, waiting=0, owing=0;
@@ -1100,7 +1329,7 @@ function renderHome(){
 }
 
 function render(){
-  renderDebts();renderRent();renderExp();renderHome();
+  renderDebts();renderRent();renderExp();renderHome();renderNotes();
   const open=DEBTS.filter(d=>paidOf(d)<(d.amount||0));
   $("sumDebt").textContent=fmt(open.filter(d=>d.type!=="out").reduce((s,d)=>s+((d.amount||0)-paidOf(d)),0));
   $("cntOpen").textContent=open.length;
@@ -1115,7 +1344,7 @@ function render(){
 }
 
 function exportJson(){
-  const b=new Blob([JSON.stringify({settings:SET,debts:DEBTS,rent:RENT,expenses:EXP},null,2)],{type:"application/json"});
+  const b=new Blob([JSON.stringify({settings:SET,debts:DEBTS,rent:RENT,expenses:EXP,noteFolders:FOLDERS,notes:NOTES},null,2)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="llogarite-"+today()+".json";a.click();
 }
 
@@ -1126,11 +1355,20 @@ function repForm(kind){
     let o="";for(let k=y+1;k>=y-4;k--)o+=`<option ${k===YEAR?"selected":""}>${k}</option>`;
     openM(`<h3>Raporti i qirasë</h3>
     <p class="muted">Vetëm qiraja e shtëpisë — pa borxhe e pa shpenzime.</p>
-    <label>Viti</label><select id="rp_y">${o}</select>
+    <label>Periudha e raportit</label>
+    <select id="rp_rent_mode" onchange="rentReportPeriodChanged()">
+      <option value="year">Viti i zgjedhur</option>
+      <option value="since">Nga fillimi i qirasë deri në muajin aktual</option>
+    </select>
+    <div id="rp_rent_year_wrap">
+      <label>Viti</label><select id="rp_y">${o}</select>
+    </div>
+    <div class="muted" id="rp_rent_hint" style="margin-top:9px;font-size:12px"></div>
     <div class="row" style="margin-top:16px">
       <button class="btn sec" onclick="closeM()">Anulo</button>
-      <button class="btn" onclick="pdfRent(+$('rp_y').value)">Krijo PDF</button>
+      <button class="btn" onclick="rentReportGenerate()">Krijo PDF</button>
     </div>`);
+    rentReportPeriodChanged();
   }else{
     openM(`<h3>Bilanci financiar</h3>
     <p class="muted">Borxhe + shpenzime, me gjendjen totale.</p>
@@ -1147,12 +1385,33 @@ function repForm(kind){
     </div>`);
   }
 }
+function rentReportPeriodChanged(){
+  var mode=$("rp_rent_mode");
+  if(!mode)return;
+  var whole=mode.value==="since";
+  $("rp_rent_year_wrap").style.display=whole?"none":"block";
+  if(!whole){
+    $("rp_rent_hint").textContent="Raporti përfshin të gjithë muajt e vitit të zgjedhur.";
+    return;
+  }
+  var start=firstRentKey();
+  var end=rentKey(new Date().getFullYear(),new Date().getMonth());
+  var source=SET.rentStart?"data e fillimit që ke vendosur te Qiraja"
+    :RENT.length?"muaji më i hershëm i regjistruar":"janari i këtij viti (derisa të regjistrosh fillimin)";
+  $("rp_rent_hint").textContent="Periudha: "+keyLabel(start)+" — "+keyLabel(end)
+    +". Fillimi përcaktohet nga "+source+".";
+}
+function rentReportGenerate(){
+  if($("rp_rent_mode").value==="since")pdfRent(null,true);
+  else pdfRent(+$('rp_y').value,false);
+}
 var RPT_TITLE="raport";
 function prn(title,body){
   closeM();
   RPT_TITLE=title;
   var host=document.getElementById("printArea");
-  host.innerHTML='<div class="rpt" id="rptInner">'+body
+  var rentClass=title.indexOf("Raporti i qirasë")===0?" rent-report":"";
+  host.innerHTML='<div class="rpt'+rentClass+'" id="rptInner">'+body
     +'<div class="foot">Krijuar me '+new Date().toLocaleString("sq-AL")+' - Llogarite e Mia</div></div>';
   document.getElementById("printBar").style.display="flex";
   document.body.classList.add("printing");
@@ -1184,10 +1443,12 @@ function prnGo(){
   }
   setBtn("Duke krijuar...",true);
 
-  // rendero gjithmonë në gjërësi fikse, që PDF të dalë njësoj
+  // gjerësia e raportit të qirasë përshtatet me padding-un e #printArea,
+  // që kolona e fundit të mos pritet në skajin e PDF-së.
   var W=690;
+  var contentW=RPT_TITLE.indexOf("Raporti i qirasë")===0?W-24:W;
   var prevW=el.style.width, prevMax=el.style.maxWidth, prevFs=el.style.fontSize;
-  el.style.width=W+"px"; el.style.maxWidth="none"; el.style.fontSize="12.5px";
+  el.style.width=contentW+"px"; el.style.maxWidth="none"; el.style.fontSize="12.5px";
   el.classList.add("pdfmode");
 
   function restore(){
@@ -1313,43 +1574,136 @@ function pdfFin(){
     <tr><td>Nëse arkëtohet dhe shlyhet gjithçka</td><td class="r ${proj>=0?"pos":"neg"}">${proj>=0?"+":"−"}${fmt(Math.abs(proj))}</td></tr>
   </table>`);
 }
-function pdfRent(y){
-  let tot=0,paid=0,rows="",pays="";
-  for(let m=0;m<12;m++){
-    const r=rentOf(y,m);
-    const due=(r&&r.amount!=null?r.amount:SET.rent)||0;
-    const p=rentPaid(r),rest=due-p;tot+=due;paid+=p;
-    const s=due<=0?"—":rest<=0?"PAGUAR":p>0?"PJESËRISHT":"PAPAGUAR";
-    rows+=`<tr><td><b>${MON[m]} ${y}</b></td><td class="r">${fmt(due)}</td><td class="r">${fmt(p)}</td>
-      <td class="r">${rest>0?fmt(rest):"—"}</td><td><span class="pill">${s}</span></td></tr>`;
-    (r?.payments||[]).slice().sort((x,z)=>(x.date||"").localeCompare(z.date||"")).forEach(x=>{
-      pays+=`<tr><td>${x.date||""}</td><td>${MON[m]} ${y}</td><td>${x.method==="bank"?"Bankë":"Cash"}</td>
-        <td>${esc(x.note||"")}</td><td class="r">${fmt(x.amount)}</td></tr>`;});
+function rentDateLabel(value){
+  var m=String(value||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m?m[3]+"/"+m[2]+"/"+m[1]:(value||"—");
+}
+function rentPaymentGroups(entries){
+  entries=entries.slice().sort(function(a,b){
+    var date=(a.date||"").localeCompare(b.date||"");
+    return date||((+a.ts||0)-(+b.ts||0))||(a.key||"").localeCompare(b.key||"");
+  });
+  var groups=[],byId=Object.create(null);
+  entries.forEach(function(e){
+    var g=null;
+    if(e.groupId)g=byId["id:"+e.groupId]||null;
+    if(!g&&!e.groupId&&e.ts>0){
+      var last=groups[groups.length-1];
+      if(last&&!last.groupId&&last.date===e.date&&last.method===e.method&&last.note===e.note
+          &&last.tsLast>0&&e.ts===last.tsLast+1)g=last;
+    }
+    if(!g){
+      g={groupId:e.groupId||null,date:e.date,method:e.method,note:e.note,
+        tsFirst:e.ts||0,tsLast:e.ts||0,total:0,items:[]};
+      groups.push(g);
+      if(e.groupId)byId["id:"+e.groupId]=g;
+    }
+    g.items.push(e);g.total+=e.amount;
+    if(e.ts)g.tsLast=e.ts;
+  });
+  groups.forEach(function(g){g.items.sort(function(a,b){
+    return (a.key||"").localeCompare(b.key||"")||((+a.ts||0)-(+b.ts||0));
+  });});
+  return groups;
+}
+function pdfRent(y,fullPeriod){
+  var leaseStart=firstRentKey();
+  var startKey=fullPeriod?leaseStart:rentKey(y,0);
+  var endKey=fullPeriod?rentKey(new Date().getFullYear(),new Date().getMonth()):rentKey(y,11);
+  if(startKey>endKey){
+    alert("Fillimi i qirasë është pas muajit aktual. Kontrollo datën e fillimit te Qiraja.");
+    return;
   }
-  const rest=tot-paid;
-  const un=unpaidMonths();
-  const arr=un.reduce((s,x)=>s+x.rest,0);
-  const dep=SET.deposit||{};
-  prn("Raporti i qirasë "+y,`
-  <h1>Qiraja e shtëpisë — ${y}</h1>
-  <div class="sub">Raport i veçuar: nuk përfshin borxhet dhe shpenzimet</div>
+
+  var months=[],tot=0,paid=0,rows="",k=startKey,guard=0;
+  while(k<=endKey&&guard<1200){
+    var parts=k.split("-"),yy=+parts[0],mm=+parts[1]-1;
+    var r=rentOf(yy,mm),before=k<leaseStart;
+    var due=before?0:((r&&r.amount!=null?r.amount:SET.rent)||0);
+    var p=rentPaid(r),rest=due-p;
+    tot+=due;paid+=p;
+    var status=before?"PARA FILLIMIT":due<=0?"—":rest<=0?"PAGUAR":p>0?"PJESËRISHT":"PAPAGUAR";
+    var statusClass=before?"rent-status-before":due<=0?"rent-status-empty":rest<=0?"rent-status-paid":p>0?"rent-status-partial":"rent-status-due";
+    rows+=`<tr><td><b>${MON[mm]} ${yy}</b></td><td class="r">${fmt(due)}</td><td class="r">${fmt(p)}</td>
+      <td class="r">${rest>0?fmt(rest):"—"}</td><td><span class="pill ${statusClass}">${status}</span></td></tr>`;
+    months.push({key:k,year:yy,month:mm,r:r,due:due,paid:p,rest:rest,before:before});
+    k=keyAdd(k,1);guard++;
+  }
+  if(guard>=1200&&k<=endKey){
+    alert("Periudha është tepër e gjatë për t'u përfshirë në një raport.");
+    return;
+  }
+
+  // Pagesat grupohen sipas datës së transaksionit dhe renditen me muajt që mbulojnë.
+  // Për raportin vjetor filtrohet data kur u bë pagesa; për raportin e plotë, data nga fillimi deri sot.
+  var allPayments=[],todayKey=today(),startDate=startKey+"-01";
+  RENT.forEach(function(r){
+    var coveredKey=r.id||"";
+    if(!/^\d{4}-\d{2}$/.test(coveredKey))return;
+    (r.payments||[]).forEach(function(x){
+      var dt=String(x.date||""),inScope;
+      if(fullPeriod){
+        inScope=dt?dt<=todayKey&&(dt>=startDate||(coveredKey>=startKey&&coveredKey<=endKey))
+          :coveredKey>=startKey&&coveredKey<=endKey;
+      }else{
+        inScope=dt?dt.slice(0,4)===String(y):coveredKey.slice(0,4)===String(y);
+      }
+      if(inScope)allPayments.push({key:coveredKey,amount:+x.amount||0,date:dt,
+        method:x.method||"cash",note:x.note||"",ts:+x.ts||0,groupId:x.groupId||x.batchId||""});
+    });
+  });
+  var paymentGroups=rentPaymentGroups(allPayments);
+  var paymentsTotal=paymentGroups.reduce(function(sum,g){return sum+g.total;},0);
+  var paysHtml=paymentGroups.map(function(g){
+    var count=g.items.length,method=g.method==="bank"?"Bankë":"Cash";
+    var methodClass=g.method==="bank"?"rent-method-bank":"rent-method-cash";
+    var head='<tr class="rent-pay-head"><td><b>'+rentDateLabel(g.date)+'</b>'
+      +(g.note?'<br><small>'+esc(g.note)+'</small>':'')+'</td>'
+      +'<td><span class="rent-method '+methodClass+'">'+method+'</span></td>'
+      +'<td><b>U nda në '+count+' '+(count===1?'muaj':'muaj')+'</b></td>'
+      +'<td class="r"><b>'+fmt(g.total)+'</b></td></tr>';
+    var detail=g.items.map(function(x){
+      return '<tr class="rent-pay-month"><td></td><td></td>'
+        +'<td><span class="rent-month-label">↳ '+keyLabel(x.key)+'</span></td>'
+        +'<td class="r">'+fmt(x.amount)+'</td></tr>';
+    }).join("");
+    return head+detail;
+  }).join("");
+  var rest=tot-paid;
+  var un=unpaidMonths();
+  var arr=un.reduce((s,x)=>s+x.rest,0);
+  var dep=SET.deposit||{};
+  var reportTitle=fullPeriod?"Raporti i qirasë nga "+startKey+" deri "+endKey:"Raporti i qirasë "+y;
+  var reportHeading=fullPeriod
+    ?"Qiraja e shtëpisë — "+keyLabel(startKey)+" deri "+keyLabel(endKey)
+    :"Qiraja e shtëpisë — "+y;
+  var reportPeriod=fullPeriod
+    ?"Periudha: "+keyLabel(startKey)+" — "+keyLabel(endKey)+" · nga fillimi i regjistruar deri në muajin aktual"
+    :"Viti "+y;
+  var totalLabel=fullPeriod?"TOTALI I PERIUDHËS":"TOTALI "+y;
+  var dueLabel=fullPeriod?"Detyrimi për periudhën":"Detyrimi vjetor";
+
+  prn(reportTitle,`
+  <h1>${reportHeading}</h1>
+  <div class="sub">${reportPeriod} · raport i veçuar: nuk përfshin borxhet dhe shpenzimet<br>
+    Te historiku, çdo datë pagese ka muajt ku u nda pagesa.</div>
   ${arr>0?`<div class="box"><div class="l">Borxh i prapambetur (të gjithë vitet)</div>
     <div class="v neg">${fmt(arr)}</div>
     <div class="l" style="margin-top:6px;text-transform:none;letter-spacing:0">
       ${un.length} muaj të pashlyer, nga ${keyLabel(un[0].key)}</div></div>`
    :`<div class="box"><div class="l">Gjendja</div><div class="v pos">Pa borxhe të prapambetura</div></div>`}
   <div class="grid">
-    <div class="g"><div class="l">Detyrimi vjetor</div><div class="v">${fmt(tot)}</div></div>
-    <div class="g"><div class="l">Paguar</div><div class="v pos">${fmt(paid)}</div></div>
+    <div class="g"><div class="l">${dueLabel}</div><div class="v">${fmt(tot)}</div></div>
+    <div class="g"><div class="l">Paguar sipas muajve</div><div class="v pos">${fmt(paid)}</div></div>
     <div class="g"><div class="l">Mbetur</div><div class="v ${rest>0?"neg":"pos"}">${fmt(Math.max(0,rest))}</div></div>
   </div>
-  <h2>Pasqyra mujore</h2>
+  <h2>Pasqyra mujore (${fullPeriod?keyLabel(startKey)+" — "+keyLabel(endKey):y})</h2>
   <table><tr><th>Muaji</th><th class="r">Detyrimi</th><th class="r">Paguar</th><th class="r">Mbetur</th><th>Statusi</th></tr>
-  ${rows}<tr class="tot"><td>TOTALI ${y}</td><td class="r">${fmt(tot)}</td><td class="r">${fmt(paid)}</td><td class="r">${fmt(Math.max(0,rest))}</td><td></td></tr></table>
-  <h2>Historiku i pagesave</h2>
-  ${pays?`<table><tr><th>Data e pagesës</th><th>Për muajin</th><th>Mënyra</th><th>Shënim</th><th class="r">Shuma</th></tr>${pays}
-    <tr class="tot"><td colspan="4">GJITHSEJ PAGUAR</td><td class="r">${fmt(paid)}</td></tr></table>`
-   :`<p><small>Asnjë pagesë e regjistruar për ${y}.</small></p>`}
+  ${rows}<tr class="tot"><td>${totalLabel}</td><td class="r">${fmt(tot)}</td><td class="r">${fmt(paid)}</td><td class="r">${fmt(Math.max(0,rest))}</td><td></td></tr></table>
+  <h2>Pagesat sipas datës · muajt e mbuluar</h2>
+  ${paysHtml?`<table class="rent-payments"><colgroup><col style="width:18%"><col style="width:14%"><col style="width:40%"><col style="width:28%"></colgroup><tr><th>Data e pagesës</th><th>Mënyra</th><th>Muaji i mbuluar</th><th class="r">Shuma e ndarë</th></tr>${paysHtml}
+    <tr class="tot"><td colspan="3">GJITHSEJ PAGESA NË KËTË RAPORT</td><td class="r">${fmt(paymentsTotal)}</td></tr></table>`
+   :`<p><small>Asnjë pagesë e regjistruar për këtë periudhë.</small></p>`}
 
   ${un.length?`<h2>Muajt e pashlyer (të gjithë vitet)</h2>
     <table><tr><th>Muaji</th><th class="r">Detyrimi</th><th class="r">Mbetur</th></tr>
@@ -1359,7 +1713,7 @@ function pdfRent(y){
   <h2>Kapari (garancia)</h2>
   ${dep.amount?`<table>
     <tr><td>Shuma e kaparit</td><td class="r"><b>${fmt(dep.amount)}</b></td></tr>
-    <tr><td>Data e pagesës</td><td class="r">${dep.date||"—"}</td></tr>
+    <tr><td>Data e pagesës</td><td class="r">${rentDateLabel(dep.date)}</td></tr>
     <tr><td>Mënyra</td><td class="r">${dep.method==="bank"?"Bankë":"Cash"}</td></tr>
     <tr><td>Gjendja</td><td class="r">${dep.status==="returned"?"U kthye":"Te pronari"}</td></tr>
     ${dep.note?`<tr><td>Shënim</td><td class="r">${esc(dep.note)}</td></tr>`:""}
@@ -1369,7 +1723,8 @@ function pdfRent(y){
   ${dep.status!=="returned"?`<p><small>Kapari kthehet kur të lësh shtëpinë, me kusht që të mos ketë pagesa të prapambetura.${arr>0?" Aktualisht ke "+fmt(arr)+" borxh të prapambetur.":""}</small></p>`:""}`
   :`<p><small>Nuk ke regjistruar kapar.</small></p>`}`);
 }
+
 go("home");
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a434eb31082df474',t:'MTc5MDc4OTA0MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4c2635788434bdc',t:'MTc5MjI3MjQ1NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
