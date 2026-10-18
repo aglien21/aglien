@@ -90,9 +90,20 @@ nav button.on{color:var(--acc)}
 .folder-info b{display:block;font-size:15px;overflow-wrap:anywhere}
 .folder-info small{display:block;color:var(--dim);font-size:12px;margin-top:3px}
 .folder-arrow{font-size:24px;color:var(--dim);line-height:1}
-.note-preview{white-space:pre-wrap;overflow-wrap:anywhere;max-height:112px;overflow:hidden;
-  color:var(--dim);font-size:13.5px;line-height:1.45;margin-top:8px}
-.note-date{font-size:11.5px;color:var(--dim);margin-top:3px}
+.note-list{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
+.note-row{display:block;width:100%;min-width:0;padding:13px 14px;text-align:left;overflow-wrap:anywhere;
+  border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--txt);font:inherit;
+  font-size:14px;font-weight:650;line-height:1.35;cursor:pointer}
+.note-row:last-child{border-bottom:0}
+.note-row:active{background:var(--card2)}
+.note-row:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.note-editor{width:100%;min-height:180px;max-height:48vh;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;
+  padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card2);color:var(--txt);
+  font-family:inherit;font-size:16px;line-height:1.45;outline:none}
+.note-editor:focus{outline:2px solid var(--acc);outline-offset:-1px}
+.note-editor:empty:before{content:attr(data-placeholder);color:var(--dim)}
+.note-editor a.note-link{color:#69a7ff!important;font-weight:700;
+  text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}
 @media(max-width:390px){
   nav button{font-size:9.5px;padding-left:1px;padding-right:1px}
   nav button .ic{font-size:19px}
@@ -570,7 +581,7 @@ function logout(){auth.signOut();}
 /* ---------- state ---------- */
 let DEBTS=[],RENT=[],EXP=[],FOLDERS=[],NOTES=[],SET={currency:"LEK",rent:0};
 let YEAR=new Date().getFullYear(), MIDX=new Date().getMonth(), MYEAR=new Date().getFullYear();
-let VIEW="home", DF="open", DTYPE="in", OPEN_FOLDER_ID=null;
+let VIEW="home", DF="open", DTYPE="in", OPEN_FOLDER_ID=null, NOTE_EDIT=null;
 const col=n=>db.collection("users").doc(UID).collection(n);
 
 function start(){
@@ -605,7 +616,8 @@ function chMon(d){MIDX+=d;if(MIDX>11){MIDX=0;MYEAR++}if(MIDX<0){MIDX=11;MYEAR--}
 
 /* ---------- modal ---------- */
 function openM(h){$("sheet").innerHTML=h;$("modal").classList.add("on");}
-function closeM(){$("modal").classList.remove("on");}
+function closeM(){if(NOTE_EDIT){noteSave();return;}closeMNow();}
+function closeMNow(){$("modal").classList.remove("on");NOTE_EDIT=null;}
 function openAdd(){VIEW==="debt"?debtForm():expForm();}
 
 /* ================= BORXHE ================= */
@@ -1221,41 +1233,98 @@ async function folderDel(id){
   }catch(e){alert("Dosja nuk u fshi plotësisht. Kontrollo internetin dhe provo përsëri. "+(e.message||""));}
 }
 
+function openNoteLink(event){
+  event.preventDefault();event.stopPropagation();
+  window.open(event.currentTarget.href,"_blank","noopener,noreferrer");
+}
+function linkifyText(value){
+  var raw=String(value??""),out="",last=0;
+  var re=/https?:\/\/[^\s<>"']+|www\.[^\s<>"']+/gi,m;
+  while((m=re.exec(raw))){
+    var url=m[0],tail="";
+    while(/[.,!?;:)\]}]$/.test(url)){tail=url.slice(-1)+tail;url=url.slice(0,-1);}
+    out+=esc(raw.slice(last,m.index));
+    if(url){
+      var href=/^www\./i.test(url)?"https://"+url:url;
+      out+='<a class="note-link" href="'+esc(href)+'" target="_blank" rel="noopener noreferrer" onclick="openNoteLink(event)">'+esc(url)+'</a>'+esc(tail);
+    }else out+=esc(m[0]);
+    last=m.index+m[0].length;
+  }
+  return out+esc(raw.slice(last));
+}
 function noteForm(id,folderId){
   var n=NOTES.find(function(x){return x.id===id;})||{};
   var target=folderId||n.folderId||OPEN_FOLDER_ID;
   var folder=FOLDERS.find(function(x){return x.id===target;});
   if(!folder){toast("Hap fillimisht një dosje.");return;}
-  openM(`<h3>${id?"Ndrysho shënimin":"Shënim i ri"}</h3>
+  NOTE_EDIT={id:id||"",folderId:target,originalTitle:String(n.title||"").trim(),
+    originalContent:String(n.content||"").trim(),saving:false};
+  openM(`<h3>${id?"Shënim":"Shënim i ri"}</h3>
     <p class="muted">Dosja: <b>${esc(folder.name)}</b></p>
     <label>Titulli</label><input id="note_title" value="${esc(n.title||"")}" placeholder="p.sh. Ide për projektin">
-    <label>Shënimi</label><textarea id="note_body" rows="9" placeholder="Shkruaj shënimin këtu...">${esc(n.content||"")}</textarea>
-    <p class="muted" style="font-size:11.5px;margin:7px 0 0">Ruhet në cloud dhe mund ta hapësh nga pajisjet e tua.</p>
+    <label>Shënimi</label>
+    <div id="note_body" class="note-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Shënimi" data-placeholder="Shkruaj shënimin këtu...">${linkifyText(n.content||"")}</div>
+    <p class="muted" style="font-size:11.5px;margin:7px 0 0">Mbylle shënimin për ta ruajtur automatikisht në cloud.</p>
     <div class="row" style="margin-top:16px">
-      <button class="btn sec" onclick="closeM()">Anulo</button>
-      <button class="btn" onclick="noteSave('${id||""}','${target}')">Ruaj shënimin</button>
+      <button id="note_close" class="btn sec" onclick="closeM()">Mbyll</button>
     </div>
-    ${id?`<button class="btn danger full sm" style="margin-top:10px" onclick="noteDel('${id}')">Fshi shënimin</button>`:""}`);
+    ${id?`<button class="btn danger full sm" style="margin-top:10px" data-note-id="${esc(id)}" onclick="noteDel(this.dataset.noteId)">Fshi shënimin</button>`:""}`);
 }
-function noteSave(id,folderId){
-  var title=$("note_title").value.trim(), content=$("note_body").value.trim();
-  if(!title&&!content){alert("Shkruaj titullin ose përmbajtjen e shënimit.");return;}
-  if(!FOLDERS.some(function(f){return f.id===folderId;})){alert("Kjo dosje nuk u gjet. Kthehu te dosjet dhe provo përsëri.");return;}
+function noteSave(){
+  var edit=NOTE_EDIT;
+  if(!edit||edit.saving)return;
+  var titleEl=$("note_title"),bodyEl=$("note_body");
+  if(!titleEl||!bodyEl){NOTE_EDIT=null;closeMNow();return;}
+  var title=titleEl.value.trim();
+  var content=String(bodyEl.innerText||bodyEl.textContent||"").replace(/\r/g,"").trim();
+  if(!title&&!content){
+    if(edit.id){alert("Shkruaj titullin ose përmbajtjen e shënimit, ose fshije shënimin.");return;}
+    NOTE_EDIT=null;closeMNow();return;
+  }
+  if(!FOLDERS.some(function(f){return f.id===edit.folderId;})){
+    alert("Kjo dosje nuk u gjet. Kthehu te dosjet dhe provo përsëri.");return;
+  }
   if(!title){
     var first=content.split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean)[0]||"Shënim";
     title=first.length>60?first.slice(0,57)+"...":first;
   }
-  var now=Date.now(), data={title:title,content:content,folderId:folderId,updatedAt:now};
-  var write=id?col("notes").doc(id).update(data)
-              :col("notes").add(Object.assign({createdAt:now},data));
-  write.then(function(){closeM();toast("Shënimi u ruajt në cloud");})
-    .catch(function(e){alert("Shënimi nuk u ruajt. Kontrollo internetin dhe provo përsëri. "+(e.message||""));});
+  if(edit.id&&title===edit.originalTitle&&content===edit.originalContent){
+    NOTE_EDIT=null;closeMNow();return;
+  }
+  edit.saving=true;
+  var now=Date.now(),data={title:title,content:content,folderId:edit.folderId,updatedAt:now};
+  var write=edit.id?col("notes").doc(edit.id).update(data)
+                  :col("notes").add(Object.assign({createdAt:now},data));
+  var closeButton=$("note_close");
+  if(closeButton){closeButton.disabled=true;closeButton.textContent="Duke ruajtur...";}
+  write.then(function(){
+    if(NOTE_EDIT!==edit)return;
+    NOTE_EDIT=null;closeMNow();toast("Shënimi u ruajt në cloud");
+  }).catch(function(e){
+    if(NOTE_EDIT!==edit)return;
+    edit.saving=false;
+    var button=$("note_close");
+    if(button){button.disabled=false;button.textContent="Mbyll";}
+    alert("Shënimi nuk u ruajt. Kontrollo internetin dhe provo përsëri. "+(e.message||""));
+  });
 }
 function noteDel(id){
   var n=NOTES.find(function(x){return x.id===id;});
   if(!confirm('Të fshihet shënimi "'+(n&&n.title||"")+'"?'))return;
-  col("notes").doc(id).delete().then(function(){closeM();toast("Shënimi u fshi");})
-    .catch(function(e){alert("Shënimi nuk u fshi. Provo përsëri. "+(e.message||""));});
+  var edit=NOTE_EDIT;
+  if(edit)edit.saving=true;
+  var closeButton=$("note_close");
+  if(closeButton){closeButton.disabled=true;closeButton.textContent="Duke fshirë...";}
+  col("notes").doc(id).delete().then(function(){
+    NOTE_EDIT=null;closeMNow();toast("Shënimi u fshi");
+  }).catch(function(e){
+    if(NOTE_EDIT===edit&&edit){
+      edit.saving=false;
+      var button=$("note_close");
+      if(button){button.disabled=false;button.textContent="Mbyll";}
+    }
+    alert("Shënimi nuk u fshi. Provo përsëri. "+(e.message||""));
+  });
 }
 function renderNotes(){
   var area=$("notesArea");
@@ -1281,11 +1350,8 @@ function renderNotes(){
     return (+b.updatedAt||+b.createdAt||0)-(+a.updatedAt||+a.createdAt||0);
   });
   var noteRows=notes.map(function(n){
-    return '<div class="item"><div class="top"><div style="flex:1;min-width:0">'
-      +'<div class="name">'+esc(n.title||"Shënim pa titull")+'</div>'
-      +'<div class="note-date">Ndryshuar: '+notesDate(n.updatedAt||n.createdAt)+'</div></div>'
-      +'<button class="btn sec sm" onclick="noteForm(\''+n.id+'\',\''+folder.id+'\')">Hap</button></div>'
-      +(n.content?'<div class="note-preview">'+esc(n.content)+'</div>':'')+'</div>';
+    return '<button type="button" class="note-row" data-note-id="'+esc(n.id)+'" onclick="noteForm(this.dataset.noteId)">'
+      +esc(n.title||"Shënim pa titull")+'</button>';
   }).join("");
   area.innerHTML='<button class="btn sec sm" style="margin-bottom:10px" onclick="notesBack()">← Dosjet</button>'
     +'<div class="card"><div class="top"><div style="min-width:0"><div class="name" style="font-size:18px;overflow-wrap:anywhere">📁 '+esc(folder.name)+'</div>'
@@ -1293,7 +1359,7 @@ function renderNotes(){
     +'<div class="row" style="margin-top:12px"><button class="btn sec sm" onclick="folderForm(\''+folder.id+'\')">Ndrysho dosjen</button>'
     +'<button class="btn danger sm" onclick="folderDel(\''+folder.id+'\')">Fshi dosjen</button></div></div>'
     +'<button class="btn full" style="margin-bottom:12px" onclick="noteForm(\'\',\''+folder.id+'\')">+ Shënim i ri</button>'
-    +(notes.length?noteRows:'<div class="empty">Kjo dosje është bosh.<br>Shto shënimin e parë.</div>');
+    +(notes.length?'<div class="note-list">'+noteRows+'</div>':'<div class="empty">Kjo dosje është bosh.<br>Shto shënimin e parë.</div>');
 }
 
 /* ================= RENDER ================= */
@@ -1726,5 +1792,6 @@ function pdfRent(y,fullPeriod){
 
 go("home");
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4c2635788434bdc',t:'MTc5MjI3MjQ1NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+</body>
 </html>
