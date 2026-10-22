@@ -16,6 +16,7 @@
 :root{
   --bg:#0f1115; --card:#181c24; --card2:#20252f; --line:#2c3341;
   --txt:#e9edf5; --dim:#96a0b5; --acc:#3b82f6; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+  --notes-name:#6ee7b7;
 }
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
  background:var(--bg);color:var(--txt);padding-bottom:92px;
@@ -87,13 +88,15 @@ nav button.on{color:var(--acc)}
   border:0;background:transparent;color:var(--txt);text-align:left;font:inherit;cursor:pointer}
 .folder-icon{font-size:25px;line-height:1}
 .folder-info{flex:1;min-width:0}
-.folder-info b{display:block;font-size:15px;overflow-wrap:anywhere}
+.folder-info b{display:block;font-size:15px;overflow-wrap:anywhere;color:var(--notes-name)}
 .folder-info small{display:block;color:var(--dim);font-size:12px;margin-top:3px}
 .folder-arrow{font-size:24px;color:var(--dim);line-height:1}
 .note-list{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
 .note-row{display:block;width:100%;min-width:0;padding:13px 14px;text-align:left;overflow-wrap:anywhere;
-  border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--txt);font:inherit;
+  border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--notes-name);font:inherit;
   font-size:14px;font-weight:650;line-height:1.35;cursor:pointer}
+.notes-folder-title,.notes-folder-name,#note_title,#folder_name{color:var(--notes-name)}
+#folder_delete_btn:disabled,#folder_delete_cancel:disabled{opacity:.45;cursor:not-allowed}
 .note-row:last-child{border-bottom:0}
 .note-row:active{background:var(--card2)}
 .note-row:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
@@ -581,7 +584,7 @@ function logout(){auth.signOut();}
 /* ---------- state ---------- */
 let DEBTS=[],RENT=[],EXP=[],FOLDERS=[],NOTES=[],SET={currency:"LEK",rent:0};
 let YEAR=new Date().getFullYear(), MIDX=new Date().getMonth(), MYEAR=new Date().getFullYear();
-let VIEW="home", DF="open", DTYPE="in", OPEN_FOLDER_ID=null, NOTE_EDIT=null;
+let VIEW="home", DF="open", DTYPE="in", OPEN_FOLDER_ID=null, NOTE_EDIT=null, FOLDER_DELETE_BUSY=false;
 const col=n=>db.collection("users").doc(UID).collection(n);
 
 function start(){
@@ -616,18 +619,30 @@ function chMon(d){MIDX+=d;if(MIDX>11){MIDX=0;MYEAR++}if(MIDX<0){MIDX=11;MYEAR--}
 
 /* ---------- modal ---------- */
 function openM(h){$("sheet").innerHTML=h;$("modal").classList.add("on");}
-function closeM(){if(NOTE_EDIT){noteSave();return;}closeMNow();}
-function closeMNow(){$("modal").classList.remove("on");NOTE_EDIT=null;}
+function closeM(){if(FOLDER_DELETE_BUSY)return;if(NOTE_EDIT){noteSave();return;}closeMNow();}
+function closeMNow(){$("modal").classList.remove("on");NOTE_EDIT=null;FOLDER_DELETE_BUSY=false;}
 function openAdd(){VIEW==="debt"?debtForm():expForm();}
 
 /* ================= BORXHE ================= */
-const paidOf=d=>(d.payments||[]).reduce((s,p)=>s+(+p.amount||0),0);
+const paidOf=d=>d._isPrepayment?Math.max(0,+d._settledAmount||0):(d.payments||[]).reduce((s,p)=>s+(+p.amount||0),0);
 /* teprica e paguar mbi shumën e borxhit */
 const creditRaw=d=>Math.max(0,paidOf(d)-(+d.amount||0));
 /* sa kredi është përdorur (mallra/shërbime të marra) */
 const creditUsed=d=>(d.uses||[]).reduce((s,u)=>s+(+u.amount||0),0);
+/* sa parapagim i është kthyer realisht klientit */
+const creditRefunded=d=>(d.creditRefunds||[]).reduce((s,r)=>s+(+r.amount||0),0);
 /* kredia që i ka mbetur */
-const creditOf=d=>Math.max(0,creditRaw(d)-creditUsed(d));
+const creditOf=d=>Math.max(0,creditRaw(d)-creditUsed(d)-creditRefunded(d));
+function prepaymentDebtRows(sources){
+  return sources.filter(function(d){return d.type!=="out"&&creditRaw(d)>0;}).map(function(d){
+    var raw=creditRaw(d), settled=Math.min(raw,creditUsed(d)+creditRefunded(d));
+    return {id:"prepayment:"+d.id,name:d.name,type:"out",date:d.date||"",amount:raw,
+      note:"Parapagim",payments:[],_isPrepayment:true,_sourceId:d.id,_source:d,_settledAmount:settled};
+  });
+}
+function outgoingDebtRows(sources){
+  return sources.filter(function(d){return d.type==="out";}).concat(prepaymentDebtRows(sources));
+}
 /* shënimi i fundit i lënë për kredinë */
 function creditNote(d){
   var ps=(d.payments||[]).filter(function(x){return x.cnote;});
@@ -730,44 +745,91 @@ function paySave(id){
 /* ndrysho vetëm shënimin e kredisë */
 function creditForm(id){
   var d=DEBTS.find(function(x){return x.id===id;});
-  var raw=creditRaw(d), used=creditUsed(d), left=creditOf(d);
+  if(!d)return;
+  var raw=creditRaw(d),used=creditUsed(d),refunded=creditRefunded(d),left=creditOf(d);
   var hist=(d.uses||[]).slice().sort(function(a,b){return b.ts-a.ts;}).map(function(u){
-    return '<div class="pay"><span>'+(u.date||"")+(u.note?' \u00b7 '+esc(u.note):'')
-      +'</span><span><b>\u2212'+fmt(u.amount)+'</b> '
-      +'<a onclick="useDel(\''+id+'\','+u.ts+')" style="color:#ff8a8a;cursor:pointer">\u2715</a></span></div>';
+    return '<div class="pay"><span>'+(u.date||"")+(u.note?' · '+esc(u.note):'')
+      +'</span><span><b>−'+fmt(u.amount)+'</b> '
+      +'<a onclick="useDel(\''+id+'\','+u.ts+')" style="color:#ff8a8a;cursor:pointer">✕</a></span></div>';
+  }).join("");
+  var refundHist=(d.creditRefunds||[]).slice().sort(function(a,b){return (+b.ts||0)-(+a.ts||0);}).map(function(r){
+    return '<div class="pay"><span>'+(r.method==="bank"?"🏦 Bankë":"💵 Cash")+' · '+(r.date||"")
+      +(r.note?' · '+esc(r.note):'')+'</span><span><b>−'+fmt(r.amount)+'</b></span></div>';
   }).join("");
 
-  openM('<h3>Kredi \u00b7 '+esc(d.name)+'</h3>'
+  openM('<h3>Kredi · '+esc(d.name)+'</h3>'
   +'<div style="background:var(--card2);border-radius:12px;padding:12px;margin-top:8px">'
   +'<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0">'
   +'<span class="muted">Kredi gjithsej</span><b>'+fmt(raw)+'</b></div>'
   +'<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0">'
-  +'<span class="muted">P\u00ebrdorur</span><b style="color:#ff8a8a">\u2212'+fmt(used)+'</b></div>'
+  +'<span class="muted">Përdorur për mall/shërbim</span><b style="color:#ff8a8a">−'+fmt(used)+'</b></div>'
+  +'<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0">'
+  +'<span class="muted">Kthyer klientit (cash/bankë)</span><b style="color:#ff8a8a">−'+fmt(refunded)+'</b></div>'
   +'<div style="display:flex;justify-content:space-between;font-size:15px;padding:7px 0 0;'
   +'margin-top:5px;border-top:1px solid var(--line)">'
   +'<b>I mbetur</b><b style="color:#8ab4ff">'+fmt(left)+'</b></div></div>'
+  +'<p class="muted" style="margin-top:8px">Vetëm kthimi real i parave ul arkën; përdorimi i kredisë ul detyrimin.</p>'
 
   +(left>0
-    ? '<label>Mori nj\u00eb mall / sh\u00ebrbim \u2014 zbrit nga kredia</label>'
+    ? '<label>Mori një mall / shërbim — zbrit nga kredia</label>'
       +'<input id="u_a" type="number" inputmode="decimal" placeholder="sa kushtoi" '
       +'value="'+left+'" oninput="usePrev(\''+id+'\')">'
       +'<div id="u_prev" class="muted" style="margin-top:6px;font-size:12.5px"></div>'
-      +'<label>\u00c7far\u00eb mori</label>'
+      +'<label>Çfarë mori</label>'
       +'<input id="u_no" placeholder="p.sh. 2 kg kafe">'
       +'<label>Data</label><input id="u_d" type="date" value="'+today()+'">'
       +'<button class="btn full" style="margin-top:14px" onclick="useSave(\''+id+'\')">'
       +'Zbrit nga kredia</button>'
-    : '<p class="muted" style="margin-top:12px">Kredia \u00ebsht\u00eb shterur.</p>')
+      +'<button class="btn sec full sm" style="margin-top:9px" onclick="creditRefundForm(\''+id+'\')">Kthe parapagimin</button>'
+    : '<p class="muted" style="margin-top:12px">Parapagimi është përdorur ose kthyer plotësisht.</p>')
 
   +(hist?'<div style="margin-top:16px"><div class="muted" style="font-weight:700;margin-bottom:4px">'
-    +'Historiku i p\u00ebrdorimit</div>'+hist+'</div>':'')
+    +'Historiku i përdorimit</div>'+hist+'</div>':'')
+  +(refundHist?'<div style="margin-top:16px"><div class="muted" style="font-weight:700;margin-bottom:4px">'
+    +'Historiku i kthimeve të parapagimit</div>'+refundHist+'</div>':'')
 
-  +'<label style="margin-top:16px">Sh\u00ebnim p\u00ebr kredin\u00eb</label>'
-  +'<input id="c_n" value="'+esc(creditNote(d))+'" placeholder="p.sh. parapagim p\u00ebr dyqanin">'
+  +'<label style="margin-top:16px">Shënim për kredinë</label>'
+  +'<input id="c_n" value="'+esc(creditNote(d))+'" placeholder="p.sh. parapagim për dyqanin">'
   +'<div class="row" style="margin-top:14px">'
   +'<button class="btn sec" onclick="closeM()">Mbyll</button>'
-  +'<button class="btn sec" onclick="creditSave(\''+id+'\')">Ruaj sh\u00ebnimin</button></div>');
+  +'<button class="btn sec" onclick="creditSave(\''+id+'\')">Ruaj shënimin</button></div>');
   if(left>0) usePrev(id);
+}
+function creditRefundForm(id){
+  var d=DEBTS.find(function(x){return x.id===id;});
+  if(!d)return;
+  var left=creditOf(d);
+  if(left<=0){toast("Nuk ka parapagim të mbetur.");return;}
+  openM(`<h3>Shlyej parapagimin</h3>
+    <p class="muted">Klienti: <b>${esc(d.name)}</b> · Mbetur: <b>${fmt(left)}</b></p>
+    <p class="muted">Kthimi regjistrohet si dalje dhe zbritet nga arka.</p>
+    <label>Shuma që po i kthen</label>
+    <input id="crf_a" type="number" inputmode="decimal" min="0" max="${left}" step="0.01" value="${left}">
+    <label>Mënyra e kthimit</label>
+    <div class="seg" id="crf_m">
+      <button class="on" data-m="cash" onclick="segPick(this)">💵 Cash</button>
+      <button data-m="bank" onclick="segPick(this)">🏦 Bankë</button>
+    </div>
+    <label>Data</label><input id="crf_d" type="date" value="${today()}">
+    <label>Shënim</label><input id="crf_n" value="Kthim parapagimi">
+    <div class="row" style="margin-top:16px">
+      <button class="btn sec" onclick="closeM()">Anulo</button>
+      <button class="btn" onclick="creditRefundSave('${id}')">Regjistro kthimin</button>
+    </div>`);
+}
+function creditRefundSave(id){
+  var d=DEBTS.find(function(x){return x.id===id;});
+  if(!d)return;
+  var amount=+$("crf_a").value||0,left=creditOf(d);
+  if(amount<=0){alert("Vendos shumën që po i kthen klientit.");return;}
+  if(amount>left){alert("Shuma nuk mund të jetë më e madhe se parapagimi i mbetur.");return;}
+  var method=$("crf_m").querySelector(".on").dataset.m;
+  var refunds=(d.creditRefunds||[]).slice();
+  refunds.push({amount:amount,method:method,date:$("crf_d").value,
+    note:$("crf_n").value.trim(),ts:Date.now()});
+  col("debts").doc(id).update({creditRefunds:refunds}).then(function(){
+    closeM();toast("Parapagimi u kthye · arka u ul me "+fmt(amount));
+  }).catch(function(e){alert("Kthimi nuk u ruajt. Kontrollo internetin dhe provo përsëri. "+(e.message||""));});
 }
 
 function usePrev(id){
@@ -812,9 +874,9 @@ function creditSave(id){
 
 function renderDebtSwitch(){
   var incoming=DEBTS.filter(function(d){return d.type!=="out";});
-  var outgoing=DEBTS.filter(function(d){return d.type==="out";});
+  var outgoing=outgoingDebtRows(DEBTS);
   function stats(list){
-    var open=list.filter(function(d){return (+d.amount||0)>paidOf(d);});
+    var open=list.filter(function(d){return Math.max(0,(+d.amount||0)-paidOf(d))>0;});
     return {count:open.length,total:open.reduce(function(sum,d){
       return sum+Math.max(0,(+d.amount||0)-paidOf(d));
     },0)};
@@ -832,48 +894,63 @@ function renderDebtSwitch(){
 
 function renderDebts(){
   renderDebtSwitch();
-  const list=DEBTS.filter(d=>{
-    const sameType=DTYPE==="out"?d.type==="out":d.type!=="out";
-    const paid=paidOf(d)>=(d.amount||0);
-    return sameType&&(DF==="all"||(DF==="paid"?paid:!paid));
-  }).sort((a,b)=>(b.date||"").localeCompare(a.date||""));
-  $("debtList").innerHTML=list.length?list.map(d=>{
-    const p=paidOf(d),rest=(d.amount||0)-p,full=rest<=0,pct=Math.min(100,(d.amount?p/d.amount*100:0));
-    const cr=creditOf(d);
+  const pool=DTYPE==="out"?outgoingDebtRows(DEBTS):DEBTS.filter(function(d){return d.type!=="out";});
+  const list=pool.filter(function(d){
+    const settled=Math.max(0,(+d.amount||0)-paidOf(d))<=0;
+    return DF==="all"||(DF==="paid"?settled:!settled);
+  }).sort(function(a,b){return (b.date||"").localeCompare(a.date||"");});
+  $("debtList").innerHTML=list.length?list.map(function(d){
+    const isPrepayment=!!d._isPrepayment,source=isPrepayment?d._source:null;
+    const p=paidOf(d),amount=+d.amount||0,rest=Math.max(0,amount-p),full=rest<=0;
+    const pct=Math.min(100,amount?p/amount*100:0),cr=isPrepayment?0:creditOf(d);
     const direction=d.type==="out"?"out":"in";
     const directionText=d.type==="out"?"UNË U KAM BORXH":"MË KANË BORXH MUA";
     const tag=cr>0?'<span class="tag t-info">KREDI</span>'
       :full?'<span class="tag t-ok">PAGUAR</span>'
       :p>0?'<span class="tag t-part">PJESËRISHT</span>':'<span class="tag t-no">PAPAGUAR</span>';
+    const payAction=isPrepayment?'creditRefundForm(this.dataset.sourceId)':'payForm(this.dataset.sourceId)';
+    const payLabel=isPrepayment?'Shlyej parapagimin':'+ Pagesë';
+    const payButton=!full?'<button class="btn sm" data-source-id="'+esc(isPrepayment?d._sourceId:d.id)+'" onclick="'+payAction+'">'+payLabel+'</button>':'';
+    const editButton=!isPrepayment?'<button class="btn sec sm" data-debt-id="'+esc(d.id)+'" onclick="debtForm(this.dataset.debtId)">Ndrysho</button>':'';
+    const creditBox=!isPrepayment&&(creditRaw(d)>0||creditUsed(d)>0||creditRefunded(d)>0)
+      ?`<div onclick="event.stopPropagation();creditForm('${d.id}')"
+        style="margin-top:9px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);
+        border-radius:10px;padding:8px 10px;cursor:pointer;display:flex;
+        justify-content:space-between;align-items:center;gap:8px">
+        <span style="font-size:12.5px">⭐ ${cr>0?"Kredi për më vonë":creditRefunded(d)>0&&creditUsed(d)===0?"Parapagimi u kthye":"Kredia u shterua"}
+          ${creditNote(d)?`<br><span class="muted">${esc(creditNote(d))}</span>`:""}
+          ${creditUsed(d)>0?`<br><span class="muted">përdorur ${fmt(creditUsed(d))} nga ${fmt(creditRaw(d))}</span>`:""}
+          ${creditRefunded(d)>0?`<br><span class="muted">kthyer klientit ${fmt(creditRefunded(d))}</span>`:""}
+          ${cr>0?`<br><span class="muted">shtyp për përdorim ose kthim</span>`:""}</span>
+        <b style="color:${cr>0?"#8ab4ff":"var(--dim)"};white-space:nowrap">${fmt(cr)}</b></div>`:"";
+    const prepaymentInfo=isPrepayment
+      ?`<div class="muted" style="margin-top:5px;font-size:12px">Përdorur ${fmt(creditUsed(source))} · Kthyer ${fmt(creditRefunded(source))}</div>`:"";
+    const refundHistory=isPrepayment&&(source.creditRefunds||[]).length
+      ?`<details style="margin-top:9px"><summary>${source.creditRefunds.length} kthime · ${fmt(creditRefunded(source))}</summary>
+        ${(source.creditRefunds||[]).slice().sort((a,b)=>(+b.ts||0)-(+a.ts||0)).map(function(r){
+          return `<div class="pay"><span>${r.method==="bank"?"🏦 Bankë":"💵 Cash"} · ${r.date||""}${r.note?" · "+esc(r.note):""}</span><span><b>${fmt(r.amount)}</b></span></div>`;
+        }).join("")}</details>`:"";
+    const paymentHistory=!isPrepayment&&(d.payments||[]).length
+      ?`<details style="margin-top:9px"><summary>${d.payments.length} pagesa · ${fmt(p)}</summary>
+        ${d.payments.slice().sort((x,y)=>y.ts-x.ts).map(x=>`<div class="pay">
+          <span>${x.method==="bank"?"🏦 Bankë":"💵 Cash"} · ${x.date||""}${x.note?" · "+esc(x.note):""}</span>
+          <span><b>${fmt(x.amount)}</b> <a onclick="payDel('${d.id}',${x.ts})" style="color:#ff8a8a;cursor:pointer">✕</a></span>
+        </div>`).join("")}</details>`:"";
     return `<div class="item">
       <div class="top">
         <div><div class="name">${esc(d.name)}</div>
         <div class="debt-direction"><span class="debt-kind ${direction}">${directionText}</span>
           <span class="muted" style="font-size:12px">${esc(d.date||"")}</span></div>
-        ${d.note?`<div class="muted" style="margin-top:5px">📝 ${esc(d.note)}</div>`:""}</div>
+        ${d.note?`<div class="muted" style="margin-top:5px">📝 ${esc(d.note)}</div>`:""}
+        ${prepaymentInfo}</div>
         <div style="text-align:right">${tag}
-          <div style="font-weight:800;font-size:17px;margin-top:5px">${fmt(d.amount)}</div>
-          ${!full?`<div class="muted">mbetur ${fmt(rest)}</div>`:""}
-          ${cr>0?`<div class="muted" style="color:#8ab4ff">kredi ${fmt(cr)}</div>`:""}</div>
+          <div style="font-weight:800;font-size:17px;margin-top:5px">${fmt(amount)}</div>
+          ${!full?`<div class="muted">mbetur ${fmt(rest)}</div>`:""}</div>
       </div>
       <div class="bar"><i style="width:${pct}%"></i></div>
-      ${(cr>0||creditUsed(d)>0)?`<div onclick="event.stopPropagation();creditForm('${d.id}')"
-        style="margin-top:9px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);
-        border-radius:10px;padding:8px 10px;cursor:pointer;display:flex;
-        justify-content:space-between;align-items:center;gap:8px">
-        <span style="font-size:12.5px">⭐ ${cr>0?"Kredi për më vonë":"Kredia u shterua"}
-          ${creditNote(d)?`<br><span class="muted">${esc(creditNote(d))}</span>`:""}
-          ${creditUsed(d)>0?`<br><span class="muted">përdorur ${fmt(creditUsed(d))} nga ${fmt(creditRaw(d))}</span>`:`<br><span class="muted">shtyp për ta përdorur</span>`}</span>
-        <b style="color:${cr>0?"#8ab4ff":"var(--dim)"};white-space:nowrap">${fmt(cr)}</b></div>`:""}
-      ${(d.payments||[]).length?`<details style="margin-top:9px"><summary>${d.payments.length} pagesa · ${fmt(p)}</summary>
-        ${d.payments.slice().sort((x,y)=>y.ts-x.ts).map(x=>`<div class="pay">
-          <span>${x.method==="bank"?"🏦 Bankë":"💵 Cash"} · ${x.date||""}${x.note?" · "+esc(x.note):""}</span>
-          <span><b>${fmt(x.amount)}</b> <a onclick="payDel('${d.id}',${x.ts})" style="color:#ff8a8a;cursor:pointer">✕</a></span>
-        </div>`).join("")}</details>`:""}
-      <div class="row" style="margin-top:10px">
-        ${!full?`<button class="btn sm" onclick="payForm('${d.id}')">+ Pagesë</button>`:""}
-        <button class="btn sec sm" onclick="debtForm('${d.id}')">Ndrysho</button>
-      </div></div>`;
+      ${creditBox}${paymentHistory}${refundHistory}
+      ${payButton||editButton?`<div class="row" style="margin-top:10px">${payButton}${editButton}</div>`:""}
+    </div>`;
   }).join(""):`<div class="empty">${DF==="open"?"Nuk ka borxhe të hapura në këtë ndarje.":DF==="paid"?"Nuk ka borxhe të paguara në këtë ndarje.":"Nuk ka borxhe të regjistruara në këtë ndarje."}<br>
       <button class="btn sm" style="margin-top:12px" onclick="debtForm()">+ Shto në këtë ndarje</button></div>`;
 }
@@ -1219,18 +1296,60 @@ function folderSave(id){
   write.then(function(){closeM();toast("Dosja u ruajt në cloud");})
     .catch(function(e){alert("Dosja nuk u ruajt. Kontrollo internetin dhe provo përsëri. "+(e.message||""));});
 }
-async function folderDel(id){
+function folderDel(id){
   var f=FOLDERS.find(function(x){return x.id===id;});
   if(!f)return;
+  var count=NOTES.filter(function(n){return n.folderId===id;}).length;
+  var folderName=esc(f.name||"Dosje pa emër");
+  var consequence=count
+    ?`Dosja <b class="notes-folder-name">${folderName}</b> dhe ${count} ${count===1?"shënimi i saj":"shënimet e saj"} do të fshihen përgjithmonë.`
+    :`Dosja <b class="notes-folder-name">${folderName}</b> do të fshihet përgjithmonë.`;
+  openM(`<h3>Konfirmo fshirjen</h3>
+    <p class="muted">${consequence}</p>
+    <p class="muted">Ky veprim nuk mund të kthehet.</p>
+    <label>Shkruaj <b class="notes-folder-name">FSHI</b> për të vazhduar</label>
+    <input id="folder_delete_word" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="FSHI" oninput="folderDeleteCheck()">
+    <div class="row" style="margin-top:16px">
+      <button id="folder_delete_cancel" class="btn sec" onclick="closeM()">Anulo</button>
+      <button id="folder_delete_btn" class="btn danger" data-folder-id="${esc(id)}" onclick="folderDeleteConfirm(this.dataset.folderId)" disabled>Fshi dosjen</button>
+    </div>`);
+}
+function folderDeleteCheck(){
+  var input=$("folder_delete_word"),button=$("folder_delete_btn");
+  if(input&&button&&!FOLDER_DELETE_BUSY)button.disabled=input.value.trim().toUpperCase()!=="FSHI";
+}
+async function folderDeleteConfirm(id){
+  if(FOLDER_DELETE_BUSY)return;
+  var input=$("folder_delete_word"),button=$("folder_delete_btn");
+  if(!input||input.value.trim().toUpperCase()!=="FSHI"){
+    if(button)button.disabled=true;
+    return;
+  }
+  var f=FOLDERS.find(function(x){return x.id===id;});
+  if(!f){closeMNow();toast("Dosja nuk u gjet.");return;}
   var children=NOTES.filter(function(n){return n.folderId===id;});
-  var count=children.length;
-  if(!confirm('Të fshihet dosja "'+f.name+'" dhe '+count+(count===1?' shënimi i saj':' shënimet e saj')+'? Ky veprim nuk kthehet.'))return;
+  FOLDER_DELETE_BUSY=true;
+  if(button){button.disabled=true;button.textContent="Duke fshirë...";}
+  var cancel=$("folder_delete_cancel");
+  if(cancel)cancel.disabled=true;
+  input.disabled=true;
   try{
     await Promise.all(children.map(function(n){return col("notes").doc(n.id).delete();}));
     await col("noteFolders").doc(id).delete();
+    NOTES=NOTES.filter(function(n){return n.folderId!==id;});
+    FOLDERS=FOLDERS.filter(function(f){return f.id!==id;});
     if(OPEN_FOLDER_ID===id)OPEN_FOLDER_ID=null;
-    toast("Dosja dhe shënimet u fshinë");
-  }catch(e){alert("Dosja nuk u fshi plotësisht. Kontrollo internetin dhe provo përsëri. "+(e.message||""));}
+    closeMNow();
+    renderNotes();
+    toast(children.length?"Dosja dhe shënimet u fshinë":"Dosja u fshi");
+  }catch(e){
+    FOLDER_DELETE_BUSY=false;
+    if(button){button.textContent="Fshi dosjen";}
+    if(cancel)cancel.disabled=false;
+    if(input)input.disabled=false;
+    folderDeleteCheck();
+    alert("Dosja nuk u fshi plotësisht. Kontrollo internetin dhe provo përsëri. "+(e.message||""));
+  }
 }
 
 function openNoteLink(event){
@@ -1260,7 +1379,7 @@ function noteForm(id,folderId){
   NOTE_EDIT={id:id||"",folderId:target,originalTitle:String(n.title||"").trim(),
     originalContent:String(n.content||"").trim(),saving:false};
   openM(`<h3>${id?"Shënim":"Shënim i ri"}</h3>
-    <p class="muted">Dosja: <b>${esc(folder.name)}</b></p>
+    <p class="muted">Dosja: <b class="notes-folder-name">${esc(folder.name)}</b></p>
     <label>Titulli</label><input id="note_title" value="${esc(n.title||"")}" placeholder="p.sh. Ide për projektin">
     <label>Shënimi</label>
     <div id="note_body" class="note-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Shënimi" data-placeholder="Shkruaj shënimin këtu...">${linkifyText(n.content||"")}</div>
@@ -1354,7 +1473,7 @@ function renderNotes(){
       +esc(n.title||"Shënim pa titull")+'</button>';
   }).join("");
   area.innerHTML='<button class="btn sec sm" style="margin-bottom:10px" onclick="notesBack()">← Dosjet</button>'
-    +'<div class="card"><div class="top"><div style="min-width:0"><div class="name" style="font-size:18px;overflow-wrap:anywhere">📁 '+esc(folder.name)+'</div>'
+    +'<div class="card"><div class="top"><div style="min-width:0"><div class="name notes-folder-title" style="font-size:18px;overflow-wrap:anywhere">📁 '+esc(folder.name)+'</div>'
     +'<div class="muted" style="margin-top:4px">'+notes.length+(notes.length===1?' shënim':' shënime')+'</div></div></div>'
     +'<div class="row" style="margin-top:12px"><button class="btn sec sm" onclick="folderForm(\''+folder.id+'\')">Ndrysho dosjen</button>'
     +'<button class="btn danger sm" onclick="folderDel(\''+folder.id+'\')">Fshi dosjen</button></div></div>'
@@ -1368,7 +1487,12 @@ function renderHome(){
   DEBTS.forEach(function(d){
     var paid=paidOf(d), amt=(+d.amount||0), rest=amt-paid;
     if(d.type==="out"){ cashOut+=paid; if(rest>0) owing+=rest; }
-    else { cashIn+=paid; if(rest>0) waiting+=rest; }
+    else {
+      cashIn+=paid;
+      if(rest>0) waiting+=rest;
+      owing+=creditOf(d);
+      cashOut+=creditRefunded(d);
+    }
   });
   var expTot=EXP.reduce(function(s,e){return s+(+e.amount||0);},0);
   var outAll=cashOut+expTot;
@@ -1548,34 +1672,52 @@ function pdfFin(){
   const only=$("rp_s").querySelector(".on").dataset.m==="open";
   const inR=d=>(d.date||"")>=a&&(d.date||"")<=b;
 
-  let D=DEBTS.filter(inR); if(only)D=D.filter(d=>paidOf(d)<(d.amount||0));
+  const allD=DEBTS.filter(inR);
+  let D=allD.slice(); if(only)D=D.filter(d=>paidOf(d)<(d.amount||0));
   const E=EXP.filter(inR).sort((x,y)=>(x.date||"").localeCompare(y.date||""));
-  const IN=D.filter(d=>d.type!=="out"), OUT=D.filter(d=>d.type==="out");
+  const IN=D.filter(d=>d.type!=="out"), OUTactual=D.filter(d=>d.type==="out");
+  const prepaymentSources=allD.filter(d=>d.type!=="out"&&creditRaw(d)>0&&(!only||creditOf(d)>0));
+  const PRE=prepaymentDebtRows(prepaymentSources), OUT=OUTactual.concat(PRE);
+  const cashInRows=allD.filter(d=>d.type!=="out"),cashOutRows=allD.filter(d=>d.type==="out");
 
   const sum=(l,f)=>l.reduce((s,x)=>s+f(x),0);
-  const inTot=sum(IN,d=>+d.amount||0), inPaid=sum(IN,paidOf), inRest=inTot-inPaid;
-  const outTot=sum(OUT,d=>+d.amount||0), outPaid=sum(OUT,paidOf), outRest=outTot-outPaid;
+  const inTot=sum(IN,d=>+d.amount||0), inTablePaid=sum(IN,paidOf);
+  const inRest=sum(IN,d=>Math.max(0,(+d.amount||0)-paidOf(d)));
+  const outTot=sum(OUT,d=>+d.amount||0);
+  const outUsed=sum(prepaymentSources,creditUsed);
+  const outTableCashPaid=sum(OUTactual,paidOf)+sum(prepaymentSources,creditRefunded);
+  const outRest=sum(OUT,d=>Math.max(0,(+d.amount||0)-paidOf(d)));
+  const inPaid=sum(cashInRows,paidOf);
+  const outPaid=sum(cashOutRows,paidOf)+sum(cashInRows,creditRefunded);
   const expTot=sum(E,e=>+e.amount||0);
   const expCash=sum(E.filter(e=>e.method!=="bank"),e=>+e.amount||0);
   const expBank=expTot-expCash;
   const bal=inPaid-outPaid-expTot;
   const proj=bal+inRest-outRest;
 
-  const st=d=>{const r=(d.amount||0)-paidOf(d);
-    if(creditOf(d)>0) return '<span class="pill">KREDI</span>';
+  const st=d=>{const r=Math.max(0,(d.amount||0)-paidOf(d));
+    if(!d._isPrepayment&&creditOf(d)>0) return '<span class="pill">KREDI</span>';
     return r<=0?'<span class="pill">PAGUAR</span>':paidOf(d)>0?'<span class="pill">PJESËRISHT</span>':'<span class="pill">PAPAGUAR</span>';};
-  const meth=d=>{const m=[...new Set((d.payments||[]).map(p=>p.method))];
-    return m.length?m.map(x=>x==="bank"?"Bankë":"Cash").join(", "):"—";};
-  const tbl=(l,lbl)=>l.length?`<table><tr><th>Emri</th><th>Data</th><th>Mënyra</th><th>Statusi</th><th class="r">Shuma</th><th class="r">Paguar</th><th class="r">Mbetur</th><th class="r">Kredi</th></tr>
-    ${l.sort((x,y)=>(x.date||"").localeCompare(y.date||"")).map(d=>`<tr><td><b>${esc(d.name)}</b>${d.note?`<br><small>${esc(d.note)}</small>`:""}</td>
+  const meth=d=>{
+    if(d._isPrepayment){
+      var source=d._source,methods=[...new Set((source.creditRefunds||[]).map(r=>r.method))],parts=[];
+      if(creditUsed(source)>0)parts.push("Përdorur");
+      if(methods.length)parts.push("Kthyer "+methods.map(x=>x==="bank"?"Bankë":"Cash").join(", "));
+      return parts.join("; ")||"—";
+    }
+    const m=[...new Set((d.payments||[]).map(p=>p.method))];
+    return m.length?m.map(x=>x==="bank"?"Bankë":"Cash").join(", "):"—";
+  };
+  const tbl=(l,lbl)=>l.length?`<table><tr><th>Emri</th><th>Data</th><th>Mënyra</th><th>Statusi</th><th class="r">Shuma</th><th class="r">${l.some(d=>d._isPrepayment)?"Shlyer / përdorur":"Paguar"}</th><th class="r">Mbetur</th><th class="r">Kredi</th></tr>
+    ${l.sort((x,y)=>(x.date||"").localeCompare(y.date||"")).map(d=>`<tr><td><b>${esc(d.name)}</b>${d.note?`<br><small>${esc(d.note)}</small>`:""}${d._isPrepayment?`<br><small>Përdorur ${fmt(creditUsed(d._source))} · kthyer ${fmt(creditRefunded(d._source))}</small>`:""}</td>
       <td>${d.date||""}</td><td>${meth(d)}</td><td>${st(d)}</td>
       <td class="r">${fmt(d.amount)}</td><td class="r">${fmt(paidOf(d))}</td><td class="r"><b>${fmt(Math.max(0,(d.amount||0)-paidOf(d)))}</b></td>
-      <td class="r">${creditOf(d)>0?fmt(creditOf(d)):"—"}</td></tr>`).join("")}
-    <tr class="tot"><td colspan="4">${lbl}</td><td class="r">${fmt(sum(l,d=>+d.amount||0))}</td><td class="r">${fmt(sum(l,paidOf))}</td><td class="r">${fmt(sum(l,d=>Math.max(0,(d.amount||0)-paidOf(d))))}</td><td class="r">${fmt(sum(l,creditOf))}</td></tr></table>`
+      <td class="r">${!d._isPrepayment&&creditOf(d)>0?fmt(creditOf(d)):"—"}</td></tr>`).join("")}
+    <tr class="tot"><td colspan="4">${lbl}</td><td class="r">${fmt(sum(l,d=>+d.amount||0))}</td><td class="r">${fmt(sum(l,paidOf))}</td><td class="r">${fmt(sum(l,d=>Math.max(0,(d.amount||0)-paidOf(d))))}</td><td class="r">${fmt(sum(l,d=>d._isPrepayment?0:creditOf(d)))}</td></tr></table>`
     :`<p><small>Asnjë zë.</small></p>`;
 
   const cats={};E.forEach(e=>cats[e.cat||"Tjetër"]=(cats[e.cat||"Tjetër"]||0)+(+e.amount||0));
-  const CRED=D.filter(d=>creditRaw(d)>0);
+  const CRED=allD.filter(d=>creditRaw(d)>0&&(!only||creditOf(d)>0));
   const credTot=CRED.reduce((s,d)=>s+creditOf(d),0);
 
   prn("Bilanci financiar",`
@@ -1587,12 +1729,12 @@ function pdfFin(){
     <div class="v ${bal>=0?"pos":"neg"}">${bal>=0?"+":"−"}${fmt(Math.abs(bal))}</div>
     <div class="l" style="margin-top:6px;text-transform:none;letter-spacing:0">
       ${bal>=0?"Je në plus.":"Ke dalë me minus."}
-      Llogaritur: arkëtuar ${fmt(inPaid)} − paguar borxhe ${fmt(outPaid)} − shpenzime ${fmt(expTot)}</div>
+      Llogaritur: arkëtuar ${fmt(inPaid)} − paguar borxhe / kthime parapagimesh ${fmt(outPaid)} − shpenzime ${fmt(expTot)}</div>
   </div>
 
   <div class="grid">
     <div class="g"><div class="l">Arkëtuar</div><div class="v pos">${fmt(inPaid)}</div></div>
-    <div class="g"><div class="l">Paguar borxhe</div><div class="v neg">${fmt(outPaid)}</div></div>
+    <div class="g"><div class="l">Borxhe / parapagime të kthyera</div><div class="v neg">${fmt(outPaid)}</div></div>
     <div class="g"><div class="l">Shpenzime</div><div class="v neg">${fmt(expTot)}</div></div>
   </div>
   <div class="grid">
@@ -1605,15 +1747,18 @@ function pdfFin(){
   <h2>2. Kam borxh unë (${OUT.length})</h2>${tbl(OUT,"TOTALI")}
 
   ${CRED.length?`<h2>Kredi / parapagime (${CRED.length})</h2>
-   <table><tr><th>Emri</th><th>Për çfarë</th><th class="r">Gjithsej</th><th class="r">Përdorur</th><th class="r">Mbetur</th></tr>
-   ${CRED.map(d=>`<tr><td><b>${esc(d.name)}</b>${(d.uses||[]).length?`<br><small>${d.uses.map(u=>esc((u.date||"")+(u.note?" "+u.note:""))+" −"+fmt(u.amount)).join("<br>")}</small>`:""}</td>
+   <p><small>Parapagimet e mbetura shfaqen edhe te “Kam borxh unë”.</small></p>
+   <table><tr><th>Emri</th><th>Për çfarë</th><th class="r">Gjithsej</th><th class="r">Përdorur</th><th class="r">Kthyer</th><th class="r">Mbetur</th></tr>
+   ${CRED.map(d=>`<tr><td><b>${esc(d.name)}</b></td>
      <td>${esc(creditNote(d)||"—")}</td>
      <td class="r">${fmt(creditRaw(d))}</td>
      <td class="r">${creditUsed(d)>0?fmt(creditUsed(d)):"—"}</td>
+     <td class="r">${creditRefunded(d)>0?fmt(creditRefunded(d)):"—"}</td>
      <td class="r"><b>${fmt(creditOf(d))}</b></td></tr>`).join("")}
    <tr class="tot"><td colspan="2">TOTALI</td>
      <td class="r">${fmt(CRED.reduce((s,d)=>s+creditRaw(d),0))}</td>
      <td class="r">${fmt(CRED.reduce((s,d)=>s+creditUsed(d),0))}</td>
+     <td class="r">${fmt(CRED.reduce((s,d)=>s+creditRefunded(d),0))}</td>
      <td class="r">${fmt(credTot)}</td></tr></table>`:""}
 
   <h2>3. Shpenzimet (${E.length})</h2>
@@ -1629,11 +1774,12 @@ function pdfFin(){
 
   <h2>Përmbledhje</h2>
   <table>
-    <tr><td>Borxhe që më kanë (totali i regjistruar)</td><td class="r">${fmt(inTot)}</td></tr>
-    <tr><td>&nbsp;&nbsp;— arkëtuar deri tani</td><td class="r">${fmt(inPaid)}</td></tr>
+    <tr><td>Borxhe që më kanë (zërat e përfshirë)</td><td class="r">${fmt(inTot)}</td></tr>
+    <tr><td>&nbsp;&nbsp;— arkëtuar në këta zëra</td><td class="r">${fmt(inTablePaid)}</td></tr>
     <tr><td>&nbsp;&nbsp;— për të marrë</td><td class="r"><b>${fmt(inRest)}</b></td></tr>
-    <tr><td>Borxhe që kam unë (totali i regjistruar)</td><td class="r">${fmt(outTot)}</td></tr>
-    <tr><td>&nbsp;&nbsp;— shlyer deri tani</td><td class="r">${fmt(outPaid)}</td></tr>
+    <tr><td>Borxhe që kam unë, përfshirë parapagimet</td><td class="r">${fmt(outTot)}</td></tr>
+    <tr><td>&nbsp;&nbsp;— shlyer me cash/bankë në zërat e përfshirë</td><td class="r">${fmt(outTableCashPaid)}</td></tr>
+    <tr><td>&nbsp;&nbsp;— përdorur nga parapagimet (jo cash)</td><td class="r">${fmt(outUsed)}</td></tr>
     <tr><td>&nbsp;&nbsp;— për të dhënë</td><td class="r"><b>${fmt(outRest)}</b></td></tr>
     <tr><td>Shpenzime gjithsej</td><td class="r"><b>${fmt(expTot)}</b></td></tr>
     <tr class="tot"><td>GJENDJA AKTUALE (arkëtuar − paguar − shpenzime)</td><td class="r ${bal>=0?"pos":"neg"}">${bal>=0?"+":"−"}${fmt(Math.abs(bal))}</td></tr>
@@ -1792,6 +1938,6 @@ function pdfRent(y,fullPeriod){
 
 go("home");
 </script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4eada4f2ea4a5b3',t:'MTc5MjY5Njc1Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
