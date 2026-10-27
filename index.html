@@ -59,6 +59,64 @@ nav button .ic{font-size:20px;line-height:1}
 nav button.on{color:var(--acc)}
 .view{display:none}.view.on{display:block}
 
+/* Klientët dhe borxhet */
+.client-list-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 10px}
+.client-list-head h2{font-size:17px}
+.client-list-head .muted{font-size:12px;margin-top:3px}
+.client-card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:9px;overflow:hidden}
+.client-open{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:13px;border:0;background:transparent;color:var(--txt);text-align:left;font:inherit;cursor:pointer}
+.client-open:active{background:var(--card2)}
+.client-open:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.client-main{min-width:0;flex:1}
+.client-name{font-size:15px;font-weight:750;overflow-wrap:anywhere}
+.client-small{font-size:11px;color:var(--dim);margin-top:4px;line-height:1.35}
+.client-value{white-space:nowrap;text-align:right;font-size:14px;font-weight:800}
+.client-due{color:#8ab4ff}.client-credit{color:#5ee89b}.client-closed{color:var(--dim)}
+.client-detail-head{display:flex;align-items:center;gap:10px;margin:2px 0 12px}
+.client-detail-head h2{font-size:18px;min-width:0;overflow-wrap:anywhere;flex:1}
+.client-balance{padding:15px;border:1px solid var(--line);border-radius:16px;background:var(--card);margin-bottom:12px}
+.client-balance-label{font-size:12px;color:var(--dim);font-weight:700}
+.client-balance-value{font-size:26px;font-weight:850;margin-top:4px;letter-spacing:-.4px}
+.client-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:10px 0 14px}
+.client-actions button{min-width:0}
+.client-ledger-title{font-size:14px;font-weight:800;margin:18px 2px 9px}
+.client-history{margin-top:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+.client-history .debt-history-list{max-height:none}
+.client-bill{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:12px;margin-bottom:9px}
+.client-prepayment{border-color:rgba(52,211,153,.35);background:linear-gradient(135deg,rgba(16,185,129,.07),var(--card) 65%)}
+.client-prepayment-total{color:#7be7b3}
+.client-bill-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.client-bill-name{font-weight:750;font-size:14px;overflow-wrap:anywhere}
+.client-bill-meta{font-size:11.5px;color:var(--dim);margin-top:4px;line-height:1.4}
+.client-bill-total{font-size:14px;font-weight:800;text-align:right;white-space:nowrap}
+.client-bill-actions{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+.client-bill-status{display:inline-flex;align-items:center;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:850;letter-spacing:.2px}
+.client-bill-status.settled{background:rgba(52,211,153,.14);color:#7be7b3}
+.client-bill-status.partial{background:rgba(251,191,36,.14);color:#ffd36a}
+.client-bill-status.open{background:rgba(248,113,113,.14);color:#ff9e9e}
+.client-payment-list{display:grid;gap:7px;margin-top:10px}
+.client-payment-list-title{font-size:11px;font-weight:800;color:var(--dim);letter-spacing:.2px;margin-bottom:1px}
+.client-payment-row{position:relative;border:1px solid var(--line);border-radius:10px;padding:8px 36px 8px 9px;background:var(--card2);min-width:0}
+.client-payment-row.cash{border-color:rgba(52,211,153,.38);background:rgba(16,185,129,.075)}
+.client-payment-row.bank{border-color:rgba(96,165,250,.4);background:rgba(59,130,246,.08)}
+.client-payment-row.credit{border-color:rgba(251,191,36,.4);background:rgba(245,158,11,.08)}
+.client-payment-head{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0}
+.client-payment-badge{display:inline-flex;align-items:center;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:800;line-height:1.2}
+.client-payment-row.cash .client-payment-badge{background:rgba(52,211,153,.16);color:#91f0c1}
+.client-payment-row.bank .client-payment-badge{background:rgba(96,165,250,.18);color:#a9ccff}
+.client-payment-row.credit .client-payment-badge{background:rgba(251,191,36,.18);color:#ffda7d}
+.client-payment-date{font-size:10.5px;color:var(--dim)}
+.client-payment-amount{margin-left:auto;font-size:12px;font-weight:850;white-space:nowrap}
+.client-payment-row.cash .client-payment-amount{color:#7be7b3}
+.client-payment-row.bank .client-payment-amount{color:#9cc2ff}
+.client-payment-row.credit .client-payment-amount{color:#ffd36a}
+.client-payment-note{font-size:12px;line-height:1.4;margin-top:6px;overflow-wrap:anywhere;color:var(--txt)}
+.client-payment-note-label{font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.3px;color:var(--dim);margin-right:4px}
+.client-payment-note.empty{color:var(--dim);font-style:italic}
+.client-payment-delete{position:absolute;right:7px;top:7px;width:23px;height:23px;border:0;border-radius:7px;background:rgba(248,113,113,.12);color:#ff9999;font-size:14px;line-height:1;cursor:pointer}
+.client-note{padding:10px 12px;border-radius:11px;background:rgba(59,130,246,.1);color:#c6d8ff;font-size:12px;line-height:1.4;margin:10px 0}
+.client-warning{padding:10px 12px;margin:10px 0;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);border-radius:10px;color:#fcd890;font-size:12px;line-height:1.4}
+
 /* Borxhet: ndarje e qarte sipas drejtimit */
 .debt-type-switch{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
 .debt-type-tab{min-width:0;min-height:91px;text-align:left;display:flex;flex-direction:column;
@@ -73,11 +131,47 @@ nav button.on{color:var(--acc)}
 .debt-type-tab.on.out{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.55)}
 .debt-type-tab.on.out strong{color:#ff9c9c}
 .debt-filter-label{font-size:12px;font-weight:700;margin:0 2px 6px}
+.debt-search{margin:12px 0}
+.debt-search label{margin:0 2px 5px}
+.debt-name-group{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
+.debt-name-group>summary{list-style:none;position:relative;cursor:pointer;padding:13px 42px 13px 13px}
+.debt-name-group>summary::-webkit-details-marker{display:none}
+.debt-name-group>summary::after{content:"⌄";position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:20px}
+.debt-name-group[open]>summary::after{content:"⌃"}
+.debt-name-group>summary:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.debt-group-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.debt-group-title{min-width:0;font-weight:700;font-size:15px;overflow-wrap:anywhere}
+.debt-group-total{white-space:nowrap;text-align:right;font-weight:800;font-size:14px}
+.debt-group-meta{display:flex;justify-content:space-between;gap:5px;flex-wrap:wrap;margin-top:5px;font-size:11.5px;color:var(--dim)}
+.debt-group-items{border-top:1px solid var(--line);padding:1px 10px}
+.debt-group-items .item{margin-top:10px}
+.debt-group-items .item:last-child{margin-bottom:10px}
 .debt-direction{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:5px}
 .debt-kind{display:inline-flex;align-items:center;border-radius:999px;padding:4px 7px;
   font-size:10.5px;font-weight:800;letter-spacing:.15px;line-height:1.2}
 .debt-kind.in{background:rgba(59,130,246,.15);color:#9cc2ff}
 .debt-kind.out{background:rgba(239,68,68,.15);color:#ffaaaa}
+.debt-history-single{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.debt-history-single>summary{cursor:pointer;color:#9cc2ff;font-weight:700;font-size:12px;list-style:none}
+.debt-history-single>summary::-webkit-details-marker{display:none}
+.debt-history-inline{margin:10px 0 12px;padding:10px 0 0;border-top:1px solid var(--line)}
+.debt-history-heading{font-size:12px;font-weight:800;color:#9cc2ff;margin-bottom:8px}
+.debt-history-list{display:grid;gap:0;max-height:360px;overflow:auto;padding:0 2px 0 0}
+.debt-history-event{position:relative;display:grid;grid-template-columns:12px minmax(0,1fr);gap:8px;padding:0 0 12px;min-width:0}
+.debt-history-event:before{content:"";position:absolute;left:4px;top:9px;bottom:0;width:1px;background:var(--line)}
+.debt-history-event:last-child:before{display:none}
+.debt-history-dot{position:relative;z-index:1;width:9px;height:9px;margin-top:3px;border-radius:50%;background:#60a5fa;border:2px solid var(--card)}
+.debt-history-event.created .debt-history-dot,.debt-history-event.baseline .debt-history-dot{background:#34d399}
+.debt-history-event.updated .debt-history-dot,.debt-history-event.credit_note_updated .debt-history-dot{background:#fbbf24}
+.debt-history-event.deleted .debt-history-dot,.debt-history-event.payment_deleted .debt-history-dot,.debt-history-event.credit_use_deleted .debt-history-dot{background:#fb7185}
+.debt-history-content{min-width:0;overflow-wrap:anywhere}
+.debt-history-content strong{font-size:12px;line-height:1.3}
+.debt-history-content time{display:block;margin-top:2px;color:var(--dim);font-size:10.5px}
+.debt-history-detail{margin-top:4px;color:var(--dim);font-size:11.5px;line-height:1.4;overflow-wrap:anywhere}
+.debt-history-archived{margin-top:5px;color:var(--dim);font-size:11px}
+.debt-history-archived summary{cursor:pointer;color:#fcc65a}
+.debt-history-warning{padding:10px 12px;margin:10px 0;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);border-radius:10px;color:#fcd890;font-size:12px;line-height:1.4}
+.debt-archive-note{padding:10px;margin:10px 0;color:var(--dim);font-size:12px;text-align:center}
 
 /* Shënimet dhe dosjet */
 .notes-intro{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -323,8 +417,8 @@ body.printing #pdfFab{display:block}
       <div class="muted">Të kanë borxh gjithsej</div>
       <div class="big" id="sumDebt" style="color:#8ab4ff">0</div>
       <div class="grid2" style="margin-top:12px">
-        <div class="stat"><div class="l">Të papaguara</div><div class="v" id="cntOpen">0</div></div>
-        <div class="stat"><div class="l">Të mbyllura</div><div class="v" id="cntDone">0</div></div>
+        <div class="stat"><div class="l">Klientë me detyrim</div><div class="v" id="cntOpen">0</div></div>
+        <div class="stat"><div class="l">Klientë pa detyrim</div><div class="v" id="cntDone">0</div></div>
       </div>
     </div>
     <div class="card">
@@ -341,14 +435,13 @@ body.printing #pdfFab{display:block}
     </div>
   </div>
 
-  <!-- BORXHE -->
+  <!-- KLIENTËT / BORXHET -->
   <div id="v-debt" class="view">
-    <div class="muted" style="font-weight:700;margin:0 2px 7px">Zgjidh cilat borxhe dëshiron të shohësh:</div>
-    <div class="debt-type-switch" role="group" aria-label="Ndarja e borxheve">
+    <div class="debt-type-switch" role="group" aria-label="Llogaritë">
       <button type="button" id="debtTypeIn" class="debt-type-tab on in" aria-pressed="true" onclick="setDebtType('in')">
-        <span class="kicker">TË MË PAGUAJNË</span>
-        <strong>Më kanë borxh mua</strong>
-        <span class="summary"><b id="debtInTotal">0 LEK</b> · <span id="debtInCount">0 borxhe të hapura</span></span>
+        <span class="kicker">KLIENTËT</span>
+        <strong>Klientët</strong>
+        <span class="summary"><b id="debtInTotal">0 LEK</b> · <span id="debtInCount">0 klientë me detyrim</span></span>
       </button>
       <button type="button" id="debtTypeOut" class="debt-type-tab out" aria-pressed="false" onclick="setDebtType('out')">
         <span class="kicker">UNË PAGUAJ</span>
@@ -356,14 +449,36 @@ body.printing #pdfFab{display:block}
         <span class="summary"><b id="debtOutTotal">0 LEK</b> · <span id="debtOutCount">0 borxhe të hapura</span></span>
       </button>
     </div>
-    <div class="debt-filter-label muted">Statusi i pagesës</div>
-    <div class="seg" id="debtStatusTabs" style="margin-bottom:12px">
-      <button class="on" data-f="open" onclick="fDebt('open',this)">Të papaguara</button>
-      <button data-f="paid" onclick="fDebt('paid',this)">Të paguara</button>
-      <button data-f="all" onclick="fDebt('all',this)">Të gjitha</button>
+
+    <div id="clientSection">
+      <div id="clientListView">
+        <div class="client-list-head">
+          <div><h2>Lista e klientëve</h2><div class="muted">Prek një klient për llogarinë dhe historikun.</div></div>
+          <button class="btn sm" onclick="clientForm()">+ Klient</button>
+        </div>
+        <div class="debt-search">
+          <label for="clientSearch">Kërko klientin</label>
+          <input id="clientSearch" type="search" autocomplete="off" placeholder="Shkruaj emrin..." oninput="renderClients()">
+        </div>
+        <div id="clientList"></div>
+      </div>
+      <div id="clientDetailView" style="display:none"><div id="clientDetail"></div></div>
     </div>
-    <div id="debtList"></div>
-    <button class="btn sec full sm" style="margin:4px 0 12px" onclick="repForm('fin')">📄 Shkarko bilancin (PDF)</button>
+
+    <div id="outgoingSection" style="display:none">
+      <div class="debt-search">
+        <label for="debtSearch">Kërko sipas emrit</label>
+        <input id="debtSearch" type="search" autocomplete="off" placeholder="Shkruaj emrin e personit..." oninput="renderDebts()">
+      </div>
+      <div class="debt-filter-label muted">Statusi i pagesës</div>
+      <div class="seg" id="debtStatusTabs" style="margin-bottom:12px">
+        <button class="on" data-f="open" onclick="fDebt('open',this)">Të papaguara</button>
+        <button data-f="paid" onclick="fDebt('paid',this)">Të paguara</button>
+        <button data-f="all" onclick="fDebt('all',this)">Të gjitha</button>
+      </div>
+      <div id="debtList"></div>
+    </div>
+    <button class="btn sec full sm" style="margin:8px 0 12px" onclick="repForm('fin')">📄 Shkarko bilancin (PDF)</button>
   </div>
 
   <!-- QIRAJA -->
@@ -477,7 +592,7 @@ service cloud.firestore {
 
 <nav>
   <button class="on" data-v="home" onclick="go('home')"><span class="ic">📊</span>Kreu</button>
-  <button data-v="debt" onclick="go('debt')"><span class="ic">🤝</span>Borxhe</button>
+  <button data-v="debt" onclick="go('debt')"><span class="ic">👤</span>Klientët</button>
   <button data-v="rent" onclick="go('rent')"><span class="ic">🏠</span>Qiraja</button>
   <button data-v="exp" onclick="go('exp')"><span class="ic">🧾</span>Shpenzime</button>
   <button data-v="notes" onclick="go('notes')"><span class="ic">📝</span>Shënime</button>
@@ -582,19 +697,200 @@ function doAuth(){
 function logout(){auth.signOut();}
 
 /* ---------- state ---------- */
-let DEBTS=[],RENT=[],EXP=[],FOLDERS=[],NOTES=[],SET={currency:"LEK",rent:0};
+let DEBTS=[],DEBT_HISTORY=[],DEBT_HISTORY_ERROR=null,DEBT_HISTORY_LOADED=false;
+let CLIENTS=[],CLIENTS_LOADED=false,DEBTS_LOADED=false,CLIENT_MIGRATION_BUSY=false,CLIENT_MIGRATION_ERROR=null,CLIENT_DETAIL_ID=null,CLIENT_CREDIT_BUSY=new Set();
+let ARCHIVE_PURGE_BUSY=false,ARCHIVE_PURGE_DONE_UID="";
+let RENT=[],EXP=[],FOLDERS=[],NOTES=[],SET={currency:"LEK",rent:0};
 let YEAR=new Date().getFullYear(), MIDX=new Date().getMonth(), MYEAR=new Date().getFullYear();
-let VIEW="home", DF="open", DTYPE="in", OPEN_FOLDER_ID=null, NOTE_EDIT=null, FOLDER_DELETE_BUSY=false;
+let VIEW="home", DF="open", DTYPE="in", OPEN_FOLDER_ID=null, NOTE_EDIT=null, FOLDER_DELETE_BUSY=false, DEBT_OPEN_GROUPS=Object.create(null);
 const col=n=>db.collection("users").doc(UID).collection(n);
 
+function debtHistoryGroupRef(name,type){
+  var display=String(name||"").trim()||"Pa emër",direction=type==="out"?"out":"in";
+  return {key:direction+"|"+normalizeDebtName(display),name:display,type:direction};
+}
+function debtAuditSnapshot(d,includeLedger){
+  var snap={name:String(d.name||"").trim()||"Pa emër",amount:+d.amount||0,
+    type:d.type==="out"?"out":"in",date:String(d.date||""),note:String(d.note||""),
+    creditNote:String(d.creditNote||""),clientId:String(d.clientId||""),prepaymentOnly:!!d.prepaymentOnly};
+  if(includeLedger){
+    snap.payments=(d.payments||[]).map(function(p){return {amount:+p.amount||0,
+      method:p.method==="credit"?"credit":p.method==="bank"?"bank":"cash",date:String(p.date||""),note:String(p.note||""),
+      ts:+p.ts||0,credit:+p.credit||0,cnote:String(p.cnote||""),groupId:String(p.groupId||""),sourceDebtId:String(p.sourceDebtId||"")};});
+    snap.uses=(d.uses||[]).map(function(u){return {amount:+u.amount||0,date:String(u.date||""),
+      note:String(u.note||""),ts:+u.ts||0};});
+    snap.creditRefunds=(d.creditRefunds||[]).map(function(r){return {amount:+r.amount||0,
+      method:r.method==="bank"?"bank":"cash",date:String(r.date||""),note:String(r.note||""),ts:+r.ts||0};});
+  }
+  return snap;
+}
+function debtAuditGroups(){
+  var refs=[];
+  function add(ref){if(ref&&!refs.some(function(x){return x.key===ref.key;}))refs.push(ref);}
+  Array.from(arguments).forEach(function(s){
+    if(!s)return;
+    add(debtHistoryGroupRef(s.name,s.type));
+    var paid=(s.payments||[]).reduce(function(total,p){return total+(+p.amount||0);},0);
+    if(s.type!=="out"&&Math.max(0,paid-(+s.amount||0))>0)add(debtHistoryGroupRef(s.name,"out"));
+  });
+  return refs;
+}
+function makeDebtHistoryEvent(action,debtId,groups,extra){
+  var refs=(groups||[]).filter(Boolean);
+  var event=Object.assign({debtId:String(debtId||""),action:action,at:Date.now()},extra||{});
+  event.groups=refs;event.groupKeys=refs.map(function(g){return g.key;});
+  return event;
+}
+function debtHistoryEventsForExisting(d,events){
+  events=events||[];
+  var exists=DEBT_HISTORY.some(function(e){return String(e.debtId||"")===String(d.id||"");});
+  events.forEach(function(e){if(d.clientId&&!e.clientId)e.clientId=String(d.clientId);});
+  if(!exists){
+    var snap=debtAuditSnapshot(d,true);
+    if(DEBT_HISTORY_LOADED&&!DEBT_HISTORY_ERROR){
+      events.unshift(makeDebtHistoryEvent("baseline",d.id,debtAuditGroups(snap),
+        {after:snap,legacy:true,clientId:String(d.clientId||""),at:Date.now()}));
+    }else{
+      events.forEach(function(e){if(!e.before)e.before=snap;});
+    }
+  }
+  return events;
+}
+function commitDebtAudit(changes,events){
+  var batch=db.batch();
+  (changes||[]).forEach(function(change){
+    var ref=col(change.collection||"debts").doc(change.id);
+    if(change.op==="set")batch.set(ref,change.data);
+    else if(change.op==="delete")batch.delete(ref);
+    else batch.update(ref,change.data);
+  });
+  (events||[]).forEach(function(event){
+    var historyCol=col("debtHistory"),ref;
+    if(event.action==="baseline"&&event.debtId){
+      var suffix=encodeURIComponent(String(event.debtId)).replace(/%/g,"_").slice(0,120);
+      ref=historyCol.doc("baseline_"+suffix);
+    }else ref=historyCol.doc();
+    batch.set(ref,event);
+  });
+  return batch.commit();
+}
+function runDebtAudit(changes,events,onSuccess){
+  try{
+    return commitDebtAudit(changes,events).then(function(){if(onSuccess)onSuccess();})
+      .catch(function(e){debtAuditWriteFailed(e);});
+  }catch(e){debtAuditWriteFailed(e);return Promise.resolve();}
+}
+function debtAuditWriteFailed(e){
+  console.error("Debt history write failed",e);
+  alert("Veprimi nuk u ruajt në cloud, që historiku të mos humbasë. Kontrollo lidhjen dhe rregullat e Firestore për klientët, borxhet dhe debtHistory.");
+}
+function commitCloudChanges(changes){
+  changes=changes||[];var at=0,chunkSize=450;
+  function next(){
+    if(at>=changes.length)return Promise.resolve();
+    var batch=db.batch(),slice=changes.slice(at,at+chunkSize);at+=slice.length;
+    slice.forEach(function(change){
+      var ref=col(change.collection||"debts").doc(change.id);
+      if(change.op==="delete")batch.delete(ref);
+      else if(change.op==="set")batch.set(ref,change.data||{});
+      else batch.update(ref,change.data||{});
+    });
+    return batch.commit().then(next);
+  }
+  return next();
+}
+function sameLedgerItem(a,b){
+  if(!a||!b)return false;
+  var at=+(a.ts||0),bt=+(b.ts||0);
+  if(at&&bt)return at===bt;
+  return (+a.amount||0)===(+b.amount||0)&&String(a.date||"")===String(b.date||"")
+    &&String(a.note||"")===String(b.note||"");
+}
+function historyChangesWithoutDeletedItems(deletions,permanentDebtIds){
+  var removeDebtIds=new Set((permanentDebtIds||[]).map(String)),targets=deletions||[],changesById=new Map();
+  DEBT_HISTORY.forEach(function(event){
+    var debtId=String(event.debtId||""),eventId=String(event.id||"");if(!debtId||!eventId)return;
+    if(removeDebtIds.has(debtId)){changesById.set(eventId,{op:"delete",collection:"debtHistory",id:eventId});return;}
+    var relevant=targets.filter(function(x){return String(x.debtId)===debtId;});if(!relevant.length)return;
+    var removeEvent=relevant.some(function(target){
+      var item=event.item||{},ts=+(event.itemTs||item.ts||0),targetTs=+(target.item&&target.item.ts||0);
+      var same=targetTs&&ts?targetTs===ts:sameLedgerItem(item,target.item);
+      return same&&(event.action===target.addAction||event.action===target.removeAction);
+    });
+    if(removeEvent){changesById.set(eventId,{op:"delete",collection:"debtHistory",id:eventId});return;}
+    var copy=JSON.parse(JSON.stringify(event)),changed=false;
+    relevant.forEach(function(target){
+      ["before","after"].forEach(function(side){
+        var snapshot=copy[side];if(!snapshot||!Array.isArray(snapshot[target.field]))return;
+        var next=snapshot[target.field].filter(function(item){return !sameLedgerItem(item,target.item);});
+        if(next.length!==snapshot[target.field].length){snapshot[target.field]=next;changed=true;}
+      });
+    });
+    if(changed){delete copy.id;changesById.set(eventId,{op:"update",collection:"debtHistory",id:eventId,data:copy});}
+  });
+  return Array.from(changesById.values());
+}
+function applyLocalHistoryChanges(changes){
+  (changes||[]).filter(function(x){return x.collection==="debtHistory";}).forEach(function(change){
+    var idx=DEBT_HISTORY.findIndex(function(e){return String(e.id)===String(change.id);});
+    if(change.op==="delete"){if(idx>=0)DEBT_HISTORY.splice(idx,1);return;}
+    if(change.op==="set"){
+      var value=Object.assign({id:String(change.id)},change.data||{});
+      if(idx>=0)DEBT_HISTORY[idx]=value;else DEBT_HISTORY.push(value);return;
+    }
+    if(idx>=0)DEBT_HISTORY[idx]=Object.assign({},DEBT_HISTORY[idx],change.data||{});
+  });
+}
+function maybePurgeArchivedDebtHistory(){
+  if(!UID||!DEBTS_LOADED||!DEBT_HISTORY_LOADED||DEBT_HISTORY_ERROR||ARCHIVE_PURGE_BUSY
+    ||ARCHIVE_PURGE_DONE_UID===String(UID))return;
+  var activeIds=new Set(DEBTS.map(function(d){return String(d.id||"");}));
+  var removedDebtIds=new Set(DEBT_HISTORY.filter(function(e){return e.action==="deleted"&&e.debtId
+    &&!activeIds.has(String(e.debtId));}).map(function(e){return String(e.debtId);}));
+  var oldLedgerDeletes=[];
+  DEBT_HISTORY.forEach(function(e){
+    if(removedDebtIds.has(String(e.debtId||""))||!e.item)return;
+    if(e.action==="payment_deleted")oldLedgerDeletes.push({debtId:String(e.debtId),field:"payments",item:e.item,
+      addAction:"payment_added",removeAction:"payment_deleted"});
+    if(e.action==="credit_use_deleted")oldLedgerDeletes.push({debtId:String(e.debtId),field:"uses",item:e.item,
+      addAction:"credit_used",removeAction:"credit_use_deleted"});
+  });
+  var changes=historyChangesWithoutDeletedItems(oldLedgerDeletes,Array.from(removedDebtIds));
+  if(!changes.length){ARCHIVE_PURGE_DONE_UID=String(UID);return;}
+  var eventCount=changes.length,entryCount=removedDebtIds.size;
+  if(!confirm("U gjetën "+entryCount+" borxhe të fshira dhe "+eventCount+
+    " hyrje historiku për pastrim. Të fshihen përgjithmonë nga cloud? Ky veprim nuk mund të zhbëhet.")){
+    ARCHIVE_PURGE_DONE_UID=String(UID);return;
+  }
+  ARCHIVE_PURGE_BUSY=true;
+  commitCloudChanges(changes).then(function(){
+    applyLocalHistoryChanges(changes);ARCHIVE_PURGE_DONE_UID=String(UID);ARCHIVE_PURGE_BUSY=false;
+    syncLegacyClients();render();toast("Arkivi i fshirjeve u pastrua përgjithmonë");
+  }).catch(function(e){
+    ARCHIVE_PURGE_BUSY=false;console.error("Archive purge failed",e);
+    alert("Arkivi nuk u pastrua plotësisht në cloud. Kontrollo internetin dhe lejet për debtHistory.");
+  });
+}
+function deleteDebtPermanently(id){
+  if(!DEBT_HISTORY_LOADED||DEBT_HISTORY_ERROR)return Promise.reject(new Error("Historiku cloud nuk u ngarkua."));
+  var changes=historyChangesWithoutDeletedItems([], [String(id)]);
+  changes.push({op:"delete",collection:"debts",id:String(id)});
+  return commitCloudChanges(changes).then(function(){applyLocalHistoryChanges(changes);});
+}
+
 function start(){
+  CLIENTS=[];DEBTS=[];DEBT_HISTORY=[];CLIENTS_LOADED=false;DEBTS_LOADED=false;DEBT_HISTORY_LOADED=false;
+  CLIENT_MIGRATION_BUSY=false;CLIENT_MIGRATION_ERROR=null;CLIENT_DETAIL_ID=null;CLIENT_CREDIT_BUSY.clear();
+  ARCHIVE_PURGE_BUSY=false;ARCHIVE_PURGE_DONE_UID="";
   db.collection("users").doc(UID).onSnapshot(d=>{
     SET=Object.assign({currency:"LEK",rent:0},d.data()||{});
     CUR=SET.currency||"LEK";$("curInp").value=CUR;
     if(document.activeElement!==$("rentAmt"))$("rentAmt").value=SET.rent||"";
     render();
   });
-  col("debts").onSnapshot(s=>{DEBTS=s.docs.map(d=>({id:d.id,...d.data()}));render();});
+  col("clients").onSnapshot(s=>{CLIENTS=s.docs.map(d=>({id:d.id,...d.data()}));CLIENTS_LOADED=true;syncLegacyClients();render();},e=>{CLIENTS_LOADED=true;CLIENT_MIGRATION_ERROR=e;console.warn("Clients could not be read",e);render();});
+  col("debts").onSnapshot(s=>{DEBTS=s.docs.map(d=>({id:d.id,...d.data()}));DEBTS_LOADED=true;maybePurgeArchivedDebtHistory();syncLegacyClients();render();});
+  col("debtHistory").onSnapshot(s=>{DEBT_HISTORY_LOADED=true;DEBT_HISTORY_ERROR=null;DEBT_HISTORY=s.docs.map(d=>({id:d.id,...d.data()}));maybePurgeArchivedDebtHistory();syncLegacyClients();render();},e=>{DEBT_HISTORY_LOADED=true;DEBT_HISTORY_ERROR=e;console.warn("Debt history could not be read",e);render();});
   col("rent").onSnapshot(s=>{RENT=s.docs.map(d=>({id:d.id,...d.data()}));render();});
   col("expenses").onSnapshot(s=>{EXP=s.docs.map(d=>({id:d.id,...d.data()}));render();});
   col("noteFolders").onSnapshot(s=>{FOLDERS=s.docs.map(d=>({id:d.id,...d.data()}));render();});
@@ -607,13 +903,14 @@ function go(v){
   document.querySelectorAll(".view").forEach(e=>e.classList.remove("on"));
   $("v-"+v).classList.add("on");
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
-  $("title").textContent={home:"Përmbledhje",debt:"Borxhe",rent:"Qiraja e shtëpisë",exp:"Shpenzime",notes:"Shënime",set:"Cilësime"}[v];
-  $("fab").style.display=(v==="debt"||v==="exp")?"block":"none";
+  $("title").textContent={home:"Përmbledhje",debt:"Klientët",rent:"Qiraja e shtëpisë",exp:"Shpenzime",notes:"Shënime",set:"Cilësime"}[v];
+  $("fab").style.display=(v==="exp"||(v==="debt"&&DTYPE==="out"))?"block":"none";
+  if(v==="debt")renderDebts();
   if(v==="notes")renderNotes();
   window.scrollTo(0,0);
 }
 function fDebt(f,b){DF=f;b.parentNode.querySelectorAll("button").forEach(x=>x.classList.remove("on"));b.classList.add("on");renderDebts();}
-function setDebtType(t){DTYPE=t==="out"?"out":"in";renderDebts();}
+function setDebtType(t){DTYPE=t==="out"?"out":"in";if(DTYPE==="out")CLIENT_DETAIL_ID=null;renderDebts();}
 function chYear(d){YEAR+=d;renderRent();}
 function chMon(d){MIDX+=d;if(MIDX>11){MIDX=0;MYEAR++}if(MIDX<0){MIDX=11;MYEAR--}renderExp();}
 
@@ -621,12 +918,18 @@ function chMon(d){MIDX+=d;if(MIDX>11){MIDX=0;MYEAR++}if(MIDX<0){MIDX=11;MYEAR--}
 function openM(h){$("sheet").innerHTML=h;$("modal").classList.add("on");}
 function closeM(){if(FOLDER_DELETE_BUSY)return;if(NOTE_EDIT){noteSave();return;}closeMNow();}
 function closeMNow(){$("modal").classList.remove("on");NOTE_EDIT=null;FOLDER_DELETE_BUSY=false;}
-function openAdd(){VIEW==="debt"?debtForm():expForm();}
+function openAdd(){
+  if(VIEW==="debt"){
+    if(DTYPE==="out")debtForm();
+    else CLIENT_DETAIL_ID?clientDebtForm(CLIENT_DETAIL_ID):clientForm();
+  }else expForm();
+}
 
 /* ================= BORXHE ================= */
+const cashPaidOf=d=>d._isPrepayment?0:(d.payments||[]).reduce((s,p)=>s+(p.method==="credit"?0:(+p.amount||0)),0);
 const paidOf=d=>d._isPrepayment?Math.max(0,+d._settledAmount||0):(d.payments||[]).reduce((s,p)=>s+(+p.amount||0),0);
-/* teprica e paguar mbi shumën e borxhit */
-const creditRaw=d=>Math.max(0,paidOf(d)-(+d.amount||0));
+/* Teprica llogaritet vetëm nga paratë e marra realisht; parapagimi i përdorur nuk është cash. */
+const creditRaw=d=>Math.max(0,cashPaidOf(d)-(+d.amount||0));
 /* sa kredi është përdorur (mallra/shërbime të marra) */
 const creditUsed=d=>(d.uses||[]).reduce((s,u)=>s+(+u.amount||0),0);
 /* sa parapagim i është kthyer realisht klientit */
@@ -636,12 +939,13 @@ const creditOf=d=>Math.max(0,creditRaw(d)-creditUsed(d)-creditRefunded(d));
 function prepaymentDebtRows(sources){
   return sources.filter(function(d){return d.type!=="out"&&creditRaw(d)>0;}).map(function(d){
     var raw=creditRaw(d), settled=Math.min(raw,creditUsed(d)+creditRefunded(d));
-    return {id:"prepayment:"+d.id,name:d.name,type:"out",date:d.date||"",amount:raw,
+    var client=d.clientId?CLIENTS.find(function(c){return String(c.id)===String(d.clientId);}):null;
+    return {id:"prepayment:"+d.id,name:client&&client.name||debtDisplayName(d),type:"out",date:d.date||"",amount:raw,
       note:"Parapagim",payments:[],_isPrepayment:true,_sourceId:d.id,_source:d,_settledAmount:settled};
   });
 }
 function outgoingDebtRows(sources){
-  return sources.filter(function(d){return d.type==="out";}).concat(prepaymentDebtRows(sources));
+  return sources.filter(function(d){return d.type==="out";});
 }
 /* shënimi i fundit i lënë për kredinë */
 function creditNote(d){
@@ -655,11 +959,9 @@ function debtForm(id){
   <p class="muted">Regjistro qartë kush duhet të paguajë kë.</p>
   <label>Emri i personit</label><input id="f_n" value="${esc(d.name||"")}" placeholder="p.sh. Arben">
   <label>Shuma</label><input id="f_a" type="number" inputmode="decimal" value="${d.amount||""}" placeholder="0">
-  <label>Lloji i borxhit — zgjidh drejtimin</label>
-  <select id="f_t">
-    <option value="in" ${d.type!=="out"?"selected":""}>Më kanë borxh mua (duhet të marr)</option>
-    <option value="out" ${d.type==="out"?"selected":""}>Unë u kam borxh (duhet të paguaj)</option>
-  </select>
+  <label>Drejtimi</label>
+  <div class="client-note" style="margin-top:6px">Unë u kam borxh (duhet të paguaj)</div>
+  <input id="f_t" type="hidden" value="out">
   <label>Data</label><input id="f_d" type="date" value="${d.date||today()}">
   <label>Shënim</label><input id="f_no" value="${esc(d.note||"")}" placeholder="opsionale">
   <div class="row" style="margin-top:16px">
@@ -669,21 +971,53 @@ function debtForm(id){
   ${id?`<button class="btn danger full sm" style="margin-top:10px" onclick="debtDel('${id}')">Fshi borxhin</button>`:""}`);
 }
 function debtSave(id){
-  const o={name:$("f_n").value.trim(),amount:+$("f_a").value||0,type:$("f_t").value,
+  const o={name:$("f_n").value.trim(),amount:+$("f_a").value||0,type:"out",
     date:$("f_d").value,note:$("f_no").value.trim()};
   if(!o.name||!o.amount){alert("Vendos emrin dhe shumën.");return;}
-  if(id)col("debts").doc(id).update(o);
-  else col("debts").add({...o,payments:[],created:Date.now()});
-  closeM();toast("U ruajt");
+  if(id){
+    var current=DEBTS.find(function(x){return x.id===id;});
+    if(!current){alert("Borxhi nuk u gjet. Rifresko faqen dhe provo përsëri.");return;}
+    var before=debtAuditSnapshot(current,true),after=Object.assign({},before,o);
+    var changed=JSON.stringify(before)!==JSON.stringify(after);
+    if(!changed){closeM();toast("Nuk pati ndryshime");return;}
+    var groups=debtAuditGroups(before,after);
+    var ev=makeDebtHistoryEvent("updated",id,groups,{before:before,after:after});
+    runDebtAudit([{op:"update",id:id,data:o}],debtHistoryEventsForExisting(current,[ev]),function(){
+      closeM();toast("U ruajt dhe historiku u përditësua");
+    });
+  }else{
+    var created=Date.now(),record=Object.assign({},o,{payments:[],created:created});
+    var debtRef=col("debts").doc(),eventRecord=Object.assign({id:debtRef.id},record);
+    var afterNew=debtAuditSnapshot(eventRecord,false);
+    var createEvent=makeDebtHistoryEvent("created",eventRecord.id,[debtHistoryGroupRef(afterNew.name,afterNew.type)],
+      {after:afterNew,at:created});
+    runDebtAudit([{op:"set",id:debtRef.id,data:record}],[createEvent],function(){
+      closeM();toast("U ruajt dhe historiku u përditësua");
+    });
+  }
 }
-function debtDel(id){if(confirm("Të fshihet?")){col("debts").doc(id).delete();closeM();toast("U fshi");}}
+function debtDel(id){
+  var d=DEBTS.find(function(x){return x.id===id;});if(!d)return;
+  if(!DEBT_HISTORY_LOADED||DEBT_HISTORY_ERROR){
+    alert("Historiku cloud nuk u ngarkua, prandaj nuk mund të garantoj fshirjen përfundimtare. Rifresko faqen dhe provo përsëri.");return;
+  }
+  if(!confirm("Të fshihet përgjithmonë ky borxh dhe historiku i tij nga cloud? Nuk do të ruhet në arkiv dhe nuk mund të rikthehet."))return;
+  deleteDebtPermanently(id).then(function(){
+    applyLocalDebtChanges([{op:"delete",id:id}]);closeM();
+    if(d.clientId){openClient(d.clientId);toast("Borxhi dhe historiku i tij u fshinë përgjithmonë");}
+    else{renderDebts();toast("Borxhi dhe historiku i tij u fshinë përgjithmonë");}
+  }).catch(function(e){
+    console.error("Permanent debt deletion failed",e);
+    alert("Borxhi nuk u fshi plotësisht nga cloud. Kontrollo lidhjen dhe lejet për debts/debtHistory.");
+  });
+}
 
 function payForm(id){
   const d=DEBTS.find(x=>x.id===id);
   const rest=(d.amount||0)-paidOf(d);
   const cr=creditOf(d);
   openM(`<h3>Regjistro pagesë</h3>
-  <p class="muted">${esc(d.name)} — ${rest>0?("mbetur "+fmt(rest)):("kredi "+fmt(cr))}</p>
+  <p class="muted">${esc(debtDisplayName(d))} — ${rest>0?("mbetur "+fmt(rest)):("kredi "+fmt(cr))}</p>
   <label>Shuma e paguar</label>
   <input id="p_a" type="number" inputmode="decimal" value="${rest>0?rest:""}" oninput="payPrev('${id}')">
   <div id="p_prev" style="margin-top:8px"></div>
@@ -728,18 +1062,54 @@ function segPick(b){b.parentNode.querySelectorAll("button").forEach(x=>x.classLi
 function paySave(id){
   const a=+$("p_a").value||0;if(!a){alert("Vendos shumën.");return;}
   const m=$("p_m").querySelector(".on").dataset.m;
-  const d=DEBTS.find(x=>x.id===id);
+  const d=DEBTS.find(x=>x.id===id);if(!d)return;
   const rest=Math.max(0,(d.amount||0)-paidOf(d));
   const extra=Math.max(0,a-rest);
   const cn=$("p_cn")?$("p_cn").value.trim():"";
   const rec={amount:a,method:m,date:$("p_d").value,note:$("p_no").value.trim(),ts:Date.now()};
-  if(extra>0){ rec.credit=extra; if(cn) rec.cnote=cn; }
-  const ps=[...(d.payments||[]),rec];
-  const upd={payments:ps};
-  if(cn) upd.creditNote=cn;
-  col("debts").doc(id).update(upd);
-  closeM();
-  toast(extra>0?("Kredi "+fmt(extra)):"Pagesa u shtua");
+  if(extra>0){rec.credit=extra;if(cn)rec.cnote=cn;}
+  const upd={payments:[...(d.payments||[]),rec]};
+  if(cn)upd.creditNote=cn;
+  const afterState=Object.assign({},d,{payments:upd.payments});
+  if(cn)afterState.creditNote=cn;
+  const groups=debtAuditGroups(debtAuditSnapshot(d,true),debtAuditSnapshot(afterState,true));
+  const beforeNote=String(d.creditNote||"");
+  const events=[makeDebtHistoryEvent("payment_added",id,groups,
+    {item:rec,itemTs:rec.ts,businessDate:rec.date})];
+  if(cn&&cn!==beforeNote){
+    events.push(makeDebtHistoryEvent("credit_note_updated",id,groups,
+      {beforeNote:beforeNote,afterNote:cn}));
+  }
+  runDebtAudit([{op:"update",id:id,data:upd}],debtHistoryEventsForExisting(d,events),function(){
+    closeM();toast(extra>0?("Kredi "+fmt(extra)+" u ruajt me historik"):"Pagesa u ruajt me historik");
+  });
+}
+function payDel(id,ts){
+  var d=DEBTS.find(function(x){return x.id===id;});if(!d)return;
+  var item=(d.payments||[]).find(function(p){return p.ts===ts;});if(!item)return;
+  if(item.method==="credit"){toast("Parapagimi automatik menaxhohet nga llogaria e klientit; nuk fshihet veçmas.");return;}
+  if(!DEBT_HISTORY_LOADED||DEBT_HISTORY_ERROR){alert("Historiku cloud nuk u ngarkua, prandaj pagesa nuk mund të fshihet përfundimisht. Rifresko faqen dhe provo përsëri.");return;}
+  if(!confirm("Të fshihet përgjithmonë kjo pagesë? Nuk do të ruhet në arkiv dhe nuk mund të rikthehet."))return;
+  var next=(d.payments||[]).filter(function(p){return p!==item;});
+  var changes;
+  if(d.prepaymentOnly&&!next.length){
+    changes=historyChangesWithoutDeletedItems([], [String(id)]);
+    changes.push({op:"delete",collection:"debts",id:String(id)});
+  }else{
+    changes=[{op:"update",collection:"debts",id:String(id),data:{payments:next}}].concat(
+      historyChangesWithoutDeletedItems([{debtId:String(id),field:"payments",item:item,
+        addAction:"payment_added",removeAction:"payment_deleted"}],[]));
+  }
+  commitCloudChanges(changes).then(function(){
+    applyLocalHistoryChanges(changes);
+    if(d.prepaymentOnly&&!next.length)applyLocalDebtChanges([{op:"delete",collection:"debts",id:String(id)}]);
+    else applyLocalDebtChanges([{op:"update",collection:"debts",id:String(id),data:{payments:next}}]);
+    if(d.clientId){renderDebts();openClient(d.clientId);toast("Pagesa u fshi përgjithmonë");}
+    else{renderDebts();toast("Pagesa u fshi përgjithmonë");}
+  }).catch(function(e){
+    console.error("Permanent payment deletion failed",e);
+    alert("Pagesa nuk u fshi plotësisht nga cloud. Kontrollo lidhjen dhe lejet për debts/debtHistory.");
+  });
 }
 
 /* ndrysho vetëm shënimin e kredisë */
@@ -757,7 +1127,7 @@ function creditForm(id){
       +(r.note?' · '+esc(r.note):'')+'</span><span><b>−'+fmt(r.amount)+'</b></span></div>';
   }).join("");
 
-  openM('<h3>Kredi · '+esc(d.name)+'</h3>'
+  openM('<h3>Kredi · '+esc(debtDisplayName(d))+'</h3>'
   +'<div style="background:var(--card2);border-radius:12px;padding:12px;margin-top:8px">'
   +'<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0">'
   +'<span class="muted">Kredi gjithsej</span><b>'+fmt(raw)+'</b></div>'
@@ -801,7 +1171,7 @@ function creditRefundForm(id){
   var left=creditOf(d);
   if(left<=0){toast("Nuk ka parapagim të mbetur.");return;}
   openM(`<h3>Shlyej parapagimin</h3>
-    <p class="muted">Klienti: <b>${esc(d.name)}</b> · Mbetur: <b>${fmt(left)}</b></p>
+    <p class="muted">Klienti: <b>${esc(debtDisplayName(d))}</b> · Mbetur: <b>${fmt(left)}</b></p>
     <p class="muted">Kthimi regjistrohet si dalje dhe zbritet nga arka.</p>
     <label>Shuma që po i kthen</label>
     <input id="crf_a" type="number" inputmode="decimal" min="0" max="${left}" step="0.01" value="${left}">
@@ -818,18 +1188,20 @@ function creditRefundForm(id){
     </div>`);
 }
 function creditRefundSave(id){
-  var d=DEBTS.find(function(x){return x.id===id;});
-  if(!d)return;
+  var d=DEBTS.find(function(x){return x.id===id;});if(!d)return;
   var amount=+$("crf_a").value||0,left=creditOf(d);
   if(amount<=0){alert("Vendos shumën që po i kthen klientit.");return;}
   if(amount>left){alert("Shuma nuk mund të jetë më e madhe se parapagimi i mbetur.");return;}
   var method=$("crf_m").querySelector(".on").dataset.m;
-  var refunds=(d.creditRefunds||[]).slice();
-  refunds.push({amount:amount,method:method,date:$("crf_d").value,
-    note:$("crf_n").value.trim(),ts:Date.now()});
-  col("debts").doc(id).update({creditRefunds:refunds}).then(function(){
-    closeM();toast("Parapagimi u kthye · arka u ul me "+fmt(amount));
-  }).catch(function(e){alert("Kthimi nuk u ruajt. Kontrollo internetin dhe provo përsëri. "+(e.message||""));});
+  var item={amount:amount,method:method,date:$("crf_d").value,
+    note:$("crf_n").value.trim(),ts:Date.now()};
+  var refunds=(d.creditRefunds||[]).concat([item]);
+  var event=makeDebtHistoryEvent("credit_refunded",id,debtAuditGroups(d),
+    {item:item,itemTs:item.ts,businessDate:item.date});
+  runDebtAudit([{op:"update",id:id,data:{creditRefunds:refunds}}],
+    debtHistoryEventsForExisting(d,[event]),function(){
+      closeM();toast("Parapagimi u kthye · arka u ul me "+fmt(amount));
+    });
 }
 
 function usePrev(id){
@@ -846,113 +1218,873 @@ function usePrev(id){
 }
 
 function useSave(id){
-  var d=DEBTS.find(function(x){return x.id===id;});
-  var left=creditOf(d);
-  var a=+$("u_a").value||0;
-  if(!a){ alert("Vendos sa kushtoi."); return; }
-  if(a>left) a=left;
-  var us=(d.uses||[]).slice();
-  us.push({amount:a,note:$("u_no").value.trim(),date:$("u_d").value,ts:Date.now()});
-  var upd={uses:us};
-  var cn=$("c_n")?$("c_n").value.trim():"";
-  if(cn) upd.creditNote=cn;
-  col("debts").doc(id).update(upd);
-  closeM();
-  toast("U zbrit "+fmt(a));
+  var d=DEBTS.find(function(x){return x.id===id;});if(!d)return;
+  var left=creditOf(d),a=+$("u_a").value||0;
+  if(!a){alert("Vendos sa kushtoi.");return;}
+  if(a>left)a=left;
+  var item={amount:a,note:$("u_no").value.trim(),date:$("u_d").value,ts:Date.now()};
+  var us=(d.uses||[]).concat([item]),upd={uses:us};
+  var cn=$("c_n")?$("c_n").value.trim():"",beforeNote=String(d.creditNote||"");
+  if(cn)upd.creditNote=cn;
+  var groups=debtAuditGroups(d);
+  var events=[makeDebtHistoryEvent("credit_used",id,groups,
+    {item:item,itemTs:item.ts,businessDate:item.date})];
+  if(cn&&cn!==beforeNote)events.push(makeDebtHistoryEvent("credit_note_updated",id,groups,
+    {beforeNote:beforeNote,afterNote:cn}));
+  runDebtAudit([{op:"update",id:id,data:upd}],debtHistoryEventsForExisting(d,events),function(){
+    closeM();toast("U zbrit "+fmt(a)+" dhe u ruajt në historik");
+  });
 }
-
 function useDel(id,ts){
-  var d=DEBTS.find(function(x){return x.id===id;});
-  col("debts").doc(id).update({uses:(d.uses||[]).filter(function(u){return u.ts!==ts;})});
-  closeM(); toast("U hoq");
+  var d=DEBTS.find(function(x){return x.id===id;});if(!d)return;
+  var item=(d.uses||[]).find(function(u){return u.ts===ts;});if(!item)return;
+  if(!DEBT_HISTORY_LOADED||DEBT_HISTORY_ERROR){alert("Historiku cloud nuk u ngarkua; përdorimi nuk mund të fshihet përfundimisht. Rifresko faqen.");return;}
+  if(!confirm("Të fshihet përgjithmonë ky përdorim i parapagimit? Nuk do të ruhet në arkiv."))return;
+  var next=(d.uses||[]).filter(function(u){return u!==item;});
+  var changes=[{op:"update",collection:"debts",id:String(id),data:{uses:next}}].concat(
+    historyChangesWithoutDeletedItems([{debtId:String(id),field:"uses",item:item,
+      addAction:"credit_used",removeAction:"credit_use_deleted"}],[]));
+  commitCloudChanges(changes).then(function(){
+    applyLocalHistoryChanges(changes);applyLocalDebtChanges([{op:"update",collection:"debts",id:String(id),data:{uses:next}}]);
+    if(d.clientId){renderDebts();openClient(d.clientId);toast("Përdorimi u fshi përgjithmonë");}
+    else{renderDebts();toast("Përdorimi u fshi përgjithmonë");}
+  }).catch(function(e){
+    console.error("Permanent credit-use deletion failed",e);
+    alert("Përdorimi nuk u fshi plotësisht nga cloud. Kontrollo lidhjen dhe lejet për debtHistory.");
+  });
 }
-
 function creditSave(id){
-  col("debts").doc(id).update({creditNote:$("c_n").value.trim()});
-  closeM();toast("U ruajt");
+  var d=DEBTS.find(function(x){return x.id===id;});if(!d)return;
+  var beforeNote=String(d.creditNote||""),afterNote=$("c_n").value.trim();
+  if(beforeNote===afterNote){closeM();toast("Shënimi nuk ndryshoi");return;}
+  var event=makeDebtHistoryEvent("credit_note_updated",id,debtAuditGroups(d),
+    {beforeNote:beforeNote,afterNote:afterNote});
+  runDebtAudit([{op:"update",id:id,data:{creditNote:afterNote}}],
+    debtHistoryEventsForExisting(d,[event]),function(){closeM();toast("Shënimi dhe historiku u ruajtën");});
 }
 
 function renderDebtSwitch(){
-  var incoming=DEBTS.filter(function(d){return d.type!=="out";});
-  var outgoing=outgoingDebtRows(DEBTS);
-  function stats(list){
-    var open=list.filter(function(d){return Math.max(0,(+d.amount||0)-paidOf(d))>0;});
-    return {count:open.length,total:open.reduce(function(sum,d){
-      return sum+Math.max(0,(+d.amount||0)-paidOf(d));
-    },0)};
-  }
-  var a=stats(incoming), b=stats(outgoing);
-  $("debtInTotal").textContent=fmt(a.total);
-  $("debtInCount").textContent=a.count===1?"1 borxh i hapur":a.count+" borxhe të hapura";
-  $("debtOutTotal").textContent=fmt(b.total);
-  $("debtOutCount").textContent=b.count===1?"1 borxh i hapur":b.count+" borxhe të hapura";
+  var clients=clientProfilesForView();
+  var dueClients=clients.map(function(c){return clientState(c);}).filter(function(x){return x.netDue>0;});
+  var incomingTotal=dueClients.reduce(function(sum,x){return sum+x.netDue;},0);
+  var outgoing=DEBTS.filter(function(d){return d.type==="out";});
+  var openOutgoing=outgoing.filter(function(d){return Math.max(0,(+d.amount||0)-paidOf(d))>0;});
+  $("debtInTotal").textContent=fmt(incomingTotal);
+  $("debtInCount").textContent=dueClients.length+" klientë me detyrim";
+  $("debtOutTotal").textContent=fmt(openOutgoing.reduce(function(sum,d){return sum+Math.max(0,(+d.amount||0)-paidOf(d));},0));
+  $("debtOutCount").textContent=openOutgoing.length+" borxhe të hapura";
   $("debtTypeIn").classList.toggle("on",DTYPE!=="out");
   $("debtTypeOut").classList.toggle("on",DTYPE==="out");
   $("debtTypeIn").setAttribute("aria-pressed",DTYPE!=="out"?"true":"false");
   $("debtTypeOut").setAttribute("aria-pressed",DTYPE==="out"?"true":"false");
 }
 
+function normalizeDebtName(value){
+  return String(value||"").trim().replace(/\s+/g," ").toLowerCase();
+}
+
+function clientLegacyId(name){
+  var value=normalizeDebtName(name)||"pa emër",h1=2166136261,h2=5381;
+  for(var i=0;i<value.length;i++){
+    var c=value.charCodeAt(i);h1=Math.imul(h1^c,16777619);h2=Math.imul(h2^c,2246822519);
+  }
+  return "legacy_"+(h1>>>0).toString(36)+"_"+(h2>>>0).toString(36);
+}
+function clientAliases(c){
+  return Array.from(new Set((Array.isArray(c&&c.aliases)?c.aliases:[]).concat([c&&c.name,c&&c.normalizedName])
+    .map(normalizeDebtName).filter(Boolean)));
+}
+function clientProfilesForView(){
+  var byId=new Map(),profiles=[];
+  CLIENTS.forEach(function(c){if(!byId.has(String(c.id)))byId.set(String(c.id),Object.assign({},c));});
+  byId.forEach(function(c){profiles.push(c);});
+  function hasName(name){var norm=normalizeDebtName(name);return profiles.some(function(c){return clientAliases(c).includes(norm);});}
+  DEBTS.filter(function(d){return d.type!=="out";}).forEach(function(d){
+    if(d.clientId){
+      if(!byId.has(String(d.clientId))){var ghost={id:String(d.clientId),name:String(d.name||"Pa emër"),normalizedName:normalizeDebtName(d.name),aliases:[String(d.name||"")],_local:true};
+        byId.set(ghost.id,ghost);profiles.push(ghost);}
+    }else if(!hasName(d.name)){
+      var id=clientLegacyId(d.name),ghost={id:id,name:String(d.name||"Pa emër"),normalizedName:normalizeDebtName(d.name),aliases:[String(d.name||"")],_local:true};
+      byId.set(id,ghost);profiles.push(ghost);
+    }
+  });
+  return profiles;
+}
+function clientFind(id){
+  return clientProfilesForView().find(function(c){return String(c.id)===String(id);})||null;
+}
+function debtDisplayName(d){
+  var client=d&&d.clientId?CLIENTS.find(function(c){return String(c.id)===String(d.clientId);}):null;
+  return String(client&&client.name||d&&d.name||"Pa emër");
+}
+function clientRecords(c){
+  if(!c)return [];
+  var aliases=clientAliases(c);
+  return DEBTS.filter(function(d){
+    if(d.type==="out")return false;
+    return d.clientId?String(d.clientId)===String(c.id):aliases.includes(normalizeDebtName(d.name));
+  });
+}
+function clientDebtOrder(a,b){
+  var ad=historyDateMillis(a.date)||(+a.created||0),bd=historyDateMillis(b.date)||(+b.created||0);
+  return ad-bd||(+a.created||0)-(+b.created||0)||String(a.id||"").localeCompare(String(b.id||""));
+}
+function clientState(c){
+  var records=clientRecords(c),bills=records.filter(function(d){return !d.prepaymentOnly&&(+d.amount||0)>0;});
+  var due=bills.reduce(function(sum,d){return sum+Math.max(0,(+d.amount||0)-paidOf(d));},0);
+  var credit=records.reduce(function(sum,d){return sum+creditOf(d);},0);
+  return {records:records,bills:bills,due:due,credit:credit,balance:due-credit,
+    netDue:Math.max(0,due-credit),netCredit:Math.max(0,credit-due),
+    openCount:bills.filter(function(d){return Math.max(0,(+d.amount||0)-paidOf(d))>0;}).length};
+}
+function clientIdForHistoryEvent(event){
+  if(event&&event.clientId)return String(event.clientId);
+  var d=DEBTS.find(function(x){return String(x.id||"")===String(event&&event.debtId||"");});
+  return d&&d.clientId?String(d.clientId):"";
+}
+function syncLegacyClients(){
+  if(!CLIENTS_LOADED||!DEBTS_LOADED||CLIENT_MIGRATION_BUSY||ARCHIVE_PURGE_BUSY)return;
+  var byId=new Map(),profiles=CLIENTS.map(function(c){return Object.assign({},c);}),jobs=[];
+  profiles.forEach(function(c){byId.set(String(c.id),c);});
+  function findName(name){var n=normalizeDebtName(name);return profiles.find(function(c){return clientAliases(c).includes(n);})||null;}
+  function queueClientWrite(item,data){
+    var found=jobs.find(function(job){return job.kind==="client"&&job.id===String(item.id);});
+    if(found)Object.assign(found.data,data);
+    else jobs.push({kind:"client",id:String(item.id),data:data});
+  }
+  function addProfile(id,name){
+    id=String(id||clientLegacyId(name));
+    if(byId.has(id))return byId.get(id);
+    var display=String(name||"Pa emër").trim()||"Pa emër",now=Date.now();
+    var data={name:display,normalizedName:normalizeDebtName(display),aliases:[display],createdAt:now,updatedAt:now,legacyMigrated:true};
+    var item=Object.assign({id:id},data);byId.set(id,item);profiles.push(item);queueClientWrite(item,data);return item;
+  }
+  DEBTS.filter(function(d){return d.type!=="out";}).forEach(function(d){
+    var client=d.clientId?byId.get(String(d.clientId)):null;
+    if(!client&&d.clientId)client=addProfile(String(d.clientId),d.name);
+    if(!client&&!d.clientId)client=findName(d.name);
+    if(!client)client=addProfile(clientLegacyId(d.name),d.name);
+    if(!d.clientId||String(d.clientId)!==String(client.id))jobs.push({kind:"debt",id:String(d.id),data:{clientId:String(client.id)}});
+  });
+  // Keep client profiles available for archived, already-deleted incoming debts too.
+  if(DEBT_HISTORY_LOADED&&!DEBT_HISTORY_ERROR){
+    var historyByDebt=new Map();
+    DEBT_HISTORY.forEach(function(event){var id=String(event.debtId||"");if(!id)return;
+      if(!historyByDebt.has(id))historyByDebt.set(id,[]);historyByDebt.get(id).push(event);});
+    DEBT_HISTORY.filter(function(event){return event.action==="deleted"&&event.before
+      &&event.before.type!=="out";}).forEach(function(deleted){
+      var refs=debtHistoryRefs(deleted),primary=String(deleted.before.name||
+        (refs.find(function(ref){return ref.type!=="out";})||{}).name||"").trim();
+      if(!primary)return;
+      var item=deleted.clientId?byId.get(String(deleted.clientId)):null;
+      if(!item)item=findName(primary);
+      if(!item)item=addProfile(deleted.clientId||clientLegacyId(primary),primary);
+      var related=historyByDebt.get(String(deleted.debtId||""))||[],names=[];
+      function remember(name){var value=String(name||"").trim();if(value)names.push(value);}
+      related.forEach(function(event){
+        debtHistoryRefs(event).forEach(function(ref){if(ref.type!=="out")remember(ref.name);});
+        [event.before,event.after].forEach(function(snapshot){if(snapshot&&snapshot.type!=="out")remember(snapshot.name);});
+      });
+      var aliases=[],seen=new Set();
+      (Array.isArray(item.aliases)?item.aliases:[]).concat([item.name],names).forEach(function(name){
+        var value=String(name||"").trim(),normalized=normalizeDebtName(value);
+        if(value&&normalized&&!seen.has(normalized)){seen.add(normalized);aliases.push(value);}
+      });
+      var oldAliases=Array.isArray(item.aliases)?item.aliases:[];
+      if(aliases.join("\u0000")!==oldAliases.join("\u0000")){
+        item.aliases=aliases;item.updatedAt=Date.now();
+        queueClientWrite(item,{name:item.name,normalizedName:item.normalizedName||normalizeDebtName(item.name),
+          aliases:aliases,updatedAt:item.updatedAt});
+      }
+    });
+  }
+  if(!jobs.length){CLIENT_MIGRATION_ERROR=null;return;}
+  CLIENT_MIGRATION_BUSY=true;CLIENT_MIGRATION_ERROR=null;
+  var at=0;
+  function nextChunk(){
+    if(at>=jobs.length)return Promise.resolve();
+    var batch=db.batch(),slice=jobs.slice(at,at+400);at+=slice.length;
+    slice.forEach(function(job){
+      if(job.kind==="client")batch.set(col("clients").doc(job.id),job.data,{merge:true});
+      else batch.update(col("debts").doc(job.id),job.data);
+    });
+    return batch.commit().then(nextChunk);
+  }
+  nextChunk().then(function(){
+    jobs.filter(function(job){return job.kind==="client";}).forEach(function(job){
+      var item=Object.assign({id:job.id},job.data),index=CLIENTS.findIndex(function(c){return String(c.id)===job.id;});
+      if(index>=0)CLIENTS[index]=Object.assign({},CLIENTS[index],item);else CLIENTS.push(item);
+    });
+    jobs.forEach(function(job){if(job.kind==="debt"){
+      var d=DEBTS.find(function(x){return String(x.id)===job.id;});if(d)d.clientId=job.data.clientId;
+    }});
+    CLIENT_MIGRATION_BUSY=false;CLIENT_MIGRATION_ERROR=null;syncLegacyClients();render();
+  }).catch(function(e){
+    CLIENT_MIGRATION_BUSY=false;CLIENT_MIGRATION_ERROR=e;console.warn("Client migration failed",e);render();
+  });
+}
+function applyLocalDebtChanges(changes){
+  (changes||[]).forEach(function(change){
+    if(change.collection&&change.collection!=="debts")return;
+    var idx=DEBTS.findIndex(function(d){return String(d.id)===String(change.id);});
+    if(change.op==="delete"){if(idx>=0)DEBTS.splice(idx,1);return;}
+    if(change.op==="set"){
+      var item=Object.assign({id:String(change.id)},change.data||{});
+      if(idx>=0)DEBTS[idx]=item;else DEBTS.push(item);return;
+    }
+    if(idx>=0)DEBTS[idx]=Object.assign({},DEBTS[idx],change.data||{});
+  });
+}
+function planClientCreditApplications(clientId,records){
+  records=(records||[]).slice();
+  var sources=records.filter(function(d){return creditOf(d)>0;}).sort(clientDebtOrder);
+  var targets=records.filter(function(d){return !d.prepaymentOnly&&(+d.amount||0)>0
+    &&Math.max(0,(+d.amount||0)-paidOf(d))>0;}).sort(clientDebtOrder);
+  var sourceLeft=new Map(),targetLeft=new Map(),sourceUpdates=new Map(),targetUpdates=new Map(),eventsByDebt=new Map(),used=0,seq=Date.now();
+  function addEvent(debt,event){
+    var id=String(debt.id);if(!eventsByDebt.has(id))eventsByDebt.set(id,{debt:debt,events:[]});
+    eventsByDebt.get(id).events.push(event);
+  }
+  sources.forEach(function(d){sourceLeft.set(String(d.id),creditOf(d));});
+  targets.forEach(function(d){targetLeft.set(String(d.id),Math.max(0,(+d.amount||0)-paidOf(d)));});
+  sources.forEach(function(source){
+    var sid=String(source.id),available=sourceLeft.get(sid)||0;if(available<=0)return;
+    targets.forEach(function(target){
+      if(available<=0)return;
+      var tid=String(target.id),remaining=targetLeft.get(tid)||0;if(remaining<=0||sid===tid)return;
+      var amount=Math.min(available,remaining);if(amount<=0)return;
+      var ts=seq++,appId="ca_"+ts.toString(36),date=today();
+      var useItem={amount:amount,date:date,note:"U aplikua automatikisht te borxhi "+(target.date||""),ts:ts,targetDebtId:tid,applicationId:appId};
+      var payItem={amount:amount,method:"credit",date:date,note:"Parapagim i përdorur automatikisht",ts:ts+1,sourceDebtId:sid,applicationId:appId};
+      if(!sourceUpdates.has(sid))sourceUpdates.set(sid,{debt:source,items:[]});
+      sourceUpdates.get(sid).items.push(useItem);
+      if(!targetUpdates.has(tid))targetUpdates.set(tid,{debt:target,items:[]});
+      var previousTargetItems=targetUpdates.get(tid).items;
+      previousTargetItems.push(payItem);
+      var useEvent=makeDebtHistoryEvent("credit_used",sid,debtAuditGroups(source),
+        {item:useItem,itemTs:useItem.ts,businessDate:date,clientId:String(clientId)});
+      addEvent(source,useEvent);
+      var afterTarget=Object.assign({},target,{payments:(target.payments||[]).concat(previousTargetItems)});
+      var payEvent=makeDebtHistoryEvent("payment_added",tid,debtAuditGroups(target,afterTarget),
+        {item:payItem,itemTs:payItem.ts,businessDate:date,clientId:String(clientId)});
+      addEvent(target,payEvent);
+      available-=amount;sourceLeft.set(sid,available);targetLeft.set(tid,remaining-amount);used+=amount;
+    });
+  });
+  var events=[];eventsByDebt.forEach(function(entry){events=events.concat(debtHistoryEventsForExisting(entry.debt,entry.events));});
+  return {sourceUpdates:sourceUpdates,targetUpdates:targetUpdates,events:events,used:used};
+}
+function clientPlanChanges(plan,excludeId){
+  var changes=new Map();
+  function patch(id,debt,key,items){
+    id=String(id);if(id===String(excludeId||""))return;
+    if(!changes.has(id))changes.set(id,{op:"update",id:id,data:{}});
+    var row=changes.get(id);row.data[key]=(debt[key]||[]).concat(items);
+  }
+  plan.sourceUpdates.forEach(function(v,id){patch(id,v.debt,"uses",v.items);});
+  plan.targetUpdates.forEach(function(v,id){patch(id,v.debt,"payments",v.items);});
+  return Array.from(changes.values());
+}
+function applyClientPlanToRecords(records,plan){
+  return (records||[]).map(function(d){
+    var copy=Object.assign({},d),s=plan.sourceUpdates.get(String(d.id)),t=plan.targetUpdates.get(String(d.id));
+    if(s)copy.uses=(d.uses||[]).concat(s.items);
+    if(t)copy.payments=(d.payments||[]).concat(t.items);
+    return copy;
+  });
+}
+function clientHistoryEntries(c){
+  var events=buildDebtHistoryEvents(),records=clientRecords(c),ids=new Set(records.map(function(d){return String(d.id);})),aliases=clientAliases(c);
+  events.forEach(function(e){
+    if(String(e.clientId||"")===String(c.id)){if(e.debtId)ids.add(String(e.debtId));return;}
+    var matched=debtHistoryRefs(e).some(function(ref){return ref.type!=="out"&&aliases.includes(normalizeDebtName(ref.name));});
+    if(matched&&e.debtId)ids.add(String(e.debtId));
+  });
+  return events.filter(function(e){return String(e.clientId||"")===String(c.id)||(e.debtId&&ids.has(String(e.debtId)));});
+}
+function clientHistoryHtml(c){
+  var events=clientHistoryEntries(c),ordinary=[],payments=new Map();
+  events.forEach(function(e){
+    var item=e.item||{};
+    if(e.action==="payment_added"&&item.groupId&&item.method!=="credit"){
+      var key=String(item.groupId);
+      if(!payments.has(key))payments.set(key,[]);
+      payments.get(key).push(e);
+    }else ordinary.push({event:e,at:+e.at||0});
+  });
+  payments.forEach(function(parts){
+    var first=parts[0],sum=parts.reduce(function(n,e){return n+(+((e.item||{}).amount)||0);},0);
+    var item=Object.assign({},first.item||{},{amount:sum});
+    ordinary.push({event:Object.assign({},first,{item:item,groupedParts:parts.length,
+      at:parts.reduce(function(n,e){return Math.max(n,+e.at||0);},0)}),at:parts.reduce(function(n,e){return Math.max(n,+e.at||0);},0)});
+  });
+  ordinary.sort(function(a,b){return b.at-a.at;});
+  if(!ordinary.length)return '<div class="client-history"><div class="debt-history-heading">Historiku i klientit</div><div class="muted">Nuk ka ende veprimtari.</div></div>';
+  var rows=ordinary.map(function(row){var e=row.event,action=esc(e.action||"event");
+    return '<div class="debt-history-event '+action+'"><span class="debt-history-dot"></span>'
+      +'<div class="debt-history-content"><strong>'+esc(historyEventLabel(e))+'</strong>'
+      +'<time>'+historyEventTime(e)+'</time><div class="debt-history-detail">'+historyEventDetail(e)+'</div>'
+      +'</div></div>';}).join("");
+  return '<div class="client-history"><div class="debt-history-heading">Historiku i klientit · '+ordinary.length+' veprime</div>'
+    +(DEBT_HISTORY_ERROR?'<div class="client-warning">Historiku cloud nuk u ngarkua.</div>':'')
+    +'<div class="debt-history-list">'+rows+'</div></div>';
+}
+function renderClientPaymentRows(d){
+  var payments=(d.payments||[]).slice().sort(function(a,b){return (+b.ts||0)-(+a.ts||0);});
+  return payments.length?'<div class="client-payment-list"><div class="client-payment-list-title">Pagesat dhe arsyeja</div>'
+    +payments.map(function(x){
+      var key=x.method==="credit"?"credit":x.method==="bank"?"bank":"cash";
+      var method=key==="credit"?"⭐ PARAPAGIM":key==="bank"?"🏦 BANKË":"💵 CASH";
+      var note=String(x.note||"").trim();
+      return '<div class="client-payment-row '+key+'"><div class="client-payment-head">'
+        +'<span class="client-payment-badge">'+method+'</span><time class="client-payment-date">'+esc(x.date||"Pa datë")+'</time>'
+        +'<b class="client-payment-amount">+'+fmt(x.amount)+'</b></div>'
+        +'<div class="client-payment-note'+(note?'':' empty')+'"><span class="client-payment-note-label">Për çfarë u pagua:</span>'
+        +esc(note||"Nuk u shtua shënim.")+'</div>'
+        +(key==="credit"?'':'<button type="button" class="client-payment-delete" data-debt-id="'+esc(d.id)+'" data-payment-ts="'+(+x.ts||0)+'" '
+        +'onclick="payDel(this.dataset.debtId,+this.dataset.paymentTs)" aria-label="Fshi pagesën" title="Fshi pagesën">×</button>')+'</div>';
+    }).join("")+'</div>':'';
+}
+function renderClientBill(c,d){
+  var amount=+d.amount||0,settled=paidOf(d),rest=Math.max(0,amount-settled),cash=cashPaidOf(d);
+  var creditParts=(d.payments||[]).filter(function(p){return p.method==="credit";}).reduce(function(sum,p){return sum+(+p.amount||0);},0);
+  var status=rest<=0?'SHLYER':settled>0?'PJESËRISHT SHLYER':'E PAPAGUAR';
+  var statusClass=rest<=0?'settled':settled>0?'partial':'open';
+  var paymentHtml=renderClientPaymentRows(d);
+  return '<div class="client-bill"><div class="client-bill-top"><div style="min-width:0">'
+    +'<div class="client-bill-name">Borxh · '+esc(d.date||"Pa datë")+'</div>'
+    +(d.note?'<div class="client-bill-meta">Shënim për borxhin: '+esc(d.note)+'</div>':'')
+    +'<div class="client-bill-meta"><span class="client-bill-status '+statusClass+'">'+status+'</span>'
+    +' · Paguar gjithsej '+fmt(settled)
+    +(creditParts>0?' · Parapagim '+fmt(creditParts):'')
+    +(cash>0?' · Cash/bankë '+fmt(cash):'')
+    +(rest>0?' · Mbetur '+fmt(rest):'')+'</div></div>'
+    +'<div class="client-bill-total">'+fmt(amount)+(rest>0?'<div class="muted" style="font-size:11px">mbetur '+fmt(rest)+'</div>':'')+'</div></div>'
+    +paymentHtml+'<div class="client-bill-actions"><button class="btn sec sm" data-client-id="'+esc(c.id)+'" data-debt-id="'+esc(d.id)+'" onclick="clientDebtForm(this.dataset.clientId,this.dataset.debtId)">Ndrysho</button>'
+    +'<button class="btn danger sm" data-debt-id="'+esc(d.id)+'" onclick="debtDel(this.dataset.debtId)">Fshi</button></div></div>';
+}
+function renderClientPrepayment(c,d){
+  var paid=cashPaidOf(d),used=creditUsed(d),refunded=creditRefunded(d),left=creditOf(d);
+  return '<div class="client-bill client-prepayment"><div class="client-bill-top"><div style="min-width:0">'
+    +'<div class="client-bill-name">Parapagim · '+esc(d.date||"Pa datë")+'</div>'
+    +'<div class="client-bill-meta">Tepricë nga pagesa · marrë '+fmt(paid)+' · përdorur '+fmt(used)+' · kthyer '+fmt(refunded)+'</div>'
+    +'<div class="client-bill-meta"><span class="client-bill-status settled">PARAPAGIM</span> · Mbetur '+fmt(left)+'</div></div>'
+    +'<div class="client-bill-total client-prepayment-total">'+fmt(left)+'</div></div>'
+    +renderClientPaymentRows(d)+'</div>';
+}
+function renderClientDetail(){
+  var c=clientFind(CLIENT_DETAIL_ID);if(!c){CLIENT_DETAIL_ID=null;$("clientDetailView").style.display="none";$("clientListView").style.display="block";return;}
+  var state=clientState(c),balance=state.balance,records=state.bills.slice().sort(function(a,b){return -clientDebtOrder(a,b);});
+  var prepayments=state.records.filter(function(d){return d.prepaymentOnly;}).sort(function(a,b){return -clientDebtOrder(a,b);});
+  $("clientListView").style.display="none";$("clientDetailView").style.display="block";
+  var balanceTitle=balance>0?'Klienti më ka borxh':balance<0?'Parapagim i klientit':'Llogaria është shlyer';
+  var balanceColor=balance>0?'#8ab4ff':balance<0?'#5ee89b':'var(--dim)';
+  var balanceValue=fmt(Math.abs(balance));
+  var history=clientHistoryHtml(c);
+  $("clientDetail").innerHTML=(CLIENT_MIGRATION_ERROR?'<div class="client-warning">Disa të dhëna të vjetra nuk u lidhën me klientët. Kontrollo lidhjen dhe lejet e Firestore për koleksionin clients.</div>':'')
+    +'<div class="client-detail-head"><button class="btn sec sm" onclick="closeClient()">← Klientët</button>'
+    +'<h2>'+esc(c.name||"Pa emër")+'</h2><button class="btn sec sm" data-client-id="'+esc(c.id)+'" onclick="clientForm(this.dataset.clientId)">Ndrysho</button></div>'
+    +'<div class="client-balance"><div class="client-balance-label">'+balanceTitle+'</div>'
+    +'<div class="client-balance-value" style="color:'+balanceColor+'">'+balanceValue+'</div>'
+    +'<div class="client-small">'+state.openCount+' borxhe të hapura · '+state.bills.length+' borxhe gjithsej</div>'
+    +'<div class="client-note">Parapagimi përdoret vetë për borxhin më të vjetër. Nëse pagesa kalon borxhin, teprica ruhet për herën tjetër.</div></div>'
+    +'<div class="client-actions"><button class="btn" data-client-id="'+esc(c.id)+'" onclick="clientDebtForm(this.dataset.clientId)">+ Shto borxh</button>'
+    +'<button class="btn sec" data-client-id="'+esc(c.id)+'" onclick="clientPaymentForm(this.dataset.clientId)">Regjistro pagesë</button></div>'
+    +(state.netCredit>0?'<details class="card"><summary>Veprime me parapagimin · '+fmt(state.netCredit)+'</summary>'
+      +'<div class="client-actions" style="margin-bottom:0"><button class="btn sec sm" data-client-id="'+esc(c.id)+'" onclick="clientUseForm(this.dataset.clientId)">Përdorim jo-cash</button>'
+      +'<button class="btn sec sm" data-client-id="'+esc(c.id)+'" onclick="clientRefundForm(this.dataset.clientId)">Kthe cash/bankë</button></div></details>':'')
+    +'<div class="client-ledger-title">Borxhet e klientit</div>'
+    +(records.length?records.map(function(d){return renderClientBill(c,d);}).join(""):'<div class="empty" style="padding:20px 12px">Nuk ka ende borxhe të regjistruara.</div>')
+    +(prepayments.length?'<div class="client-ledger-title">Parapagimet e regjistruara</div>'+prepayments.map(function(d){return renderClientPrepayment(c,d);}).join(""):'')
+    +history;
+}
+function renderClients(){
+  if(!$("clientList"))return;
+  var search=normalizeDebtName($("clientSearch")?$("clientSearch").value:"");
+  var profiles=clientProfilesForView().filter(function(c){return !search||clientAliases(c).some(function(a){return a.includes(search);});})
+    .sort(function(a,b){return String(a.name||"").localeCompare(String(b.name||""),"sq",{sensitivity:"base"});});
+  $("clientListView").style.display=CLIENT_DETAIL_ID?"none":"block";
+  $("clientDetailView").style.display=CLIENT_DETAIL_ID?"block":"none";
+  var warning=CLIENT_MIGRATION_ERROR?'<div class="client-warning">Klientët nga të dhënat ekzistuese nuk u ngarkuan ose lidhën. Kontrollo lidhjen dhe koleksionin clients.</div>':"";
+  if(CLIENT_MIGRATION_BUSY)warning+='<div class="client-note">Po lidh borxhet ekzistuese me profilet e klientëve. Të dhënat dhe pagesat ruhen.</div>';
+  if(!profiles.length){$("clientList").innerHTML=warning+'<div class="empty">Lista e klientëve është bosh.<br><button class="btn sm" style="margin-top:12px" onclick="clientForm()">+ Shto klientin e parë</button></div>';}
+  else $("clientList").innerHTML=warning+profiles.map(function(c){
+    var state=clientState(c),balance=state.balance,title=balance>0?'Më ka borxh':balance<0?'Parapagim':'Shlyer';
+    var cls=balance>0?'client-due':balance<0?'client-credit':'client-closed';
+    return '<div class="client-card"><button class="client-open" data-client-id="'+esc(c.id)+'" onclick="openClient(this.dataset.clientId)">'
+      +'<span class="client-main"><span class="client-name">'+esc(c.name||"Pa emër")+'</span>'
+      +'<span class="client-small">'+state.openCount+' borxhe të hapura · '+state.bills.length+' gjithsej</span></span>'
+      +'<span class="client-value '+cls+'">'+title+'<br>'+fmt(Math.abs(balance))+'</span></button></div>';
+  }).join("");
+  if(CLIENT_DETAIL_ID)renderClientDetail();
+}
+function renderOutgoingDebts(){
+  var searchInput=$("debtSearch"),searchText=searchInput?String(searchInput.value||"").trim():"";
+  var search=normalizeDebtName(searchText),historyEvents=buildDebtHistoryEvents();
+  const pool=DEBTS.filter(function(d){return d.type==="out";});
+  const filtered=pool.filter(function(d){
+    const settled=Math.max(0,(+d.amount||0)-paidOf(d))<=0;
+    var display=String(d.name||"").trim()||"Pa emër";
+    return (!search||normalizeDebtName(display).includes(search))
+      &&(DF==="all"||(DF==="paid"?settled:!settled));
+  });
+  const buckets=new Map();
+  filtered.forEach(function(d){
+    var display=String(d.name||"").trim()||"Pa emër",key=debtHistoryGroupRef(display,"out").key;
+    if(!buckets.has(key))buckets.set(key,{key:key,name:display,items:[]});buckets.get(key).items.push(d);
+  });
+  var historyByKey=new Map();
+  function belongsToClient(event){
+    if(event.clientId)return true;
+    var live=DEBTS.find(function(d){return String(d.id||"")===String(event.debtId||"");});
+    if(live&&live.clientId)return true;
+    var snapshots=[event.before,event.after].filter(Boolean);
+    if(snapshots.length&&snapshots.every(function(snapshot){return snapshot.type!=="out";}))return true;
+    var refs=debtHistoryRefs(event),creditAction=["payment_added","payment_deleted","credit_used","credit_use_deleted","credit_refunded"].includes(event.action);
+    return creditAction&&refs.some(function(ref){return ref.type!=="out";})&&refs.some(function(ref){return ref.type==="out";});
+  }
+  historyEvents.forEach(function(event){debtHistoryRefs(event).forEach(function(ref){
+    // Client prepayments belong to the client profile, not the separate outgoing-debt list.
+    if(ref.type!=="out"||belongsToClient(event)||search&&!normalizeDebtName(ref.name).includes(search))return;
+    if(!historyByKey.has(ref.key))historyByKey.set(ref.key,[]);historyByKey.get(ref.key).push(event);
+  });});
+  var groups=Array.from(buckets.values()).map(function(g){
+    g.items.sort(function(a,b){return (b.date||"").localeCompare(a.date||"");});
+    g.name=String(g.items[0].name||"").trim()||g.name;
+    g.latestDate=g.items.reduce(function(latest,d){return (d.date||"")>latest?(d.date||""):latest;},"");
+    g.remaining=g.items.reduce(function(sum,d){return sum+Math.max(0,(+d.amount||0)-paidOf(d));},0);
+    g.openCount=g.items.filter(function(d){return Math.max(0,(+d.amount||0)-paidOf(d))>0;}).length;
+    g.history=historyByKey.get(g.key)||[];g.archived=false;return g;
+  }).sort(function(a,b){return (b.latestDate||"").localeCompare(a.latestDate||"");});
+  if(DF==="all")historyByKey.forEach(function(events,key){
+    if(buckets.has(key))return;var ref=null;
+    for(var i=0;i<events.length&&!ref;i++)ref=debtHistoryRefs(events[i]).find(function(x){return x.key===key;})||null;
+    if(ref)groups.push({key:key,name:ref.name||"Pa emër",items:[],history:events,archived:true,latestDate:"",
+      latestAt:events.reduce(function(v,e){return Math.max(v,+e.at||0);},0),remaining:0,openCount:0});
+  });
+  groups.sort(function(a,b){if(a.archived!==b.archived)return a.archived?1:-1;
+    return a.archived?(b.latestAt||0)-(a.latestAt||0):(b.latestDate||"").localeCompare(a.latestDate||"");});
+  var warning=DEBT_HISTORY_ERROR?'<div class="debt-history-warning">Historiku nga cloud nuk u ngarkua. Kontrollo lidhjen dhe lejet e Firestore për debtHistory.</div>':"";
+  if(!groups.length){$("debtList").innerHTML=warning+'<div class="empty">Nuk ka borxhe në këtë ndarje.<br><button class="btn sm" style="margin-top:12px" onclick="debtForm()">+ Shto borxh</button></div>';return;}
+  $("debtList").innerHTML=warning+groups.map(function(g){
+    if(g.archived)return '<details class="debt-name-group" data-group-key="'+esc(g.key)+'"><summary><span class="debt-group-title">'+esc(g.name)+'</span><b class="debt-group-total">ARKIV</b></summary>'
+      +'<div class="debt-group-items"><div class="debt-archive-note">Historiku i fshirë ruhet në cloud.</div>'+renderDebtHistory(g.key,historyEvents,false)+'</div></details>';
+    if(g.items.length===1)return renderDebtItem(g.items[0],g.key,historyEvents);
+    return '<details class="debt-name-group" data-group-key="'+esc(g.key)+'"><summary><div class="debt-group-heading"><span class="debt-group-title">'+esc(g.name)+'</span>'
+      +'<span class="debt-group-total">Mbetur '+fmt(g.remaining)+'</span></div><div class="debt-group-meta"><span>'+g.items.length+' zëra · '
+      +g.openCount+' të hapura · '+g.history.length+' ngjarje</span><span>Më e re: '+esc(g.latestDate||"—")+'</span></div></summary>'
+      +'<div class="debt-group-items">'+g.items.map(function(d){return renderDebtItem(d);}).join("")+renderDebtHistory(g.key,historyEvents,false)+'</div></details>';
+  }).join("");
+}
+function clientForm(id){
+  var c=id?clientFind(id):null;
+  openM('<h3>'+(id?'Ndrysho klientin':'Klient i ri')+'</h3><label>Emri i klientit</label>'
+    +'<input id="cl_name" value="'+esc(c&&c.name||'')+'" placeholder="p.sh. Arben" autocomplete="name">'
+    +'<div class="row" style="margin-top:16px"><button class="btn sec" onclick="closeM()">Anulo</button>'
+    +'<button class="btn" data-client-id="'+esc(id||'')+'" onclick="clientSave(this.dataset.clientId)">Ruaj</button></div>');
+}
+function clientSave(id){
+  var name=$("cl_name").value.trim();if(!name){alert("Shkruaj emrin e klientit.");return;}
+  var existing=clientProfilesForView().find(function(c){return String(c.id)!==String(id||"")&&clientAliases(c).includes(normalizeDebtName(name));});
+  if(existing){alert("Ky emër është tashmë në listën e klientëve. Hape profilin ekzistues.");return;}
+  var current=id?clientFind(id):null,now=Date.now(),ref=id?col("clients").doc(id):col("clients").doc();
+  var persisted=!!(current&&!current._local);
+  var aliases=clientAliases(current||{}).concat([current&&current.name||"",name]).filter(Boolean);
+  var data={name:name,normalizedName:normalizeDebtName(name),aliases:Array.from(new Set(aliases)),updatedAt:now};
+  if(!persisted)data.createdAt=now;
+  var event=makeDebtHistoryEvent(persisted?'client_updated':'client_created',ref.id,[],{
+    clientId:ref.id,clientName:name,beforeName:current&&current.name||"",afterName:name,at:now});
+  var change={op:persisted?'update':'set',collection:'clients',id:ref.id,data:data};
+  runDebtAudit([change],[event],function(){
+    var idx=CLIENTS.findIndex(function(x){return String(x.id)===String(ref.id);});
+    var obj=Object.assign({},current||{},data,{id:ref.id});delete obj._local;if(idx>=0)CLIENTS[idx]=obj;else CLIENTS.push(obj);
+    CLIENT_DETAIL_ID=ref.id;closeM();renderDebts();toast(current?'Emri i klientit u ruajt':'Klienti u shtua');
+  });
+}
+function closeClient(){CLIENT_DETAIL_ID=null;renderClients();window.scrollTo(0,0);}
+function openClient(id){
+  DTYPE="in";CLIENT_DETAIL_ID=String(id);renderDebtSwitch();
+  var c=clientFind(id);if(!c){renderClients();return;}
+  if(CLIENT_CREDIT_BUSY.has(String(c.id))){renderDebts();return;}
+  var records=clientRecords(c),plan=planClientCreditApplications(c.id,records);
+  if(!plan.used){renderDebts();return;}
+  var changes=clientPlanChanges(plan),clientKey=String(c.id);CLIENT_CREDIT_BUSY.add(clientKey);
+  var promise=runDebtAudit(changes,plan.events,function(){
+    applyLocalDebtChanges(changes);renderDebts();toast("Parapagimi u aplikua vetë te borxhi më i vjetër");
+  });
+  if(promise&&promise.finally)promise.finally(function(){CLIENT_CREDIT_BUSY.delete(clientKey);renderDebts();});
+  else CLIENT_CREDIT_BUSY.delete(clientKey);
+  renderDebts();
+}
+function clientDebtForm(clientId,debtId){
+  var c=clientFind(clientId),d=debtId?DEBTS.find(function(x){return String(x.id)===String(debtId);}):null;
+  if(!c)return;
+  openM('<h3>'+(d?'Ndrysho borxhin':'Regjistro borxh')+'</h3><p class="muted">Klienti: <b>'+esc(c.name)+'</b></p>'
+    +'<label>Shuma që më ka borxh</label><input id="cb_amount" type="number" inputmode="decimal" min="0" step="0.01" value="'+(d?+d.amount||'':'')+'" placeholder="p.sh. 5000">'
+    +'<label>Data</label><input id="cb_date" type="date" value="'+esc(d&&d.date||today())+'">'
+    +'<label>Shënim</label><input id="cb_note" value="'+esc(d&&d.note||'')+'" placeholder="opsionale">'
+    +'<div class="row" style="margin-top:16px"><button class="btn sec" onclick="closeM()">Anulo</button>'
+    +'<button class="btn" data-client-id="'+esc(c.id)+'" data-debt-id="'+esc(d&&d.id||'')+'" onclick="clientDebtSave(this.dataset.clientId,this.dataset.debtId)">Ruaj</button></div>');
+}
+function clientDebtSave(clientId,debtId){
+  var c=clientFind(clientId),amount=+$("cb_amount").value||0,date=$("cb_date").value||today(),note=$("cb_note").value.trim();
+  if(!c)return;if(amount<=0){alert("Vendos shumën që klienti të ka borxh.");return;}
+  if(debtId){
+    var d=DEBTS.find(function(x){return String(x.id)===String(debtId);});if(!d)return;
+    var before=debtAuditSnapshot(d,true),after=Object.assign({},before,{amount:amount,date:date,note:note});
+    var event=makeDebtHistoryEvent("updated",d.id,debtAuditGroups(before,after),{before:before,after:after,clientId:String(c.id)});
+    var events=debtHistoryEventsForExisting(d,[event]),changes=[{op:"update",id:d.id,data:{amount:amount,date:date,note:note}}];
+    runDebtAudit(changes,events,function(){applyLocalDebtChanges(changes);closeM();openClient(c.id);toast("Borxhi u ndryshua dhe historiku u ruajt");});
+    return;
+  }
+  var ref=col("debts").doc(),now=Date.now(),record={id:ref.id,name:c.name,type:"in",amount:amount,date:date,note:note,
+    payments:[],uses:[],creditRefunds:[],clientId:String(c.id),created:now};
+  var staged=clientRecords(c).concat([record]),plan=planClientCreditApplications(c.id,staged);
+  var newPayments=plan.targetUpdates.has(String(ref.id))?plan.targetUpdates.get(String(ref.id)).items:[];
+  var initialRecord=Object.assign({},record,{payments:[]});
+  record.payments=newPayments.slice();
+  var afterNew=debtAuditSnapshot(initialRecord,true),createEvent=makeDebtHistoryEvent("created",ref.id,
+    [debtHistoryGroupRef(c.name,"in")],{after:afterNew,clientId:String(c.id),at:now});
+  var changes=[{op:"set",id:ref.id,data:Object.assign({},record,{id:undefined})}].concat(clientPlanChanges(plan,ref.id));
+  // Firestore does not need the synthetic local id field in the document.
+  delete changes[0].data.id;
+  var events=[createEvent].concat(plan.events);
+  runDebtAudit(changes,events,function(){applyLocalDebtChanges(changes);closeM();renderDebts();
+    toast(plan.used?'Borxhi u ruajt · u përdor '+fmt(plan.used)+' parapagim automatikisht':'Borxhi u ruajt në llogarinë e klientit');});
+}
+function clientPaymentForm(clientId){
+  var c=clientFind(clientId);if(!c)return;var state=clientState(c);
+  openM('<h3>Regjistro pagesë</h3><p class="muted">Klienti: <b>'+esc(c.name)+'</b> · Mbetur: <b>'+fmt(state.netDue)+'</b></p>'
+    +'<label>Shuma që pagoi</label><input id="cp_amount" type="number" inputmode="decimal" min="0" step="0.01" value="'+(state.netDue||'')+'" placeholder="p.sh. 5000">'
+    +'<div class="client-note">Pagesa shlyen borxhin më të vjetër. Nëse paguan më shumë, teprica ruhet si parapagim për këtë klient.</div>'
+    +'<label>Mënyra e pagesës</label><div class="seg" id="cp_method"><button class="on" data-m="cash" onclick="segPick(this)">💵 Cash</button>'
+    +'<button data-m="bank" onclick="segPick(this)">🏦 Bankë</button></div>'
+    +'<label>Data</label><input id="cp_date" type="date" value="'+today()+'"><label>Shënim — për çfarë u pagua?</label><input id="cp_note" placeholder="p.sh. produktet ose shërbimi">'
+    +'<div class="row" style="margin-top:16px"><button class="btn sec" onclick="closeM()">Anulo</button>'
+    +'<button class="btn" data-client-id="'+esc(c.id)+'" onclick="clientPaymentSave(this.dataset.clientId)">Ruaj pagesën</button></div>');
+}
+function clientPaymentSave(clientId){
+  var c=clientFind(clientId),amount=+$("cp_amount").value||0;if(!c)return;
+  if(amount<=0){alert("Vendos shumën e pagesës.");return;}
+  var method=$("cp_method").querySelector(".on").dataset.m,date=$("cp_date").value||today(),note=$("cp_note").value.trim();
+  var original=clientRecords(c),oldPlan=planClientCreditApplications(c.id,original),staged=applyClientPlanToRecords(original,oldPlan);
+  var bills=staged.filter(function(d){return !d.prepaymentOnly&&(+d.amount||0)>0;}).sort(clientDebtOrder);
+  var remaining=amount,groupId="cp_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8),events=oldPlan.events.slice(),changes=clientPlanChanges(oldPlan),seq=Date.now()+100;
+  for(var i=0;i<bills.length&&remaining>0;i++){
+    var d=bills[i],rest=Math.max(0,(+d.amount||0)-paidOf(d));if(rest<=0)continue;
+    var part=Math.min(remaining,rest),item={amount:part,method:method,date:date,note:note,ts:seq++,groupId:groupId};
+    var before=debtAuditSnapshot(d,true),after=Object.assign({},d,{payments:(d.payments||[]).concat([item])});
+    d.payments=(d.payments||[]).concat([item]);
+    var ev=makeDebtHistoryEvent("payment_added",d.id,debtAuditGroups(before,after),{item:item,itemTs:item.ts,businessDate:date,clientId:String(c.id)});
+    events=events.concat(debtHistoryEventsForExisting(Object.assign({},d,{payments:(d.payments||[]).slice(0,-1)}),[ev]));
+    var existing=changes.find(function(x){return String(x.id)===String(d.id);});
+    if(existing){existing.data.payments=d.payments.slice();}
+    else changes.push({op:"update",id:d.id,data:{payments:d.payments.slice()}});
+    remaining-=part;
+  }
+  var prepayRef=null;
+  if(remaining>0){
+    prepayRef=col("debts").doc();var item={amount:remaining,method:method,date:date,note:note,ts:seq++,groupId:groupId};
+    var prepay={id:prepayRef.id,name:c.name,type:"in",amount:0,date:date,note:"Parapagim",payments:[item],uses:[],creditRefunds:[],
+      clientId:String(c.id),prepaymentOnly:true,created:Date.now()};
+    changes.push({op:"set",id:prepayRef.id,data:Object.assign({},prepay)});delete changes[changes.length-1].data.id;
+    var afterPrepay=debtAuditSnapshot(Object.assign({},prepay,{payments:[]}),true);
+    events.push(makeDebtHistoryEvent("created",prepayRef.id,[debtHistoryGroupRef(c.name,"in"),debtHistoryGroupRef(c.name,"out")],
+      {after:afterPrepay,clientId:String(c.id),at:prepay.created}));
+    events.push(makeDebtHistoryEvent("payment_added",prepayRef.id,debtAuditGroups(prepay),
+      {item:item,itemTs:item.ts,businessDate:date,clientId:String(c.id)}));
+  }
+  runDebtAudit(changes,events,function(){applyLocalDebtChanges(changes);closeM();renderDebts();
+    toast(remaining>0?'Pagesa u ruajt · '+fmt(remaining)+' mbeti parapagim':'Pagesa u ruajt dhe u nda sipas borxheve më të vjetra');});
+}
+function clientUseForm(clientId){
+  var c=clientFind(clientId),state=clientState(c);if(!c||state.netCredit<=0)return;
+  openM('<h3>Përdor parapagimin</h3><p class="muted">'+esc(c.name)+' · Mbetur '+fmt(state.netCredit)+'</p>'
+    +'<p class="muted">Ky është përdorim jo-cash; nuk ndryshon arkën.</p><label>Shuma e përdorur</label>'
+    +'<input id="cu_amount" type="number" inputmode="decimal" min="0" max="'+state.netCredit+'" value="'+state.netCredit+'">'
+    +'<label>Çfarë mori</label><input id="cu_note" placeholder="p.sh. mall ose shërbim">'
+    +'<label>Data</label><input id="cu_date" type="date" value="'+today()+'">'
+    +'<div class="row" style="margin-top:16px"><button class="btn sec" onclick="closeM()">Anulo</button>'
+    +'<button class="btn" data-client-id="'+esc(c.id)+'" onclick="clientUseSave(this.dataset.clientId)">Ruaj përdorimin</button></div>');
+}
+function clientUseSave(clientId){
+  var c=clientFind(clientId),amount=+$("cu_amount").value||0;if(!c)return;var state=clientState(c);
+  if(amount<=0||amount>state.netCredit){alert("Shuma duhet të jetë brenda parapagimit të mbetur.");return;}
+  var sources=state.records.filter(function(d){return creditOf(d)>0;}).sort(clientDebtOrder),remaining=amount,changes=[],events=[],date=$("cu_date").value||today(),note=$("cu_note").value.trim(),seq=Date.now();
+  sources.forEach(function(d){if(remaining<=0)return;var part=Math.min(remaining,creditOf(d));if(part<=0)return;
+    var item={amount:part,note:note,date:date,ts:seq++},uses=(d.uses||[]).concat([item]);
+    changes.push({op:"update",id:d.id,data:{uses:uses}});
+    var ev=makeDebtHistoryEvent("credit_used",d.id,debtAuditGroups(d),{item:item,itemTs:item.ts,businessDate:date,clientId:String(c.id)});
+    events=events.concat(debtHistoryEventsForExisting(d,[ev]));remaining-=part;
+  });
+  runDebtAudit(changes,events,function(){applyLocalDebtChanges(changes);closeM();renderDebts();toast("Përdorimi jo-cash u ruajt");});
+}
+function clientRefundForm(clientId){
+  var c=clientFind(clientId),state=clientState(c);if(!c||state.netCredit<=0)return;
+  openM('<h3>Kthe parapagimin</h3><p class="muted">Klienti: <b>'+esc(c.name)+'</b> · Mbetur '+fmt(state.netCredit)+'</p>'
+    +'<label>Shuma që po i kthen</label><input id="cr_amount" type="number" inputmode="decimal" min="0" max="'+state.netCredit+'" value="'+state.netCredit+'">'
+    +'<label>Mënyra e kthimit</label><div class="seg" id="cr_method"><button class="on" data-m="cash" onclick="segPick(this)">💵 Cash</button>'
+    +'<button data-m="bank" onclick="segPick(this)">🏦 Bankë</button></div><label>Data</label><input id="cr_date" type="date" value="'+today()+'">'
+    +'<label>Shënim</label><input id="cr_note" value="Kthim parapagimi">'
+    +'<div class="row" style="margin-top:16px"><button class="btn sec" onclick="closeM()">Anulo</button>'
+    +'<button class="btn" data-client-id="'+esc(c.id)+'" onclick="clientRefundSave(this.dataset.clientId)">Ruaj kthimin</button></div>');
+}
+function clientRefundSave(clientId){
+  var c=clientFind(clientId),amount=+$("cr_amount").value||0;if(!c)return;var state=clientState(c);
+  if(amount<=0||amount>state.netCredit){alert("Shuma duhet të jetë brenda parapagimit të mbetur.");return;}
+  var method=$("cr_method").querySelector(".on").dataset.m,sources=state.records.filter(function(d){return creditOf(d)>0;}).sort(clientDebtOrder),remaining=amount,changes=[],events=[],date=$("cr_date").value||today(),note=$("cr_note").value.trim(),seq=Date.now();
+  sources.forEach(function(d){if(remaining<=0)return;var part=Math.min(remaining,creditOf(d));if(part<=0)return;
+    var item={amount:part,method:method,date:date,note:note,ts:seq++},refunds=(d.creditRefunds||[]).concat([item]);
+    changes.push({op:"update",id:d.id,data:{creditRefunds:refunds}});
+    var ev=makeDebtHistoryEvent("credit_refunded",d.id,debtAuditGroups(d),{item:item,itemTs:item.ts,businessDate:date,clientId:String(c.id)});
+    events=events.concat(debtHistoryEventsForExisting(d,[ev]));remaining-=part;
+  });
+  runDebtAudit(changes,events,function(){applyLocalDebtChanges(changes);closeM();renderDebts();toast("Parapagimi u kthye · arka u ul me "+fmt(amount));});
+}
+function debtHistoryRefs(event){
+  if(event&&Array.isArray(event.groups)&&event.groups.length)return event.groups;
+  if(event&&Array.isArray(event.groupKeys)&&event.groupKeys.length){
+    return event.groupKeys.map(function(key){
+      var direction=String(key).split("|")[0]==="out"?"out":"in";
+      return {key:String(key),name:String(event.name||"Pa emër"),type:direction};
+    });
+  }
+  if(event&&event.before)return debtAuditGroups(event.before);
+  if(event&&event.after)return debtAuditGroups(event.after);
+  if(event&&event.name)return [debtHistoryGroupRef(event.name,event.type)];
+  return [];
+}
+function historyDateMillis(value){
+  var text=String(value||"");if(!text)return 0;
+  var date=new Date(/^\d{4}-\d{2}-\d{2}$/.test(text)?text+"T12:00:00":text);
+  return isNaN(date.getTime())?0:date.getTime();
+}
+function historyItemAlreadyLogged(events,debtId,action,item,groupKey){
+  var targetTs=+(item&&item.ts)||0;
+  return events.some(function(e){
+    if(String(e.debtId||"")!==String(debtId||"")||e.action!==action)return false;
+    if(groupKey&&!debtHistoryRefs(e).some(function(ref){return ref.key===groupKey;}))return false;
+    var logged=e.item||{},loggedTs=+(e.itemTs||logged.ts)||0;
+    if(targetTs&&loggedTs)return targetTs===loggedTs;
+    return (+logged.amount||0)===(+item.amount||0)
+      &&String(logged.date||"")===String(item.date||"")
+      &&String(logged.note||"")===String(item.note||"");
+  });
+}
+function debtHistoryRefsForRecord(debtId,events,fallback){
+  var refs=[];
+  function add(ref){if(ref&&ref.key&&!refs.some(function(x){return x.key===ref.key;}))refs.push(ref);}
+  events.filter(function(e){return String(e.debtId||"")===String(debtId||"");})
+    .forEach(function(e){debtHistoryRefs(e).forEach(add);});
+  if(fallback)debtAuditGroups(fallback).forEach(add);
+  return refs;
+}
+function addLegacyLedgerEvents(events,debtId,snapshot,fallbackAt){
+  if(!snapshot)return;
+  var refs=debtHistoryRefsForRecord(debtId,events,snapshot);
+  function add(action,item){
+    refs.forEach(function(ref){
+      if(historyItemAlreadyLogged(events,debtId,action,item,ref.key))return;
+      var at=+(item&&item.ts)||historyDateMillis(item&&item.date)||fallbackAt||0;
+      events.push(makeDebtHistoryEvent(action,debtId,[ref],{
+        item:item,itemTs:+(item&&item.ts)||0,businessDate:String(item&&item.date||""),
+        at:at,legacy:true,synthetic:true
+      }));
+    });
+  }
+  (snapshot.payments||[]).forEach(function(item){add("payment_added",item);});
+  (snapshot.uses||[]).forEach(function(item){add("credit_used",item);});
+  (snapshot.creditRefunds||[]).forEach(function(item){add("credit_refunded",item);});
+}
+function buildDebtHistoryEvents(){
+  var events=DEBT_HISTORY.map(function(e){return Object.assign({},e);});
+  DEBTS.forEach(function(d){
+    var own=events.filter(function(e){return String(e.debtId||"")===String(d.id||"");});
+    var hasStart=own.some(function(e){return e.action==="created"||e.action==="baseline";});
+    if(!hasStart){
+      var first=own.filter(function(e){return e.before;}).sort(function(a,b){return (+a.at||0)-(+b.at||0);})[0];
+      var snapshot=first?first.before:debtAuditSnapshot(d,true);
+      var ref=debtHistoryGroupRef(snapshot.name,snapshot.type);
+      var at=first?(Math.max(1,(+first.at||Date.now())-1)):(+d.created||historyDateMillis(snapshot.date)||Date.now());
+      events.push(makeDebtHistoryEvent("baseline",d.id,debtAuditGroups(snapshot),{after:snapshot,legacy:true,synthetic:true,at:at}));
+    }
+    addLegacyLedgerEvents(events,d.id,debtAuditSnapshot(d,true),+d.created||historyDateMillis(d.date));
+  });
+  events.slice().forEach(function(e){
+    if(e.action==="baseline"&&e.after)addLegacyLedgerEvents(events,e.debtId,e.after,+e.at||0);
+    if(e.action==="deleted"&&e.before)addLegacyLedgerEvents(events,e.debtId,e.before,+e.at||0);
+    if((e.action==="payment_deleted"||e.action==="credit_use_deleted")&&e.item){
+      var action=e.action==="payment_deleted"?"payment_added":"credit_used";
+      if(!historyItemAlreadyLogged(events,e.debtId,action,e.item,
+          (debtHistoryRefs(e)[0]||{}).key||"")){
+        var refs=debtHistoryRefs(e),itemAt=+(e.item.ts)||historyDateMillis(e.item.date)||Math.max(1,(+e.at||Date.now())-1);
+        events.push(makeDebtHistoryEvent(action,e.debtId,refs,{item:e.item,
+          itemTs:+(e.itemTs||e.item.ts)||0,businessDate:String(e.item.date||""),
+          at:itemAt,legacy:true,synthetic:true}));
+      }
+    }
+  });
+  return events.filter(function(e){
+    return !(e.action==="baseline"&&events.some(function(other){
+      return String(other.debtId||"")===String(e.debtId||"")&&other.action==="created";
+    }));
+  });
+}
+function historyEventLabel(event){
+  var labels={created:"U krijua borxhi",baseline:event.synthetic?"Gjendja e njohur nga rekordi ekzistues":"Pikënisja e historikut u ruajt në cloud",
+    client_created:"U krijua profili i klientit",client_updated:"U ndryshua profili i klientit",
+    updated:"U ndryshua rekordi",deleted:"Borxhi u fshi · kopja u ruajt",
+    payment_added:event.legacy?"Pagesë e ruajtur në rekord":"U regjistrua pagesa",
+    payment_deleted:"U hoq pagesa · u ruajt në historik",
+    credit_used:event.legacy?"Përdorim kredie i ruajtur në rekord":"U përdor parapagimi",
+    credit_use_deleted:"U anulua përdorimi · u ruajt në historik",
+    credit_refunded:"U kthye parapagimi",credit_note_updated:"U ndryshua shënimi i parapagimit"};
+  return labels[event.action]||"Ngjarje e ruajtur";
+}
+function historyDirection(type){return type==="out"?"Unë u kam borxh":"Më kanë borxh mua";}
+function historySnapshotHtml(snapshot){
+  if(!snapshot)return "";
+  var html='<div>'+esc(historyDirection(snapshot.type))+' · <b>'+fmt(snapshot.amount)+'</b>'
+    +' · data e borxhit '+esc(snapshot.date||"—")+'</div>';
+  if(snapshot.note)html+='<div>Shënim: '+esc(snapshot.note)+'</div>';
+  if(snapshot.creditNote)html+='<div>Shënim parapagimi: '+esc(snapshot.creditNote)+'</div>';
+  var pc=(snapshot.payments||[]).length,uc=(snapshot.uses||[]).length,rc=(snapshot.creditRefunds||[]).length;
+  if(pc||uc||rc)html+='<div class="debt-history-archived">Në kopjen e ruajtur: '+pc+' pagesa · '
+    +uc+' përdorime kredie · '+rc+' kthime parapagimi.</div>';
+  return html;
+}
+function historyChangedFields(before,after){
+  if(!before||!after)return "";
+  var fields=[["name","Emri"],["amount","Shuma"],["type","Drejtimi"],["date","Data"],
+    ["note","Shënimi"],["creditNote","Shënimi i parapagimit"]];
+  return fields.map(function(pair){
+    var key=pair[0],label=pair[1],a=before[key],b=after[key];
+    if(String(a??"")===String(b??""))return "";
+    var av=key==="amount"?fmt(a):key==="type"?historyDirection(a):String(a||"—");
+    var bv=key==="amount"?fmt(b):key==="type"?historyDirection(b):String(b||"—");
+    return '<div><b>'+esc(label)+':</b> '+esc(av)+' → '+esc(bv)+'</div>';
+  }).join("");
+}
+function historyEventDetail(event){
+  var item=event.item||{},html="";
+  if(event.action==="client_created")return '<div>Klienti: <b>'+esc(event.afterName||event.clientName||"")+'</b></div>';
+  if(event.action==="client_updated")return '<div><b>Emri:</b> '+esc(event.beforeName||"—")+' → '+esc(event.afterName||"—")+'</div>';
+  if(event.action==="created")return historySnapshotHtml(event.after);
+  if(event.action==="baseline")return historySnapshotHtml(event.after);
+  if(event.action==="updated")return historyChangedFields(event.before,event.after)||"Fushat nuk ndryshuan.";
+  if(event.action==="deleted")return historySnapshotHtml(event.before);
+  if(event.action==="credit_note_updated")return '<div><b>Shënimi:</b> '
+    +esc(event.beforeNote||"—")+' → '+esc(event.afterNote||"—")+'</div>';
+  if(event.action==="payment_added"||event.action==="payment_deleted"){
+    html='<div><b>'+fmt(item.amount)+'</b> · '+(item.method==="credit"?"Parapagim (jo cash)":item.method==="bank"?"Bankë":"Cash")
+      +(item.date?' · data '+esc(item.date):"")+(item.note?' · '+esc(item.note):"")+'</div>';
+    if(+item.credit>0)html+='<div>Tepricë e ruajtur si parapagim: '+fmt(item.credit)+'.</div>';
+    if(+event.creditRemaining>0)html+='<div>Parapagim i mbetur: '+fmt(event.creditRemaining)+'.</div>';
+    if(event.groupedParts>1)html+='<div>Pagesa u nda në '+event.groupedParts+' borxhe.</div>';
+    return html;
+  }
+  if(event.action==="credit_used"||event.action==="credit_use_deleted"){
+    return '<div><b>'+fmt(item.amount)+'</b> · përdorim jo-cash'
+      +(item.date?' · data '+esc(item.date):"")+(item.note?' · '+esc(item.note):"")+'</div>';
+  }
+  if(event.action==="credit_refunded")return '<div><b>'+fmt(item.amount)+'</b> · '
+    +(item.method==="bank"?"Bankë":"Cash")+(item.date?' · data '+esc(item.date):"")
+    +(item.note?' · '+esc(item.note):"")+'</div>';
+  return esc(event.note||"");
+}
+function historyEventTime(event){
+  var at=+(event.at||0);
+  if(at>0&&!isNaN(at))return new Date(at).toLocaleString("sq-AL",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
+  return esc(event.businessDate||"Data/orari nuk u ruajt");
+}
+function renderDebtHistory(key,events,collapsible){
+  var items=events.filter(function(e){return debtHistoryRefs(e).some(function(ref){return ref.key===key;});})
+    .sort(function(a,b){return (+b.at||0)-(+a.at||0);});
+  if(!items.length)return "";
+  var rows=items.map(function(e){
+    var action=esc(e.action||"event");
+    return '<div class="debt-history-event '+action+'"><span class="debt-history-dot"></span>'
+      +'<div class="debt-history-content"><strong>'+esc(historyEventLabel(e))+'</strong>'
+      +'<time>'+historyEventTime(e)+'</time><div class="debt-history-detail">'
+      +historyEventDetail(e)+'</div></div></div>';
+  }).join("");
+  var body='<div class="debt-history-list">'+rows+'</div>';
+  return collapsible
+    ?'<details class="debt-history-single"><summary>Historiku · '+items.length+' ngjarje</summary>'+body+'</details>'
+    :'<section class="debt-history-inline"><div class="debt-history-heading">Historiku i grupit · '+items.length+' ngjarje</div>'+body+'</section>';
+}
+function debtGroupToggle(el){
+  var key=el&&el.dataset?el.dataset.groupKey:"";
+  if(!key)return;
+  if(el.open)DEBT_OPEN_GROUPS[key]=true;
+  else delete DEBT_OPEN_GROUPS[key];
+}
+function renderDebtItem(d,historyKey,historyEvents){
+  const isPrepayment=!!d._isPrepayment,source=isPrepayment?d._source:null;
+  const p=paidOf(d),amount=+d.amount||0,rest=Math.max(0,amount-p),full=rest<=0;
+  const historyHtml=historyKey?renderDebtHistory(historyKey,historyEvents||[],true):"";
+  const pct=Math.min(100,amount?p/amount*100:0),cr=isPrepayment?0:creditOf(d);
+  const direction=d.type==="out"?"out":"in";
+  const directionText=d.type==="out"?"UNË U KAM BORXH":"MË KANË BORXH MUA";
+  const tag=cr>0?'<span class="tag t-info">KREDI</span>'
+    :full?'<span class="tag t-ok">PAGUAR</span>'
+    :p>0?'<span class="tag t-part">PJESËRISHT</span>':'<span class="tag t-no">PAPAGUAR</span>';
+  const payAction=isPrepayment?'creditRefundForm(this.dataset.sourceId)':'payForm(this.dataset.sourceId)';
+  const payLabel=isPrepayment?'Shlyej parapagimin':'+ Pagesë';
+  const payButton=!full?'<button class="btn sm" data-source-id="'+esc(isPrepayment?d._sourceId:d.id)+'" onclick="'+payAction+'">'+payLabel+'</button>':'';
+  const editButton=!isPrepayment?'<button class="btn sec sm" data-debt-id="'+esc(d.id)+'" onclick="debtForm(this.dataset.debtId)">Ndrysho</button>':'';
+  const creditBox=!isPrepayment&&(creditRaw(d)>0||creditUsed(d)>0||creditRefunded(d)>0)
+    ?`<div onclick="event.stopPropagation();creditForm('${d.id}')"
+      style="margin-top:9px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);
+      border-radius:10px;padding:8px 10px;cursor:pointer;display:flex;
+      justify-content:space-between;align-items:center;gap:8px">
+      <span style="font-size:12.5px">⭐ ${cr>0?"Kredi për më vonë":creditRefunded(d)>0&&creditUsed(d)===0?"Parapagimi u kthye":"Kredia u shterua"}
+        ${creditNote(d)?`<br><span class="muted">${esc(creditNote(d))}</span>`:""}
+        ${creditUsed(d)>0?`<br><span class="muted">përdorur ${fmt(creditUsed(d))} nga ${fmt(creditRaw(d))}</span>`:""}
+        ${creditRefunded(d)>0?`<br><span class="muted">kthyer klientit ${fmt(creditRefunded(d))}</span>`:""}
+        ${cr>0?`<br><span class="muted">shtyp për përdorim ose kthim</span>`:""}</span>
+      <b style="color:${cr>0?"#8ab4ff":"var(--dim)"};white-space:nowrap">${fmt(cr)}</b></div>`:"";
+  const prepaymentInfo=isPrepayment
+    ?`<div class="muted" style="margin-top:5px;font-size:12px">Përdorur ${fmt(creditUsed(source))} · Kthyer ${fmt(creditRefunded(source))}</div>`:"";
+  const refundHistory=isPrepayment&&(source.creditRefunds||[]).length
+    ?`<details style="margin-top:9px"><summary>${source.creditRefunds.length} kthime · ${fmt(creditRefunded(source))}</summary>
+      ${(source.creditRefunds||[]).slice().sort((a,b)=>(+b.ts||0)-(+a.ts||0)).map(function(r){
+        return `<div class="pay"><span>${r.method==="bank"?"🏦 Bankë":"💵 Cash"} · ${r.date||""}${r.note?" · "+esc(r.note):""}</span><span><b>${fmt(r.amount)}</b></span></div>`;
+      }).join("")}</details>`:"";
+  const paymentHistory=!isPrepayment&&(d.payments||[]).length
+    ?`<details style="margin-top:9px"><summary>${d.payments.length} pagesa · ${fmt(p)}</summary>
+      ${d.payments.slice().sort((x,y)=>y.ts-x.ts).map(x=>`<div class="pay">
+        <span>${x.method==="credit"?"⭐ Parapagim":x.method==="bank"?"🏦 Bankë":"💵 Cash"} · ${x.date||""}${x.note?" · "+esc(x.note):""}</span>
+        <span><b>${fmt(x.amount)}</b> <a onclick="payDel('${d.id}',${x.ts})" style="color:#ff8a8a;cursor:pointer">✕</a></span>
+      </div>`).join("")}</details>`:"";
+  return `<div class="item">
+    <div class="top">
+      <div><div class="name">${esc(d.name||"Pa emër")}</div>
+      <div class="debt-direction"><span class="debt-kind ${direction}">${directionText}</span>
+        <span class="muted" style="font-size:12px">${esc(d.date||"")}</span></div>
+      ${d.note?`<div class="muted" style="margin-top:5px">📝 ${esc(d.note)}</div>`:""}
+      ${prepaymentInfo}</div>
+      <div style="text-align:right">${tag}
+        <div style="font-weight:800;font-size:17px;margin-top:5px">${fmt(amount)}</div>
+        ${!full?`<div class="muted">mbetur ${fmt(rest)}</div>`:""}</div>
+    </div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    ${creditBox}${paymentHistory}${refundHistory}
+    ${payButton||editButton?`<div class="row" style="margin-top:10px">${payButton}${editButton}</div>`:""}
+    ${historyHtml}
+  </div>`;
+}
 function renderDebts(){
   renderDebtSwitch();
-  const pool=DTYPE==="out"?outgoingDebtRows(DEBTS):DEBTS.filter(function(d){return d.type!=="out";});
-  const list=pool.filter(function(d){
-    const settled=Math.max(0,(+d.amount||0)-paidOf(d))<=0;
-    return DF==="all"||(DF==="paid"?settled:!settled);
-  }).sort(function(a,b){return (b.date||"").localeCompare(a.date||"");});
-  $("debtList").innerHTML=list.length?list.map(function(d){
-    const isPrepayment=!!d._isPrepayment,source=isPrepayment?d._source:null;
-    const p=paidOf(d),amount=+d.amount||0,rest=Math.max(0,amount-p),full=rest<=0;
-    const pct=Math.min(100,amount?p/amount*100:0),cr=isPrepayment?0:creditOf(d);
-    const direction=d.type==="out"?"out":"in";
-    const directionText=d.type==="out"?"UNË U KAM BORXH":"MË KANË BORXH MUA";
-    const tag=cr>0?'<span class="tag t-info">KREDI</span>'
-      :full?'<span class="tag t-ok">PAGUAR</span>'
-      :p>0?'<span class="tag t-part">PJESËRISHT</span>':'<span class="tag t-no">PAPAGUAR</span>';
-    const payAction=isPrepayment?'creditRefundForm(this.dataset.sourceId)':'payForm(this.dataset.sourceId)';
-    const payLabel=isPrepayment?'Shlyej parapagimin':'+ Pagesë';
-    const payButton=!full?'<button class="btn sm" data-source-id="'+esc(isPrepayment?d._sourceId:d.id)+'" onclick="'+payAction+'">'+payLabel+'</button>':'';
-    const editButton=!isPrepayment?'<button class="btn sec sm" data-debt-id="'+esc(d.id)+'" onclick="debtForm(this.dataset.debtId)">Ndrysho</button>':'';
-    const creditBox=!isPrepayment&&(creditRaw(d)>0||creditUsed(d)>0||creditRefunded(d)>0)
-      ?`<div onclick="event.stopPropagation();creditForm('${d.id}')"
-        style="margin-top:9px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);
-        border-radius:10px;padding:8px 10px;cursor:pointer;display:flex;
-        justify-content:space-between;align-items:center;gap:8px">
-        <span style="font-size:12.5px">⭐ ${cr>0?"Kredi për më vonë":creditRefunded(d)>0&&creditUsed(d)===0?"Parapagimi u kthye":"Kredia u shterua"}
-          ${creditNote(d)?`<br><span class="muted">${esc(creditNote(d))}</span>`:""}
-          ${creditUsed(d)>0?`<br><span class="muted">përdorur ${fmt(creditUsed(d))} nga ${fmt(creditRaw(d))}</span>`:""}
-          ${creditRefunded(d)>0?`<br><span class="muted">kthyer klientit ${fmt(creditRefunded(d))}</span>`:""}
-          ${cr>0?`<br><span class="muted">shtyp për përdorim ose kthim</span>`:""}</span>
-        <b style="color:${cr>0?"#8ab4ff":"var(--dim)"};white-space:nowrap">${fmt(cr)}</b></div>`:"";
-    const prepaymentInfo=isPrepayment
-      ?`<div class="muted" style="margin-top:5px;font-size:12px">Përdorur ${fmt(creditUsed(source))} · Kthyer ${fmt(creditRefunded(source))}</div>`:"";
-    const refundHistory=isPrepayment&&(source.creditRefunds||[]).length
-      ?`<details style="margin-top:9px"><summary>${source.creditRefunds.length} kthime · ${fmt(creditRefunded(source))}</summary>
-        ${(source.creditRefunds||[]).slice().sort((a,b)=>(+b.ts||0)-(+a.ts||0)).map(function(r){
-          return `<div class="pay"><span>${r.method==="bank"?"🏦 Bankë":"💵 Cash"} · ${r.date||""}${r.note?" · "+esc(r.note):""}</span><span><b>${fmt(r.amount)}</b></span></div>`;
-        }).join("")}</details>`:"";
-    const paymentHistory=!isPrepayment&&(d.payments||[]).length
-      ?`<details style="margin-top:9px"><summary>${d.payments.length} pagesa · ${fmt(p)}</summary>
-        ${d.payments.slice().sort((x,y)=>y.ts-x.ts).map(x=>`<div class="pay">
-          <span>${x.method==="bank"?"🏦 Bankë":"💵 Cash"} · ${x.date||""}${x.note?" · "+esc(x.note):""}</span>
-          <span><b>${fmt(x.amount)}</b> <a onclick="payDel('${d.id}',${x.ts})" style="color:#ff8a8a;cursor:pointer">✕</a></span>
-        </div>`).join("")}</details>`:"";
-    return `<div class="item">
-      <div class="top">
-        <div><div class="name">${esc(d.name)}</div>
-        <div class="debt-direction"><span class="debt-kind ${direction}">${directionText}</span>
-          <span class="muted" style="font-size:12px">${esc(d.date||"")}</span></div>
-        ${d.note?`<div class="muted" style="margin-top:5px">📝 ${esc(d.note)}</div>`:""}
-        ${prepaymentInfo}</div>
-        <div style="text-align:right">${tag}
-          <div style="font-weight:800;font-size:17px;margin-top:5px">${fmt(amount)}</div>
-          ${!full?`<div class="muted">mbetur ${fmt(rest)}</div>`:""}</div>
-      </div>
-      <div class="bar"><i style="width:${pct}%"></i></div>
-      ${creditBox}${paymentHistory}${refundHistory}
-      ${payButton||editButton?`<div class="row" style="margin-top:10px">${payButton}${editButton}</div>`:""}
-    </div>`;
-  }).join(""):`<div class="empty">${DF==="open"?"Nuk ka borxhe të hapura në këtë ndarje.":DF==="paid"?"Nuk ka borxhe të paguara në këtë ndarje.":"Nuk ka borxhe të regjistruara në këtë ndarje."}<br>
-      <button class="btn sm" style="margin-top:12px" onclick="debtForm()">+ Shto në këtë ndarje</button></div>`;
+  var clientsMode=DTYPE!=="out";
+  $("clientSection").style.display=clientsMode?"block":"none";
+  $("outgoingSection").style.display=clientsMode?"none":"block";
+  if(VIEW==="debt"){
+    $("fab").style.display=clientsMode?"none":"block";
+    $("title").textContent=clientsMode?"Klientët":"Borxhe";
+  }
+  if(clientsMode){renderClients();return;}
+  renderOutgoingDebts();
 }
 
 /* ================= QIRAJA ================= */
@@ -1483,47 +2615,36 @@ function renderNotes(){
 
 /* ================= RENDER ================= */
 function renderHome(){
-  var cashIn=0, cashOut=0, waiting=0, owing=0;
+  var cashIn=0,cashOut=0,ownOwing=0;
   DEBTS.forEach(function(d){
-    var paid=paidOf(d), amt=(+d.amount||0), rest=amt-paid;
-    if(d.type==="out"){ cashOut+=paid; if(rest>0) owing+=rest; }
-    else {
-      cashIn+=paid;
-      if(rest>0) waiting+=rest;
-      owing+=creditOf(d);
-      cashOut+=creditRefunded(d);
-    }
+    var cash=cashPaidOf(d),rest=Math.max(0,(+d.amount||0)-paidOf(d));
+    if(d.type==="out"){cashOut+=cash;if(rest>0)ownOwing+=rest;}
+    else{cashIn+=cash;cashOut+=creditRefunded(d);}
   });
-  var expTot=EXP.reduce(function(s,e){return s+(+e.amount||0);},0);
-  var outAll=cashOut+expTot;
-  var bal=cashIn-outAll;
-
+  var profiles=clientProfilesForView(),waiting=0,clientCredit=0;
+  profiles.forEach(function(c){var state=clientState(c);waiting+=state.netDue;clientCredit+=state.netCredit;});
+  var expTot=EXP.reduce(function(s,e){return s+(+e.amount||0);},0),outAll=cashOut+expTot,bal=cashIn-outAll;
   $("balV").textContent=(bal>=0?"+":"\u2212")+fmt(Math.abs(bal));
   $("balV").style.color=bal>=0?"#5ee89b":"#ff8a8a";
-  $("balNote").textContent=bal>=0?"Je n\u00eb plus":"Ke dal\u00eb me minus";
-  $("bIn").textContent=fmt(cashIn);
-  $("bOut").textContent=fmt(outAll);
-
-  var tot=cashIn+outAll;
-  $("balBar").innerHTML=tot>0
-    ? '<div style="width:'+(cashIn/tot*100)+'%;background:#22c55e"></div>'
-     +'<div style="width:'+(outAll/tot*100)+'%;background:#ef4444"></div>'
-    : "";
-
-  var credit=DEBTS.reduce(function(s,d){return s+creditOf(d);},0);
+  $("balNote").textContent=bal>=0?"Je në plus":"Ke dalë me minus";
+  $("bIn").textContent=fmt(cashIn);$("bOut").textContent=fmt(outAll);
+  var total=cashIn+outAll;
+  $("balBar").innerHTML=total>0?'<div style="width:'+(cashIn/total*100)+'%;background:#22c55e"></div>'
+    +'<div style="width:'+(outAll/total*100)+'%;background:#ef4444"></div>':"";
   var bits=[];
-  if(waiting>0) bits.push('P\u00ebr t\u00eb marr\u00eb <b style="color:#8ab4ff">'+fmt(waiting)+'</b>');
-  if(owing>0)   bits.push('P\u00ebr t\u00eb dh\u00ebn\u00eb <b style="color:#ff8a8a">'+fmt(owing)+'</b>');
-  if(credit>0)  bits.push('Kredi <b style="color:#8ab4ff">'+fmt(credit)+'</b>');
-  $("bPend").innerHTML=bits.length?bits.join(" \u00b7 "):"Asnj\u00eb borxh i hapur.";
+  if(waiting>0)bits.push('Klientët të kanë borxh <b style="color:#8ab4ff">'+fmt(waiting)+'</b>');
+  if(ownOwing>0)bits.push('Ti u ke borxh <b style="color:#ff8a8a">'+fmt(ownOwing)+'</b>');
+  if(clientCredit>0)bits.push('Parapagime klientësh <b style="color:#5ee89b">'+fmt(clientCredit)+'</b>');
+  $("bPend").innerHTML=bits.length?bits.join(" · "):"Asnjë borxh i hapur.";
 }
 
 function render(){
   renderDebts();renderRent();renderExp();renderHome();renderNotes();
-  const open=DEBTS.filter(d=>paidOf(d)<(d.amount||0));
-  $("sumDebt").textContent=fmt(open.filter(d=>d.type!=="out").reduce((s,d)=>s+((d.amount||0)-paidOf(d)),0));
-  $("cntOpen").textContent=open.length;
-  $("cntDone").textContent=DEBTS.length-open.length;
+  const profiles=clientProfilesForView();
+  const dueProfiles=profiles.map(function(c){return clientState(c);}).filter(function(x){return x.netDue>0;});
+  $("sumDebt").textContent=fmt(dueProfiles.reduce(function(sum,x){return sum+x.netDue;},0));
+  $("cntOpen").textContent=dueProfiles.length;
+  $("cntDone").textContent=Math.max(0,profiles.length-dueProfiles.length);
   const y=new Date().getFullYear();let t=0,p=0;
   for(let m=0;m<12;m++){const r=rentOf(y,m);const due=(r&&r.amount!=null?r.amount:SET.rent)||0;t+=due;p+=rentPaid(r);}
   $("sumRent").textContent=fmt(p);
@@ -1534,7 +2655,7 @@ function render(){
 }
 
 function exportJson(){
-  const b=new Blob([JSON.stringify({settings:SET,debts:DEBTS,rent:RENT,expenses:EXP,noteFolders:FOLDERS,notes:NOTES},null,2)],{type:"application/json"});
+  const b=new Blob([JSON.stringify({settings:SET,clients:CLIENTS,debts:DEBTS,debtHistory:DEBT_HISTORY,rent:RENT,expenses:EXP,noteFolders:FOLDERS,notes:NOTES},null,2)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="llogarite-"+today()+".json";a.click();
 }
 
@@ -1627,8 +2748,7 @@ function prnGo(){
     btns.forEach(function(b){ if(b){ b.disabled=dis; b.textContent=t; } });
   }
   if(typeof html2pdf==="undefined"){
-    try{ window.print(); }
-    catch(e){ alert("Nuk u ngarkua mjeti i PDF-s\u00eb. Kontrollo internetin dhe rifresko faqen."); }
+    alert("Mjeti për krijimin e PDF-së nuk u ngarkua. Kontrollo lidhjen me internetin dhe rifresko faqen.");
     return;
   }
   setBtn("Duke krijuar...",true);
@@ -1675,7 +2795,7 @@ function pdfFin(){
   const allD=DEBTS.filter(inR);
   let D=allD.slice(); if(only)D=D.filter(d=>paidOf(d)<(d.amount||0));
   const E=EXP.filter(inR).sort((x,y)=>(x.date||"").localeCompare(y.date||""));
-  const IN=D.filter(d=>d.type!=="out"), OUTactual=D.filter(d=>d.type==="out");
+  const IN=D.filter(d=>d.type!=="out"&&!d.prepaymentOnly), OUTactual=D.filter(d=>d.type==="out");
   const prepaymentSources=allD.filter(d=>d.type!=="out"&&creditRaw(d)>0&&(!only||creditOf(d)>0));
   const PRE=prepaymentDebtRows(prepaymentSources), OUT=OUTactual.concat(PRE);
   const cashInRows=allD.filter(d=>d.type!=="out"),cashOutRows=allD.filter(d=>d.type==="out");
@@ -1685,10 +2805,10 @@ function pdfFin(){
   const inRest=sum(IN,d=>Math.max(0,(+d.amount||0)-paidOf(d)));
   const outTot=sum(OUT,d=>+d.amount||0);
   const outUsed=sum(prepaymentSources,creditUsed);
-  const outTableCashPaid=sum(OUTactual,paidOf)+sum(prepaymentSources,creditRefunded);
+  const outTableCashPaid=sum(OUTactual,cashPaidOf)+sum(prepaymentSources,creditRefunded);
   const outRest=sum(OUT,d=>Math.max(0,(+d.amount||0)-paidOf(d)));
-  const inPaid=sum(cashInRows,paidOf);
-  const outPaid=sum(cashOutRows,paidOf)+sum(cashInRows,creditRefunded);
+  const inPaid=sum(cashInRows,cashPaidOf);
+  const outPaid=sum(cashOutRows,cashPaidOf)+sum(cashInRows,creditRefunded);
   const expTot=sum(E,e=>+e.amount||0);
   const expCash=sum(E.filter(e=>e.method!=="bank"),e=>+e.amount||0);
   const expBank=expTot-expCash;
@@ -1706,10 +2826,10 @@ function pdfFin(){
       return parts.join("; ")||"—";
     }
     const m=[...new Set((d.payments||[]).map(p=>p.method))];
-    return m.length?m.map(x=>x==="bank"?"Bankë":"Cash").join(", "):"—";
+    return m.length?m.map(x=>x==="credit"?"Parapagim":x==="bank"?"Bankë":"Cash").join(", "):"—";
   };
-  const tbl=(l,lbl)=>l.length?`<table><tr><th>Emri</th><th>Data</th><th>Mënyra</th><th>Statusi</th><th class="r">Shuma</th><th class="r">${l.some(d=>d._isPrepayment)?"Shlyer / përdorur":"Paguar"}</th><th class="r">Mbetur</th><th class="r">Kredi</th></tr>
-    ${l.sort((x,y)=>(x.date||"").localeCompare(y.date||"")).map(d=>`<tr><td><b>${esc(d.name)}</b>${d.note?`<br><small>${esc(d.note)}</small>`:""}${d._isPrepayment?`<br><small>Përdorur ${fmt(creditUsed(d._source))} · kthyer ${fmt(creditRefunded(d._source))}</small>`:""}</td>
+  const tbl=(l,lbl)=>l.length?`<table><tr><th>Emri</th><th>Data</th><th>Mënyra</th><th>Statusi</th><th class="r">Shuma</th><th class="r">${l.some(d=>d._isPrepayment)?"Shlyer / përdorur":"Shlyer gjithsej"}</th><th class="r">Mbetur</th><th class="r">Kredi</th></tr>
+    ${l.sort((x,y)=>(x.date||"").localeCompare(y.date||"")).map(d=>`<tr><td><b>${esc(debtDisplayName(d))}</b>${d.note?`<br><small>${esc(d.note)}</small>`:""}${d._isPrepayment?`<br><small>Përdorur ${fmt(creditUsed(d._source))} · kthyer ${fmt(creditRefunded(d._source))}</small>`:""}</td>
       <td>${d.date||""}</td><td>${meth(d)}</td><td>${st(d)}</td>
       <td class="r">${fmt(d.amount)}</td><td class="r">${fmt(paidOf(d))}</td><td class="r"><b>${fmt(Math.max(0,(d.amount||0)-paidOf(d)))}</b></td>
       <td class="r">${!d._isPrepayment&&creditOf(d)>0?fmt(creditOf(d)):"—"}</td></tr>`).join("")}
@@ -1747,9 +2867,9 @@ function pdfFin(){
   <h2>2. Kam borxh unë (${OUT.length})</h2>${tbl(OUT,"TOTALI")}
 
   ${CRED.length?`<h2>Kredi / parapagime (${CRED.length})</h2>
-   <p><small>Parapagimet e mbetura shfaqen edhe te “Kam borxh unë”.</small></p>
+   <p><small>Në raport, parapagimet paraqiten veçmas te “Kam borxh unë”.</small></p>
    <table><tr><th>Emri</th><th>Për çfarë</th><th class="r">Gjithsej</th><th class="r">Përdorur</th><th class="r">Kthyer</th><th class="r">Mbetur</th></tr>
-   ${CRED.map(d=>`<tr><td><b>${esc(d.name)}</b></td>
+   ${CRED.map(d=>`<tr><td><b>${esc(debtDisplayName(d))}</b></td>
      <td>${esc(creditNote(d)||"—")}</td>
      <td class="r">${fmt(creditRaw(d))}</td>
      <td class="r">${creditUsed(d)>0?fmt(creditUsed(d)):"—"}</td>
@@ -1775,7 +2895,7 @@ function pdfFin(){
   <h2>Përmbledhje</h2>
   <table>
     <tr><td>Borxhe që më kanë (zërat e përfshirë)</td><td class="r">${fmt(inTot)}</td></tr>
-    <tr><td>&nbsp;&nbsp;— arkëtuar në këta zëra</td><td class="r">${fmt(inTablePaid)}</td></tr>
+    <tr><td>&nbsp;&nbsp;— shlyer në këta zëra (cash + parapagim)</td><td class="r">${fmt(inTablePaid)}</td></tr>
     <tr><td>&nbsp;&nbsp;— për të marrë</td><td class="r"><b>${fmt(inRest)}</b></td></tr>
     <tr><td>Borxhe që kam unë, përfshirë parapagimet</td><td class="r">${fmt(outTot)}</td></tr>
     <tr><td>&nbsp;&nbsp;— shlyer me cash/bankë në zërat e përfshirë</td><td class="r">${fmt(outTableCashPaid)}</td></tr>
@@ -1938,6 +3058,5 @@ function pdfRent(y,fullPeriod){
 
 go("home");
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4eada4f2ea4a5b3',t:'MTc5MjY5Njc1Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
