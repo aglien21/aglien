@@ -71,7 +71,7 @@ nav button.on{color:var(--acc)}
 .client-name{font-size:15px;font-weight:750;overflow-wrap:anywhere}
 .client-small{font-size:11px;color:var(--dim);margin-top:4px;line-height:1.35}
 .client-value{white-space:nowrap;text-align:right;font-size:14px;font-weight:800}
-.client-due{color:#8ab4ff}.client-credit{color:#5ee89b}.client-closed{color:var(--dim)}
+.client-due{color:#ff8a8a}.client-credit{color:#5ee89b}.client-closed{color:var(--dim)}
 .client-detail-head{display:flex;align-items:center;gap:10px;margin:2px 0 12px}
 .client-detail-head h2{font-size:18px;min-width:0;overflow-wrap:anywhere;flex:1}
 .client-balance{padding:15px;border:1px solid var(--line);border-radius:16px;background:var(--card);margin-bottom:12px}
@@ -82,6 +82,17 @@ nav button.on{color:var(--acc)}
 .client-ledger-title{font-size:14px;font-weight:800;margin:18px 2px 9px}
 .client-history{margin-top:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
 .client-history .debt-history-list{max-height:none}
+.client-delete-wrap{margin:14px 0 8px;padding-top:12px;border-top:1px solid var(--line)}
+.client-delete-wrap.top{margin:0 0 14px;padding:0;border:0}
+.client-total-link{display:block;padding:0;margin:0;border:0;background:transparent;text-align:left;color:#ff8a8a;font-family:inherit;font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.2;cursor:pointer}
+.client-total-link:hover{text-decoration:underline;text-underline-offset:3px}
+.client-total-link:focus-visible,.stat-action:focus-visible{outline:2px solid #ff8a8a;outline-offset:2px;border-radius:9px}
+.stat-action{display:block;width:100%;min-width:0;border:0;color:var(--txt);font:inherit;text-align:left;cursor:pointer;transition:filter .15s,transform .15s}
+.stat-action:hover{filter:brightness(1.14);transform:translateY(-1px)}
+.stat-action.due-filter .v{color:#ff8a8a}
+.client-filter-banner{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;margin:0 0 10px;border:1px solid rgba(248,113,113,.34);border-radius:10px;background:rgba(248,113,113,.08);color:#ffaaaa;font-size:12px;line-height:1.35}
+.client-filter-banner button{flex:none;border:0;border-radius:8px;padding:6px 8px;background:rgba(248,113,113,.14);color:#ffc0c0;font-weight:750;cursor:pointer}
+#debtInTotal{color:#ff9c9c}
 .client-bill{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:12px;margin-bottom:9px}
 .client-prepayment{border-color:rgba(52,211,153,.35);background:linear-gradient(135deg,rgba(16,185,129,.07),var(--card) 65%)}
 .client-prepayment-total{color:#7be7b3}
@@ -89,6 +100,7 @@ nav button.on{color:var(--acc)}
 .client-bill-name{font-weight:750;font-size:14px;overflow-wrap:anywhere}
 .client-bill-meta{font-size:11.5px;color:var(--dim);margin-top:4px;line-height:1.4}
 .client-bill-total{font-size:14px;font-weight:800;text-align:right;white-space:nowrap}
+.client-bill:not(.client-prepayment) .client-bill-total{color:#ff8a8a}
 .client-bill-actions{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
 .client-bill-status{display:inline-flex;align-items:center;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:850;letter-spacing:.2px}
 .client-bill-status.settled{background:rgba(52,211,153,.14);color:#7be7b3}
@@ -126,8 +138,8 @@ nav button.on{color:var(--acc)}
 .debt-type-tab strong{font-size:15px;line-height:1.15;display:block}
 .debt-type-tab .summary{font-size:11.5px;line-height:1.25;color:var(--dim)}
 .debt-type-tab .summary b{color:var(--txt);font-size:12px}
-.debt-type-tab.on.in{background:rgba(59,130,246,.14);border-color:rgba(59,130,246,.65)}
-.debt-type-tab.on.in strong{color:#8ab4ff}
+.debt-type-tab.on.in{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.55)}
+.debt-type-tab.on.in strong{color:#ff9c9c}
 .debt-type-tab.on.out{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.55)}
 .debt-type-tab.on.out strong{color:#ff9c9c}
 .debt-filter-label{font-size:12px;font-weight:700;margin:0 2px 6px}
@@ -355,7 +367,7 @@ body.printing #pdfFab{display:block}
       <div style="font-size:52px">💰</div>
       <h1 style="font-size:22px;margin-top:6px">Llogaritë e Mia</h1>
       <p class="muted">Ruhen në cloud — s'humbasin kurrë</p>
-      <p class="muted" style="font-size:11px">versioni 3</p>
+      <p class="muted" style="font-size:11px">versioni 4</p>
     </div>
 
     <div class="card" id="cfgCard" style="display:none">
@@ -415,10 +427,12 @@ body.printing #pdfFab{display:block}
 
     <div class="card">
       <div class="muted">Të kanë borxh gjithsej</div>
-      <div class="big" id="sumDebt" style="color:#8ab4ff">0</div>
+      <button type="button" class="big client-total-link" id="sumDebt" onclick="showClientList('due')" aria-label="Shfaq klientët me borxh">0</button>
       <div class="grid2" style="margin-top:12px">
-        <div class="stat"><div class="l">Klientë me detyrim</div><div class="v" id="cntOpen">0</div></div>
-        <div class="stat"><div class="l">Klientë pa detyrim</div><div class="v" id="cntDone">0</div></div>
+        <button type="button" class="stat stat-action due-filter" onclick="showClientList('due')" aria-label="Shfaq klientët me detyrim">
+          <div class="l">Klientë me detyrim</div><div class="v" id="cntOpen">0</div></button>
+        <button type="button" class="stat stat-action clear-filter" onclick="showClientList('clear')" aria-label="Shfaq klientët pa detyrim">
+          <div class="l">Klientë pa detyrim</div><div class="v" id="cntDone">0</div></button>
       </div>
     </div>
     <div class="card">
@@ -699,6 +713,7 @@ function logout(){auth.signOut();}
 /* ---------- state ---------- */
 let DEBTS=[],DEBT_HISTORY=[],DEBT_HISTORY_ERROR=null,DEBT_HISTORY_LOADED=false;
 let CLIENTS=[],CLIENTS_LOADED=false,DEBTS_LOADED=false,CLIENT_MIGRATION_BUSY=false,CLIENT_MIGRATION_ERROR=null,CLIENT_DETAIL_ID=null,CLIENT_CREDIT_BUSY=new Set();
+let CLIENT_LIST_FILTER="all";
 let ARCHIVE_PURGE_BUSY=false,ARCHIVE_PURGE_DONE_UID="";
 let RENT=[],EXP=[],FOLDERS=[],NOTES=[],SET={currency:"LEK",rent:0};
 let YEAR=new Date().getFullYear(), MIDX=new Date().getMonth(), MYEAR=new Date().getFullYear();
@@ -898,6 +913,12 @@ function start(){
 }
 
 /* ---------- nav ---------- */
+function showClientList(filter){
+  DTYPE="in";CLIENT_DETAIL_ID=null;
+  CLIENT_LIST_FILTER=filter==="due"?"due":filter==="clear"?"clear":"all";
+  if($("clientSearch"))$("clientSearch").value="";
+  go("debt");
+}
 function go(v){
   VIEW=v;
   document.querySelectorAll(".view").forEach(e=>e.classList.remove("on"));
@@ -1578,7 +1599,7 @@ function renderClientDetail(){
   var prepayments=state.records.filter(function(d){return d.prepaymentOnly;}).sort(function(a,b){return -clientDebtOrder(a,b);});
   $("clientListView").style.display="none";$("clientDetailView").style.display="block";
   var balanceTitle=balance>0?'Klienti më ka borxh':balance<0?'Parapagim i klientit':'Llogaria është shlyer';
-  var balanceColor=balance>0?'#8ab4ff':balance<0?'#5ee89b':'var(--dim)';
+  var balanceColor=balance>0?'#ff8a8a':balance<0?'#5ee89b':'var(--dim)';
   var balanceValue=fmt(Math.abs(balance));
   var history=clientHistoryHtml(c);
   $("clientDetail").innerHTML=(CLIENT_MIGRATION_ERROR?'<div class="client-warning">Disa të dhëna të vjetra nuk u lidhën me klientët. Kontrollo lidhjen dhe lejet e Firestore për koleksionin clients.</div>':'')
@@ -1590,6 +1611,8 @@ function renderClientDetail(){
     +'<div class="client-note">Parapagimi përdoret vetë për borxhin më të vjetër. Nëse pagesa kalon borxhin, teprica ruhet për herën tjetër.</div></div>'
     +'<div class="client-actions"><button class="btn" data-client-id="'+esc(c.id)+'" onclick="clientDebtForm(this.dataset.clientId)">+ Shto borxh</button>'
     +'<button class="btn sec" data-client-id="'+esc(c.id)+'" onclick="clientPaymentForm(this.dataset.clientId)">Regjistro pagesë</button></div>'
+    +'<div class="client-delete-wrap top"><button type="button" class="btn danger full sm" data-client-id="'+esc(c.id)+'" onclick="clientDelete(this.dataset.clientId)">Fshi klientin</button>'
+    +'<div class="client-small" style="text-align:center">Fshin përfundimisht borxhet, pagesat, parapagimet dhe historikun e këtij klienti.</div></div>'
     +(state.netCredit>0?'<details class="card"><summary>Veprime me parapagimin · '+fmt(state.netCredit)+'</summary>'
       +'<div class="client-actions" style="margin-bottom:0"><button class="btn sec sm" data-client-id="'+esc(c.id)+'" onclick="clientUseForm(this.dataset.clientId)">Përdorim jo-cash</button>'
       +'<button class="btn sec sm" data-client-id="'+esc(c.id)+'" onclick="clientRefundForm(this.dataset.clientId)">Kthe cash/bankë</button></div></details>':'')
@@ -1601,14 +1624,19 @@ function renderClientDetail(){
 function renderClients(){
   if(!$("clientList"))return;
   var search=normalizeDebtName($("clientSearch")?$("clientSearch").value:"");
-  var profiles=clientProfilesForView().filter(function(c){return !search||clientAliases(c).some(function(a){return a.includes(search);});})
+  var source=clientProfilesForView();
+  if(CLIENT_LIST_FILTER==="due")source=source.filter(function(c){return clientState(c).netDue>0;});
+  else if(CLIENT_LIST_FILTER==="clear")source=source.filter(function(c){return clientState(c).netDue<=0;});
+  var profiles=source.filter(function(c){return !search||clientAliases(c).some(function(a){return a.includes(search);});})
     .sort(function(a,b){return String(a.name||"").localeCompare(String(b.name||""),"sq",{sensitivity:"base"});});
   $("clientListView").style.display=CLIENT_DETAIL_ID?"none":"block";
   $("clientDetailView").style.display=CLIENT_DETAIL_ID?"block":"none";
   var warning=CLIENT_MIGRATION_ERROR?'<div class="client-warning">Klientët nga të dhënat ekzistuese nuk u ngarkuan ose lidhën. Kontrollo lidhjen dhe koleksionin clients.</div>':"";
   if(CLIENT_MIGRATION_BUSY)warning+='<div class="client-note">Po lidh borxhet ekzistuese me profilet e klientëve. Të dhënat dhe pagesat ruhen.</div>';
-  if(!profiles.length){$("clientList").innerHTML=warning+'<div class="empty">Lista e klientëve është bosh.<br><button class="btn sm" style="margin-top:12px" onclick="clientForm()">+ Shto klientin e parë</button></div>';}
-  else $("clientList").innerHTML=warning+profiles.map(function(c){
+  var filterBanner=CLIENT_LIST_FILTER==="due"?'<div class="client-filter-banner"><span>Po shfaqen vetëm klientët me detyrim.</span><button type="button" data-filter="all" onclick="showClientList(this.dataset.filter)">Shfaq të gjithë</button></div>'
+    :CLIENT_LIST_FILTER==="clear"?'<div class="client-filter-banner"><span>Po shfaqen klientët pa detyrim.</span><button type="button" data-filter="all" onclick="showClientList(this.dataset.filter)">Shfaq të gjithë</button></div>':"";
+  if(!profiles.length){$("clientList").innerHTML=warning+filterBanner+(CLIENT_LIST_FILTER!=="all"?'<div class="empty">Nuk ka klientë në këtë ndarje.<br><button class="btn sm" style="margin-top:12px" data-filter="all" onclick="showClientList(this.dataset.filter)">Shfaq të gjithë klientët</button></div>':'<div class="empty">Lista e klientëve është bosh.<br><button class="btn sm" style="margin-top:12px" onclick="clientForm()">+ Shto klientin e parë</button></div>');}
+  else $("clientList").innerHTML=warning+filterBanner+profiles.map(function(c){
     var state=clientState(c),balance=state.balance,title=balance>0?'Më ka borxh':balance<0?'Parapagim':'Shlyer';
     var cls=balance>0?'client-due':balance<0?'client-credit':'client-closed';
     return '<div class="client-card"><button class="client-open" data-client-id="'+esc(c.id)+'" onclick="openClient(this.dataset.clientId)">'
@@ -1698,7 +1726,40 @@ function clientSave(id){
   runDebtAudit([change],[event],function(){
     var idx=CLIENTS.findIndex(function(x){return String(x.id)===String(ref.id);});
     var obj=Object.assign({},current||{},data,{id:ref.id});delete obj._local;if(idx>=0)CLIENTS[idx]=obj;else CLIENTS.push(obj);
-    CLIENT_DETAIL_ID=ref.id;closeM();renderDebts();toast(current?'Emri i klientit u ruajt':'Klienti u shtua');
+    if(current)CLIENT_DETAIL_ID=ref.id;
+    else{CLIENT_DETAIL_ID=null;CLIENT_LIST_FILTER="all";if($("clientSearch"))$("clientSearch").value="";}
+    closeM();renderDebts();toast(current?'Emri i klientit u ruajt':'Klienti u shtua · lista u rifreskua');
+  });
+}
+function clientDelete(clientId){
+  if(!CLIENTS_LOADED||!DEBTS_LOADED||!DEBT_HISTORY_LOADED||DEBT_HISTORY_ERROR){
+    alert("Klientët, borxhet ose historiku cloud nuk u ngarkuan. Rifresko faqen para fshirjes.");return;
+  }
+  if(CLIENT_MIGRATION_BUSY||ARCHIVE_PURGE_BUSY){alert("Prit derisa të mbarojë sinkronizimi, pastaj provo përsëri.");return;}
+  var client=clientFind(clientId);if(!client)return;
+  var id=String(client.id),aliases=clientAliases(client),records=clientRecords(client),debtIds=new Set(records.map(function(d){return String(d.id);}));
+  var history=DEBT_HISTORY.filter(function(event){
+    var debtId=String(event.debtId||"");
+    if(String(event.clientId||"")===id||debtId===id||debtIds.has(debtId))return true;
+    if(event.clientId)return false;
+    return debtHistoryRefs(event).some(function(ref){return ref.type!=="out"&&aliases.includes(normalizeDebtName(ref.name));});
+  });
+  var paymentCount=records.reduce(function(total,d){return total+(d.payments||[]).length;},0);
+  if(!confirm("Të fshihet përgjithmonë klienti “"+String(client.name||"Pa emër")+"” dhe të gjitha të dhënat e tij?\n\n"
+    +records.length+" borxhe · "+paymentCount+" pagesa · historiku dhe parapagimet.\n\n"
+    +"Nuk do të ruhet në arkiv dhe nuk mund të rikthehet."))return;
+  var changes=[];
+  records.forEach(function(d){changes.push({op:"delete",collection:"debts",id:String(d.id)});});
+  history.forEach(function(event){if(event.id)changes.push({op:"delete",collection:"debtHistory",id:String(event.id)});});
+  changes.push({op:"delete",collection:"clients",id:id});
+  commitCloudChanges(changes).then(function(){
+    applyLocalHistoryChanges(changes);applyLocalDebtChanges(changes);
+    CLIENTS=CLIENTS.filter(function(c){return String(c.id)!==id;});
+    CLIENT_DETAIL_ID=null;CLIENT_LIST_FILTER="all";if($("clientSearch"))$("clientSearch").value="";
+    renderDebts();toast("Klienti dhe të gjitha të dhënat e lidhura u fshinë përgjithmonë");
+  }).catch(function(e){
+    console.error("Permanent client deletion failed",e);
+    alert("Klienti nuk u fshi plotësisht nga cloud. Kontrollo lidhjen dhe lejet për clients, debts dhe debtHistory.");
   });
 }
 function closeClient(){CLIENT_DETAIL_ID=null;renderClients();window.scrollTo(0,0);}
@@ -2632,7 +2693,7 @@ function renderHome(){
   $("balBar").innerHTML=total>0?'<div style="width:'+(cashIn/total*100)+'%;background:#22c55e"></div>'
     +'<div style="width:'+(outAll/total*100)+'%;background:#ef4444"></div>':"";
   var bits=[];
-  if(waiting>0)bits.push('Klientët të kanë borxh <b style="color:#8ab4ff">'+fmt(waiting)+'</b>');
+  if(waiting>0)bits.push('Klientët të kanë borxh <b style="color:#ff8a8a">'+fmt(waiting)+'</b>');
   if(ownOwing>0)bits.push('Ti u ke borxh <b style="color:#ff8a8a">'+fmt(ownOwing)+'</b>');
   if(clientCredit>0)bits.push('Parapagime klientësh <b style="color:#5ee89b">'+fmt(clientCredit)+'</b>');
   $("bPend").innerHTML=bits.length?bits.join(" · "):"Asnjë borxh i hapur.";
