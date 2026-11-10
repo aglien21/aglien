@@ -94,8 +94,8 @@ nav button.on{color:var(--acc)}
 .client-open:active{background:var(--card2)}
 .client-open:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
 .client-main{min-width:0;flex:1}
-.client-name{font-size:15px;font-weight:750;overflow-wrap:anywhere}
-.client-small{font-size:11px;color:var(--dim);margin-top:4px;line-height:1.35}
+.client-name{display:block;font-size:15px;font-weight:750;overflow-wrap:anywhere}
+.client-small{display:block;font-size:11px;color:var(--dim);margin-top:4px;line-height:1.35}
 .client-value{white-space:nowrap;text-align:right;font-size:14px;font-weight:800}
 .client-due{color:#ff8a8a}.client-credit{color:#5ee89b}.client-closed{color:var(--dim)}
 .client-detail-head{display:flex;align-items:center;gap:10px;margin:2px 0 12px}
@@ -211,34 +211,45 @@ nav button.on{color:var(--acc)}
 .debt-history-warning{padding:10px 12px;margin:10px 0;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);border-radius:10px;color:#fcd890;font-size:12px;line-height:1.4}
 .debt-archive-note{padding:10px;margin:10px 0;color:var(--dim);font-size:12px;text-align:center}
 
-/* Shënimet dhe dosjet */
-.notes-intro{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.notes-intro h2{font-size:17px}
-.notes-cloud{margin-top:9px;font-size:12px;color:var(--dim);line-height:1.4}
-.folder-card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
-.folder-open{width:100%;min-width:0;display:flex;align-items:center;gap:11px;padding:14px;
+/* Shënimet dhe dosjet — pamje më kompakte, me madhësi prekjeje të ruajtur në telefon */
+#notesArea>.card{padding:10px;margin-bottom:8px;border-radius:13px}
+#notesArea .muted{font-size:12px}
+#notesArea .empty{padding:22px 12px;font-size:13px;line-height:1.4}
+.notes-intro{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.notes-intro h2{font-size:15px}
+.notes-cloud{margin-top:6px;font-size:11px;color:var(--dim);line-height:1.35}
+.folder-card{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.folder-open{width:100%;min-width:0;display:flex;align-items:center;gap:8px;padding:10px 11px;
   border:0;background:transparent;color:var(--txt);text-align:left;font:inherit;cursor:pointer}
-.folder-icon{font-size:25px;line-height:1}
+.folder-icon{font-size:21px;line-height:1}
 .folder-info{flex:1;min-width:0}
-.folder-info b{display:block;font-size:15px;overflow-wrap:anywhere;color:var(--notes-name)}
-.folder-info small{display:block;color:var(--dim);font-size:12px;margin-top:3px}
-.folder-arrow{font-size:24px;color:var(--dim);line-height:1}
-.note-list{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
-.note-row{display:block;width:100%;min-width:0;padding:13px 14px;text-align:left;overflow-wrap:anywhere;
+.folder-info b{display:block;font-size:14px;overflow-wrap:anywhere;color:var(--notes-name)}
+.folder-info small{display:block;color:var(--dim);font-size:11px;margin-top:2px}
+.folder-arrow{font-size:20px;color:var(--dim);line-height:1}
+.note-list{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.note-row{display:block;width:100%;min-width:0;padding:9px 10px;text-align:left;overflow-wrap:anywhere;
   border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--notes-name);font:inherit;
-  font-size:14px;font-weight:650;line-height:1.35;cursor:pointer}
+  font-size:13px;font-weight:600;line-height:1.3;cursor:pointer}
 .notes-folder-title,.notes-folder-name,#note_title,#folder_name{color:var(--notes-name)}
 #folder_delete_btn:disabled,#folder_delete_cancel:disabled{opacity:.45;cursor:not-allowed}
 .note-row:last-child{border-bottom:0}
 .note-row:active{background:var(--card2)}
 .note-row:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
-.note-editor{width:100%;min-height:180px;max-height:48vh;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;
-  padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card2);color:var(--txt);
-  font-family:inherit;font-size:16px;line-height:1.45;outline:none}
+.note-editor{width:100%;min-height:160px;max-height:48vh;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;
+  padding:9px;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--txt);
+  font-family:inherit;font-size:14px;line-height:1.4;outline:none}
 .note-editor:focus{outline:2px solid var(--acc);outline-offset:-1px}
 .note-editor:empty:before{content:attr(data-placeholder);color:var(--dim)}
 .note-editor a.note-link{color:#69a7ff!important;font-weight:700;
   text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}
+.sheet.notes-sheet{padding:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+.notes-sheet h3{font-size:17px}
+.notes-sheet label{font-size:12px;margin:8px 0 4px}
+.notes-sheet .muted{font-size:12px;line-height:1.4}
+.notes-sheet .note-editor{min-height:160px}
+.notes-sheet #note_title{font-size:14px}
+.notes-sheet .row{gap:8px}
+.notes-sheet .btn{font-size:14px}
 @media(max-width:390px){
   nav button{font-size:9.5px;padding-left:1px;padding-right:1px}
   nav button .ic{font-size:19px}
@@ -500,11 +511,114 @@ body.printing #pdfFab{display:block}
   .client-payment-row{padding-right:52px}
   .client-payment-delete{width:40px;height:40px;display:grid;place-items:center;font-size:20px}
   input,select,textarea{min-height:48px}
+  #notesArea .folder-open{min-height:52px}
+  #notesArea .note-row{min-height:44px}
+  .notes-sheet #note_title,.notes-sheet .note-editor{font-size:16px}
+}
+
+/* Density compact across the whole app (finance views, forms, modals and login). */
+body.compact-ui{font-size:15px;padding-bottom:80px}
+body.compact-ui.auth-gate{padding-bottom:0}
+body.compact-ui .wrap{padding:10px;padding-left:calc(10px + env(safe-area-inset-left));padding-right:calc(10px + env(safe-area-inset-right))}
+body.compact-ui header{gap:8px;padding:8px 11px;padding-top:calc(8px + env(safe-area-inset-top));padding-left:calc(11px + env(safe-area-inset-left));padding-right:calc(11px + env(safe-area-inset-right))}
+body.compact-ui header h1{font-size:16px}
+body.compact-ui .btn{min-height:38px;padding:8px 11px;border-radius:12px;font-size:13px}
+body.compact-ui .btn.sm{min-height:34px;padding:6px 9px;border-radius:9px;font-size:12px}
+body.compact-ui .card{padding:10px;margin-bottom:8px;border-radius:13px}
+body.compact-ui label{font-size:11px;margin:8px 0 4px;letter-spacing:.2px}
+body.compact-ui input,body.compact-ui select,body.compact-ui textarea{min-height:36px;padding:9px;border-radius:10px;font-size:14px}
+body.compact-ui .row{gap:8px}
+body.compact-ui .muted{font-size:12px}
+body.compact-ui .big{font-size:23px}
+body.compact-ui .tag{padding:3px 7px;font-size:10px}
+body.compact-ui nav{padding:4px 3px calc(4px + env(safe-area-inset-bottom))}
+body.compact-ui nav button{min-height:40px;padding:5px 1px;gap:2px;font-size:9.5px}
+body.compact-ui nav button .nav-icon{width:18px;height:18px}
+body.compact-ui .item{padding:9px;margin-bottom:7px;border-radius:12px}
+body.compact-ui .name{font-size:15px}
+body.compact-ui .stat{padding:8px;border-radius:10px}
+body.compact-ui .stat .v,body.compact-ui .stat-action .v{font-size:17px}
+body.compact-ui .stat .l{font-size:10px}
+body.compact-ui .empty{padding:28px 12px;font-size:13px}
+body.compact-ui .sheet{padding:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom));border-radius:17px 17px 0 0}
+body.compact-ui .sheet h3{font-size:16px}
+body.compact-ui .seg{padding:2px;border-radius:10px}
+body.compact-ui .seg button{padding:7px;font-size:13px}
+body.compact-ui .theme-toggle{min-height:38px;padding-inline:11px;font-size:12px;gap:6px}
+body.compact-ui .theme-toggle svg{width:15px;height:15px}
+body.compact-ui .center{padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom))}
+body.compact-ui .login-tools{margin-bottom:7px}
+body.compact-ui #gate .card{padding:11px}
+body.compact-ui #gate h1{font-size:20px!important}
+body.compact-ui .login-mark{width:64px;height:64px;border-radius:20px}
+body.compact-ui .login-mark span{font-size:36px}
+body.compact-ui .login-input>svg{left:12px;width:17px;height:17px}
+body.compact-ui .login-input input{min-height:42px;padding-left:38px;border-radius:12px}
+body.compact-ui .auth-forgot{min-height:36px;padding:6px 2px;font-size:12px}
+body.compact-ui .client-list-head h2{font-size:16px}
+body.compact-ui .client-card{margin-bottom:7px;border-radius:12px}
+body.compact-ui .client-open{padding:10px;gap:8px}
+body.compact-ui .client-name{font-size:14px}
+body.compact-ui .client-value{font-size:13px}
+body.compact-ui .client-detail-head{gap:8px;margin-bottom:9px}
+body.compact-ui .client-detail-head h2{font-size:16px}
+body.compact-ui .client-balance{padding:11px;border-radius:13px;margin-bottom:9px}
+body.compact-ui .client-balance-label{font-size:11px}
+body.compact-ui .client-balance-value{font-size:23px}
+body.compact-ui .client-actions{gap:7px;margin:8px 0 10px}
+body.compact-ui .client-ledger-title{font-size:13px;margin:14px 2px 7px}
+body.compact-ui .client-history{padding:9px;border-radius:12px}
+body.compact-ui .client-bill{padding:9px;margin-bottom:7px}
+body.compact-ui .client-bill-name,body.compact-ui .client-bill-total{font-size:13px}
+body.compact-ui .client-bill-meta{font-size:10.5px}
+body.compact-ui .client-payment-row{padding-top:6px;padding-bottom:6px}
+body.compact-ui .client-payment-note{font-size:11px;margin-top:4px}
+body.compact-ui .client-note,body.compact-ui .client-warning{padding:8px 10px;margin:8px 0;font-size:11px}
+body.compact-ui .client-total-link{font-size:23px}
+body.compact-ui .debt-type-switch{gap:7px;margin-bottom:9px}
+body.compact-ui .debt-type-tab{min-height:78px;padding:8px 9px;border-radius:12px}
+body.compact-ui .debt-type-tab strong{font-size:14px}
+body.compact-ui .debt-type-tab .summary{font-size:10.5px}
+body.compact-ui .debt-type-tab .summary b{font-size:11px}
+body.compact-ui .debt-name-group{margin-bottom:8px;border-radius:12px}
+body.compact-ui .debt-name-group>summary{padding:10px 36px 10px 10px}
+body.compact-ui .debt-name-group>summary::after{right:10px;font-size:18px}
+body.compact-ui .debt-group-title,body.compact-ui .debt-group-total{font-size:13px}
+body.compact-ui .debt-group-meta{font-size:10.5px;margin-top:4px}
+body.compact-ui .debt-group-items{padding:1px 8px}
+body.compact-ui .debt-history-list{max-height:320px}
+body.compact-ui .debt-history-content strong,body.compact-ui .debt-history-single>summary,body.compact-ui .debt-history-heading{font-size:11px}
+body.compact-ui .debt-history-detail{font-size:10.5px}
+body.compact-ui .debt-history-event{gap:6px;padding-bottom:9px}
+body.compact-ui .debt-search{margin:9px 0}
+body.compact-ui .debt-history-warning,body.compact-ui .debt-archive-note{padding:8px;margin:8px 0;font-size:11px}
+body.compact-ui .client-payment-delete{width:22px;height:22px;font-size:12px}
+body.compact-ui .fab{width:48px;height:48px;right:12px;bottom:calc(72px + env(safe-area-inset-bottom));font-size:25px}
+body.compact-ui .toast{bottom:96px;padding:8px 14px;font-size:12px}
+body.compact-ui #printBar{gap:8px;padding:8px 10px;padding-top:calc(8px + env(safe-area-inset-top))}
+body.compact-ui #pdfFab{padding:12px 24px;font-size:14px}
+
+@media (pointer:coarse){
+  body.compact-ui .btn{min-height:44px;border-radius:13px}
+  body.compact-ui .btn.sm{min-height:40px;padding:7px 9px}
+  body.compact-ui .seg button{min-height:40px}
+  body.compact-ui nav button{min-height:48px}
+  body.compact-ui .client-open{min-height:56px}
+  body.compact-ui .client-payment-delete{width:36px;height:36px;display:grid;place-items:center;font-size:16px}
+  body.compact-ui .theme-toggle{min-height:42px}
+  body.compact-ui input,body.compact-ui select,body.compact-ui textarea{min-height:44px;font-size:16px}
+  body.compact-ui .login-input input{min-height:44px}
+  body.compact-ui #notesArea .folder-open{min-height:48px}
+  body.compact-ui #notesArea .note-row{min-height:44px}
+  body.compact-ui .notes-sheet #note_title,body.compact-ui .notes-sheet .note-editor{font-size:16px}
+  /* Keep hit boxes stationary while a finger is down; no active-scale/hover shift on touch. */
+  body.compact-ui .btn:active,body.compact-ui .theme-toggle:active{transform:none!important}
+  body.compact-ui .stat-action:hover{transform:none;filter:none}
 }
 
 </style>
 </head>
-<body class="auth-gate">
+<body class="auth-gate compact-ui">
 
 <!-- ================= LOGIN / SETUP ================= -->
 <div id="gate" class="center">
@@ -517,7 +631,7 @@ body.printing #pdfFab{display:block}
       <div class="login-mark" aria-hidden="true"><span>💰</span></div>
       <h1 style="font-size:22px;margin-top:6px">Llogaritë e Mia</h1>
       <p class="muted">Llogaritë, pagesat dhe shënimet — të sinkronizuara në cloud</p>
-      <p class="muted" style="font-size:11px">versioni 7</p>
+      <p class="muted" style="font-size:11px">versioni 10</p>
     </div>
 
     <div class="card" id="cfgCard" style="display:none">
@@ -1137,7 +1251,8 @@ function chYear(d){YEAR+=d;renderRent();}
 function chMon(d){MIDX+=d;if(MIDX>11){MIDX=0;MYEAR++}if(MIDX<0){MIDX=11;MYEAR--}renderExp();}
 
 /* ---------- modal ---------- */
-function openM(h){$("sheet").innerHTML=h;$("modal").classList.add("on");}
+function openM(h){$("sheet").classList.remove("notes-sheet");$("sheet").innerHTML=h;$("modal").classList.add("on");}
+function openNotesM(h){openM(h);$("sheet").classList.add("notes-sheet");}
 function closeM(){if(FOLDER_DELETE_BUSY)return;if(NOTE_EDIT){noteSave();return;}closeMNow();}
 function closeMNow(){$("modal").classList.remove("on");NOTE_EDIT=null;FOLDER_DELETE_BUSY=false;}
 function openAdd(){
@@ -1404,7 +1519,7 @@ function creditRefundForm(id){
     </div>
     <label>Data</label><input id="crf_d" type="date" value="${today()}">
     <label>Shënim</label><input id="crf_n" value="Kthim parapagimi">
-    <div class="row" style="margin-top:16px">
+    <div class="row" style="margin-top:12px">
       <button class="btn sec" onclick="closeM()">Anulo</button>
       <button class="btn" onclick="creditRefundSave('${id}')">Regjistro kthimin</button>
     </div>`);
@@ -2673,10 +2788,10 @@ function notesDate(value){
 
 function folderForm(id){
   var f=FOLDERS.find(function(x){return x.id===id;})||{};
-  openM(`<h3>${id?"Ndrysho dosjen":"Dosje e re"}</h3>
+  openNotesM(`<h3>${id?"Ndrysho dosjen":"Dosje e re"}</h3>
     <p class="muted">Dosjet të ndihmojnë t'i organizosh shënimet sipas temës.</p>
     <label>Emri i dosjes</label><input id="folder_name" value="${esc(f.name||"")}" placeholder="p.sh. Ide, Punë, Shtëpi">
-    <div class="row" style="margin-top:16px">
+    <div class="row" style="margin-top:12px">
       <button class="btn sec" onclick="closeM()">Anulo</button>
       <button class="btn" onclick="folderSave('${id||""}')">Ruaj dosjen</button>
     </div>`);
@@ -2698,7 +2813,7 @@ function folderDel(id){
   var consequence=count
     ?`Dosja <b class="notes-folder-name">${folderName}</b> dhe ${count} ${count===1?"shënimi i saj":"shënimet e saj"} do të fshihen përgjithmonë.`
     :`Dosja <b class="notes-folder-name">${folderName}</b> do të fshihet përgjithmonë.`;
-  openM(`<h3>Konfirmo fshirjen</h3>
+  openNotesM(`<h3>Konfirmo fshirjen</h3>
     <p class="muted">${consequence}</p>
     <p class="muted">Ky veprim nuk mund të kthehet.</p>
     <label>Shkruaj <b class="notes-folder-name">FSHI</b> për të vazhduar</label>
@@ -2772,16 +2887,16 @@ function noteForm(id,folderId){
   if(!folder){toast("Hap fillimisht një dosje.");return;}
   NOTE_EDIT={id:id||"",folderId:target,originalTitle:String(n.title||"").trim(),
     originalContent:String(n.content||"").trim(),saving:false};
-  openM(`<h3>${id?"Shënim":"Shënim i ri"}</h3>
+  openNotesM(`<h3>${id?"Shënim":"Shënim i ri"}</h3>
     <p class="muted">Dosja: <b class="notes-folder-name">${esc(folder.name)}</b></p>
     <label>Titulli</label><input id="note_title" value="${esc(n.title||"")}" placeholder="p.sh. Ide për projektin">
     <label>Shënimi</label>
     <div id="note_body" class="note-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Shënimi" data-placeholder="Shkruaj shënimin këtu...">${linkifyText(n.content||"")}</div>
-    <p class="muted" style="font-size:11.5px;margin:7px 0 0">Mbylle shënimin për ta ruajtur automatikisht në cloud.</p>
-    <div class="row" style="margin-top:16px">
+    <p class="muted" style="font-size:11px;margin:5px 0 0">Mbylle shënimin për ta ruajtur automatikisht në cloud.</p>
+    <div class="row" style="margin-top:12px">
       <button id="note_close" class="btn sec" onclick="closeM()">Mbyll</button>
     </div>
-    ${id?`<button class="btn danger full sm" style="margin-top:10px" data-note-id="${esc(id)}" onclick="noteDel(this.dataset.noteId)">Fshi shënimin</button>`:""}`);
+    ${id?`<button class="btn danger full sm" style="margin-top:8px" data-note-id="${esc(id)}" onclick="noteDel(this.dataset.noteId)">Fshi shënimin</button>`:""}`);
 }
 function noteSave(){
   var edit=NOTE_EDIT;
@@ -2867,7 +2982,7 @@ function renderNotes(){
       +esc(n.title||"Shënim pa titull")+'</button>';
   }).join("");
   area.innerHTML='<button class="btn sec sm" style="margin-bottom:10px" onclick="notesBack()">← Dosjet</button>'
-    +'<div class="card"><div class="top"><div style="min-width:0"><div class="name notes-folder-title" style="font-size:18px;overflow-wrap:anywhere">📁 '+esc(folder.name)+'</div>'
+    +'<div class="card"><div class="top"><div style="min-width:0"><div class="name notes-folder-title" style="font-size:15px;overflow-wrap:anywhere">📁 '+esc(folder.name)+'</div>'
     +'<div class="muted" style="margin-top:4px">'+notes.length+(notes.length===1?' shënim':' shënime')+'</div></div></div>'
     +'<div class="row" style="margin-top:12px"><button class="btn sec sm" onclick="folderForm(\''+folder.id+'\')">Ndrysho dosjen</button>'
     +'<button class="btn danger sm" onclick="folderDel(\''+folder.id+'\')">Fshi dosjen</button></div></div>'
@@ -2937,7 +3052,7 @@ function repForm(kind){
       <label>Viti</label><select id="rp_y">${o}</select>
     </div>
     <div class="muted" id="rp_rent_hint" style="margin-top:9px;font-size:12px"></div>
-    <div class="row" style="margin-top:16px">
+    <div class="row" style="margin-top:12px">
       <button class="btn sec" onclick="closeM()">Anulo</button>
       <button class="btn" onclick="rentReportGenerate()">Krijo PDF</button>
     </div>`);
@@ -2952,7 +3067,7 @@ function repForm(kind){
       <button class="on" data-m="all" onclick="segPick(this)">Të gjitha</button>
       <button data-m="open" onclick="segPick(this)">Vetëm të hapura</button>
     </div>
-    <div class="row" style="margin-top:16px">
+    <div class="row" style="margin-top:12px">
       <button class="btn sec" onclick="closeM()">Anulo</button>
       <button class="btn" onclick="pdfFin()">Krijo PDF</button>
     </div>`);
