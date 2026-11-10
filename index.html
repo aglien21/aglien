@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sq">
+<html lang="sq" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -11,16 +11,32 @@
 <meta name="apple-mobile-web-app-title" content="Llogaritë">
 <meta name="theme-color" content="#0f1115">
 <link rel="manifest" href="manifest.json">
+<script>
+(function(){try{var saved=localStorage.getItem("llogarite-theme");
+  if(saved==="light"||saved==="dark")document.documentElement.dataset.theme=saved;
+  else if(window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches)document.documentElement.dataset.theme="light";
+}catch(e){}})();
+</script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#0f1115; --card:#181c24; --card2:#20252f; --line:#2c3341;
   --txt:#e9edf5; --dim:#96a0b5; --acc:#3b82f6; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
-  --notes-name:#6ee7b7;
+  --notes-name:#6ee7b7; --danger-text:#ff8a8a; --success-text:#5ee89b;
+  --info-text:#9cc2ff; --warning-text:#fcc65a;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#f2f5fa; --card:#ffffff; --card2:#f7f9fc; --line:#dbe3ee;
+  --txt:#172033; --dim:#536175; --acc:#2563eb; --ok:#15803d; --warn:#a15c00; --bad:#b42318;
+  --notes-name:#087f5b; --danger-text:#b42318; --success-text:#137a43;
+  --info-text:#1d4ed8; --warning-text:#8a4b08;
+  color-scheme:light;
 }
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
  background:var(--bg);color:var(--txt);padding-bottom:92px;
  -webkit-text-size-adjust:100%;overscroll-behavior-y:none}
+body.auth-gate{padding-bottom:0}
 h1,h2,h3{margin:0}
 .wrap{max-width:720px;margin:0 auto;padding:14px;
  padding-left:calc(14px + env(safe-area-inset-left));
@@ -31,9 +47,19 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,17,21,.92);backdrop-f
  padding-left:calc(14px + env(safe-area-inset-left));
  padding-right:calc(14px + env(safe-area-inset-right))}
 header h1{font-size:18px;flex:1}
-.btn{border:0;border-radius:12px;padding:11px 14px;font-size:15px;font-weight:600;
- background:var(--acc);color:#fff;cursor:pointer}
-.btn:active{opacity:.75}
+.btn{border:0;border-radius:14px;padding:11px 14px;min-height:42px;font-size:15px;font-weight:650;
+ background:var(--acc);color:#fff;cursor:pointer;touch-action:manipulation;transition:transform .16s ease,filter .16s ease}
+.btn:active{opacity:.88;transform:scale(.985)}
+button{touch-action:manipulation}
+@media (pointer:coarse){
+  .btn{min-height:48px;border-radius:16px}
+  .btn.sm{min-height:44px;padding:9px 12px}
+  .seg button{min-height:44px}
+  nav button{min-height:52px}
+  .client-open{min-height:64px}
+  .client-payment-row{padding-right:52px}
+  .client-payment-delete{width:40px;height:40px;display:grid;place-items:center;font-size:20px}
+}
 .btn.sec{background:var(--card2);color:var(--txt);border:1px solid var(--line)}
 .btn.sm{padding:7px 11px;font-size:13px;border-radius:10px}
 .btn.danger{background:#3a1d22;color:#ff8a8a;border:1px solid #5b2a30}
@@ -125,7 +151,7 @@ nav button.on{color:var(--acc)}
 .client-payment-note{font-size:12px;line-height:1.4;margin-top:6px;overflow-wrap:anywhere;color:var(--txt)}
 .client-payment-note-label{font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.3px;color:var(--dim);margin-right:4px}
 .client-payment-note.empty{color:var(--dim);font-style:italic}
-.client-payment-delete{position:absolute;right:7px;top:7px;width:23px;height:23px;border:0;border-radius:7px;background:rgba(248,113,113,.12);color:#ff9999;font-size:14px;line-height:1;cursor:pointer}
+.client-payment-delete{position:absolute;right:7px;top:7px;width:24px;height:24px;border:0;border-radius:7px;background:rgba(248,113,113,.12);color:#ff9999;font-size:14px;line-height:1;cursor:pointer}
 .client-note{padding:10px 12px;border-radius:11px;background:rgba(59,130,246,.1);color:#c6d8ff;font-size:12px;line-height:1.4;margin:10px 0}
 .client-warning{padding:10px 12px;margin:10px 0;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);border-radius:10px;color:#fcd890;font-size:12px;line-height:1.4}
 
@@ -244,10 +270,68 @@ nav button.on{color:var(--acc)}
 .pay:last-child{border:0}
 .center{min-height:100vh;display:flex;align-items:center;justify-content:center;
  padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))}
+.login-tools{display:flex;justify-content:flex-end;margin-bottom:10px}
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;
+ padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--txt);
+ font:inherit;font-size:13px;font-weight:750;box-shadow:0 5px 18px rgba(0,0,0,.12);cursor:pointer;
+ touch-action:manipulation;transition:transform .16s ease,background .2s ease,border-color .2s ease}
+.theme-toggle:active{transform:scale(.97)}
+.theme-toggle svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.theme-toggle .theme-moon{display:none}
+html[data-theme="dark"] .theme-toggle .theme-sun{display:none}
+html[data-theme="dark"] .theme-toggle .theme-moon{display:block}
+header .theme-toggle{flex:0 0 auto;box-shadow:none}
+.login-input{position:relative}
+.login-input>svg{position:absolute;left:14px;top:50%;z-index:1;width:19px;height:19px;transform:translateY(-50%);
+ fill:none;stroke:var(--dim);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.login-input input{min-height:50px;padding-left:44px;border-radius:15px;background:var(--card2)}
+.auth-tab-icon{width:16px;height:16px;vertical-align:-3px;margin-right:6px;fill:none;stroke:currentColor;
+ stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.btn-icon{width:18px;height:18px;vertical-align:-4px;margin-right:7px;fill:none;stroke:currentColor;
+ stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nav-icon{width:21px;height:21px;display:block;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;
+ stroke-linecap:round;stroke-linejoin:round}
+.auth-button-label{vertical-align:middle}
+#authErr{color:var(--danger-text)}
+#gate{position:relative;isolation:isolate;overflow:hidden;
+ background:radial-gradient(ellipse at 14% 12%,rgba(59,130,246,.16),transparent 42%),
+            radial-gradient(ellipse at 88% 88%,rgba(16,185,129,.10),transparent 38%),var(--bg)}
+#gate::before,#gate::after{content:"";position:absolute;z-index:0;border-radius:50%;pointer-events:none}
+#gate::before{width:min(72vw,420px);aspect-ratio:1;top:-175px;right:-150px;
+ border:1px solid rgba(96,165,250,.16);background:radial-gradient(circle,rgba(59,130,246,.08),transparent 68%);
+ animation:login-drift 13s ease-in-out infinite alternate}
+#gate::after{width:min(64vw,340px);aspect-ratio:1;bottom:-170px;left:-125px;
+ border:1px solid rgba(52,211,153,.13);background:radial-gradient(circle,rgba(16,185,129,.07),transparent 68%);
+ animation:login-drift 16s ease-in-out -4s infinite alternate-reverse}
+#gate>div{position:relative;z-index:1;animation:login-appear .55s cubic-bezier(.2,.75,.25,1) both}
+#gate .card{border-color:rgba(148,163,184,.2);box-shadow:0 24px 80px rgba(0,0,0,.34);backdrop-filter:blur(12px)}
+.login-mark{position:relative;display:grid;place-items:center;width:76px;height:76px;margin:0 auto 8px;
+ border-radius:24px;background:linear-gradient(145deg,rgba(59,130,246,.24),rgba(16,185,129,.13));
+ border:1px solid rgba(148,163,184,.2);box-shadow:0 10px 32px rgba(59,130,246,.17)}
+.login-mark span{font-size:43px;line-height:1;filter:drop-shadow(0 4px 10px rgba(0,0,0,.22))}
+.login-mark::after{content:"";position:absolute;inset:-6px;border:1px solid rgba(96,165,250,.28);
+ border-radius:29px;animation:login-ring 3.5s ease-in-out infinite}
+@keyframes login-appear{from{opacity:0;transform:translate3d(0,14px,0) scale(.985)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+@keyframes login-drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(0,20px,0) scale(1.04)}}
+@keyframes login-ring{0%,100%{transform:scale(.97);opacity:.35}50%{transform:scale(1.04);opacity:.8}}
+.auth-forgot-row{display:flex;justify-content:flex-end;margin:2px 0 5px}
+.auth-forgot{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:8px 2px;border:0;background:transparent;color:var(--info-text);
+ font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.auth-link-icon{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.auth-forgot:hover{text-decoration:underline;text-underline-offset:3px}
+.auth-forgot:disabled{opacity:.55;cursor:wait}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:110px;background:#fff;color:#111;
  padding:11px 18px;border-radius:99px;font-size:14px;font-weight:600;z-index:99;opacity:0;transition:.25s;pointer-events:none}
 .toast.on{opacity:1}
 details summary{cursor:pointer;color:var(--dim);font-size:13px}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    scroll-behavior:auto!important;
+    animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+  }
+}
 
 /* ---- raporti / printimi ---- */
 #printArea{display:none}
@@ -351,23 +435,89 @@ body.printing #pdfFab{display:block}
 .lg{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--dim)}
 .lg i{width:9px;height:9px;border-radius:3px;display:inline-block;flex:0 0 auto}
 
-
-
-
-
+:root[data-theme="light"] body{background:var(--bg);color:var(--txt)}
+:root[data-theme="light"] header{background:rgba(248,250,252,.92);border-color:var(--line)}
+:root[data-theme="light"] nav{background:rgba(248,250,252,.96);border-color:var(--line)}
+:root[data-theme="light"] #gate{background:radial-gradient(ellipse at 14% 12%,rgba(59,130,246,.11),transparent 42%),
+  radial-gradient(ellipse at 88% 88%,rgba(16,185,129,.08),transparent 38%),var(--bg)}
+:root[data-theme="light"] #gate::before{border-color:rgba(37,99,235,.15)}
+:root[data-theme="light"] #gate::after{border-color:rgba(5,150,105,.13)}
+:root[data-theme="light"] #gate .card{background:rgba(255,255,255,.92);border-color:rgba(148,163,184,.3);
+  box-shadow:0 22px 64px rgba(36,55,84,.12)}
+:root[data-theme="light"] .btn.sec{background:#edf1f7;color:var(--txt);border-color:#d7dfeb}
+:root[data-theme="light"] .btn.danger{background:#fee2e2;color:#991b1b;border-color:#fecaca}
+:root[data-theme="light"] .t-ok{background:#dcfce7;color:#166534}
+:root[data-theme="light"] .t-part{background:#fef3c7;color:#854d0e}
+:root[data-theme="light"] .t-no{background:#fee2e2;color:#991b1b}
+:root[data-theme="light"] .t-info{background:#dbeafe;color:#1e40af}
+:root[data-theme="light"] .client-due,:root[data-theme="light"] .client-total-link,
+:root[data-theme="light"] .stat-action.due-filter .v,:root[data-theme="light"] #debtInTotal,
+:root[data-theme="light"] .client-bill:not(.client-prepayment) .client-bill-total{color:#b42318!important}
+:root[data-theme="light"] .client-credit,:root[data-theme="light"] .client-prepayment-total,
+:root[data-theme="light"] .client-bill-status.settled{color:#137a43!important}
+:root[data-theme="light"] .client-filter-banner{background:#fff1f2;border-color:#fecdd3;color:#9f1239}
+:root[data-theme="light"] .client-filter-banner button{background:#ffe4e6;color:#9f1239}
+:root[data-theme="light"] .client-bill-status.settled{background:#dcfce7}
+:root[data-theme="light"] .client-bill-status.partial{background:#fef3c7;color:#854d0e}
+:root[data-theme="light"] .client-bill-status.open{background:#fee2e2;color:#991b1b}
+:root[data-theme="light"] .client-payment-row.cash .client-payment-badge{background:#dcfce7;color:#166534}
+:root[data-theme="light"] .client-payment-row.bank .client-payment-badge{background:#dbeafe;color:#1e40af}
+:root[data-theme="light"] .client-payment-row.credit .client-payment-badge{background:#fef3c7;color:#854d0e}
+:root[data-theme="light"] .client-payment-row.cash .client-payment-amount{color:#137a43}
+:root[data-theme="light"] .client-payment-row.bank .client-payment-amount{color:#1d4ed8}
+:root[data-theme="light"] .client-payment-row.credit .client-payment-amount{color:#8a4b08}
+:root[data-theme="light"] .client-payment-delete{background:#fee2e2;color:#b42318}
+:root[data-theme="light"] .client-note{background:#eff6ff;color:#1e40af}
+:root[data-theme="light"] .client-warning,:root[data-theme="light"] .debt-history-warning{background:#fffbeb;border-color:#fed7aa;color:#854d0e}
+:root[data-theme="light"] .debt-type-tab.on.in strong,:root[data-theme="light"] .debt-type-tab.on.out strong{color:#b42318}
+:root[data-theme="light"] .debt-kind.in{background:#dbeafe;color:#1e40af}
+:root[data-theme="light"] .debt-kind.out{background:#fee2e2;color:#991b1b}
+:root[data-theme="light"] .debt-history-single>summary,:root[data-theme="light"] .debt-history-heading{color:#1d4ed8}
+:root[data-theme="light"] .debt-history-archived summary{color:#8a4b08}
+:root[data-theme="light"] .note-editor a.note-link{color:#1d4ed8!important}
+:root[data-theme="light"] .auth-forgot{color:#1d4ed8}
+:root[data-theme="light"] .toast{background:#172033;color:#fff;box-shadow:0 8px 28px rgba(15,23,42,.2)}
+:root[data-theme="light"] #arrCard{background:#fff7ed!important;border-color:#fed7aa!important}
+:root[data-theme="light"] [style*="color:#ff8a8a"],:root[data-theme="light"] [style*="color:#ff9c9c"],
+:root[data-theme="light"] [style*="color:#ffb4b4"],:root[data-theme="light"] [style*="color:#ff9999"],
+:root[data-theme="light"] [style*="color:#ff9e9e"],:root[data-theme="light"] [style*="color:#ffaaaa"],
+:root[data-theme="light"] [style*="color:#ffc0c0"]{color:#b42318!important}
+:root[data-theme="light"] [style*="color:#5ee89b"],:root[data-theme="light"] [style*="color:#7be7b3"],
+:root[data-theme="light"] [style*="color:#91f0c1"]{color:#137a43!important}
+:root[data-theme="light"] [style*="color:#9cc2ff"],:root[data-theme="light"] [style*="color:#8ab4ff"],
+:root[data-theme="light"] [style*="color:#c6d8ff"],:root[data-theme="light"] [style*="color:#69a7ff"],
+:root[data-theme="light"] [style*="color:#a9ccff"]{color:#1d4ed8!important}
+:root[data-theme="light"] [style*="color:#fcc65a"],:root[data-theme="light"] [style*="color:#ffd36a"],
+:root[data-theme="light"] [style*="color:#ffda7d"],:root[data-theme="light"] [style*="color:#fcd890"]{color:#8a4b08!important}
+@media (pointer:coarse){
+  .theme-toggle{min-height:46px;padding-inline:14px}
+  .btn{min-height:48px;border-radius:16px}
+  .btn.sm{min-height:44px;padding:9px 12px}
+  .seg button{min-height:44px}
+  nav button{min-height:54px}
+  nav button .nav-icon{width:20px;height:20px}
+  .client-open{min-height:64px}
+  .client-payment-row{padding-right:52px}
+  .client-payment-delete{width:40px;height:40px;display:grid;place-items:center;font-size:20px}
+  input,select,textarea{min-height:48px}
+}
 
 </style>
 </head>
-<body>
+<body class="auth-gate">
 
 <!-- ================= LOGIN / SETUP ================= -->
 <div id="gate" class="center">
-  <div style="width:100%;max-width:420px">
+  <div class="login-panel" style="width:100%;max-width:420px">
+    <div class="login-tools"><button type="button" class="theme-toggle" onclick="toggleTheme()" aria-label="Ndrysho temën">
+      <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>
+      <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.9 13A8.7 8.7 0 0 1 11 3.1a9 9 0 1 0 9.9 9.9Z"></path></svg>
+      <span class="theme-label">Errët</span></button></div>
     <div style="text-align:center;margin-bottom:18px">
-      <div style="font-size:52px">💰</div>
+      <div class="login-mark" aria-hidden="true"><span>💰</span></div>
       <h1 style="font-size:22px;margin-top:6px">Llogaritë e Mia</h1>
-      <p class="muted">Ruhen në cloud — s'humbasin kurrë</p>
-      <p class="muted" style="font-size:11px">versioni 4</p>
+      <p class="muted">Llogaritë, pagesat dhe shënimet — të sinkronizuara në cloud</p>
+      <p class="muted" style="font-size:11px">versioni 7</p>
     </div>
 
     <div class="card" id="cfgCard" style="display:none">
@@ -380,14 +530,17 @@ body.printing #pdfFab{display:block}
     </div>
 
     <div class="card" id="authCard" style="display:none">
-      <div class="seg" style="margin-bottom:6px">
-        <button id="tabIn" class="on" onclick="authMode('in')">Hyr</button>
-        <button id="tabUp" onclick="authMode('up')">Regjistrohu</button>
+      <div class="seg auth-tabs" style="margin-bottom:10px">
+        <button id="tabIn" class="on" onclick="authMode('in')"><svg class="auth-tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path></svg><span>Hyr</span></button>
+        <button id="tabUp" onclick="authMode('up')"><svg class="auth-tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="4"></circle><path d="M2 21a7 7 0 0 1 14 0M19 8v6m-3-3h6"></path></svg><span>Regjistrohu</span></button>
       </div>
-      <label>Email</label><input id="em" type="email" autocomplete="email" placeholder="ti@email.com">
-      <label>Fjalëkalimi</label><input id="pw" type="password" autocomplete="current-password" placeholder="të paktën 6 shkronja">
-      <button class="btn full" style="margin-top:14px" id="authBtn" onclick="doAuth()">Hyr</button>
-      <p id="authErr" style="color:#ff8a8a;font-size:13px;margin:10px 0 0"></p>
+      <label for="em">Email</label>
+      <div class="login-input"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="m4 7 8 6 8-6"></path></svg><input id="em" type="email" autocomplete="email" placeholder="ti@email.com"></div>
+      <label for="pw">Fjalëkalimi</label>
+      <div class="login-input"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"></path></svg><input id="pw" type="password" autocomplete="current-password" placeholder="të paktën 6 shkronja"></div>
+      <div class="auth-forgot-row"><button type="button" class="auth-forgot" id="forgotBtn" onclick="forgotPassword()" aria-controls="authErr"><svg class="auth-link-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m-5 5 5-5 5 5"></path><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"></path></svg><span class="forgot-label">Harrove fjalëkalimin?</span></button></div>
+      <button class="btn full" style="margin-top:4px" id="authBtn" onclick="doAuth()"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"></path></svg><span class="auth-button-label">Hyr</span></button>
+      <p id="authErr" role="status" aria-live="polite" style="font-size:13px;margin:10px 0 0"></p>
       
     </div>
   </div>
@@ -397,6 +550,11 @@ body.printing #pdfFab{display:block}
 <div id="app" style="display:none">
 <header>
   <h1 id="title">Përmbledhje</h1>
+  <button type="button" class="theme-toggle" onclick="toggleTheme()" aria-label="Ndrysho temën">
+    <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>
+    <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.9 13A8.7 8.7 0 0 1 11 3.1a9 9 0 1 0 9.9 9.9Z"></path></svg>
+    <span class="theme-label">Errët</span>
+  </button>
   <button class="btn sec sm" onclick="logout()">Dil</button>
 </header>
 <div class="wrap">
@@ -605,12 +763,12 @@ service cloud.firestore {
 <button class="fab" id="fab" onclick="openAdd()">+</button>
 
 <nav>
-  <button class="on" data-v="home" onclick="go('home')"><span class="ic">📊</span>Kreu</button>
-  <button data-v="debt" onclick="go('debt')"><span class="ic">👤</span>Klientët</button>
-  <button data-v="rent" onclick="go('rent')"><span class="ic">🏠</span>Qiraja</button>
-  <button data-v="exp" onclick="go('exp')"><span class="ic">🧾</span>Shpenzime</button>
-  <button data-v="notes" onclick="go('notes')"><span class="ic">📝</span>Shënime</button>
-  <button data-v="set" onclick="go('set')"><span class="ic">⚙️</span>Cilësime</button>
+  <button class="on" data-v="home" onclick="go('home')"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4"></rect><path d="M7 15v2m5-6v6m5-9v9"></path></svg>Kreu</button>
+  <button data-v="debt" onclick="go('debt')"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path></svg>Klientët</button>
+  <button data-v="rent" onclick="go('rent')"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7"></path><path d="M5 9v11h14V9m-9 11v-6h4v6"></path></svg>Qiraja</button>
+  <button data-v="exp" onclick="go('exp')"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"></path><path d="M9 8h6m-6 4h6m-6 4h3"></path></svg>Shpenzime</button>
+  <button data-v="notes" onclick="go('notes')"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"></path><path d="M14 3v5h5m-9 4h5m-5 4h5"></path></svg>Shënime</button>
+  <button data-v="set" onclick="go('set')"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16"></path><circle cx="9" cy="7" r="2"></circle><circle cx="15" cy="17" r="2"></circle></svg>Cilësime</button>
 </nav>
 </div>
 
@@ -641,6 +799,25 @@ const fmt=n=>(Math.round((+n||0)*100)/100).toLocaleString("sq-AL")+" "+CUR;
 const esc=s=>String(s??"").replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 const today=()=>new Date().toISOString().slice(0,10);
 let TT;function toast(m){$("toast").textContent=m;$("toast").classList.add("on");clearTimeout(TT);TT=setTimeout(()=>$("toast").classList.remove("on"),2000);}
+const APP_THEME_KEY="llogarite-theme";
+function setAppTheme(theme,persist){
+  theme=theme==="light"?"light":"dark";
+  document.documentElement.dataset.theme=theme;
+  if(persist){try{localStorage.setItem(APP_THEME_KEY,theme);}catch(e){}}
+  document.querySelectorAll(".theme-toggle").forEach(function(btn){
+    var label=btn.querySelector(".theme-label");if(label)label.textContent=theme==="dark"?"Errët":"Çelët";
+    btn.setAttribute("aria-pressed",theme==="light"?"true":"false");
+    btn.setAttribute("aria-label",theme==="dark"?"Kalo në temë të çelët":"Kalo në temë të errët");
+  });
+  var meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=theme==="dark"?"#0f1115":"#f2f5fa";
+}
+function initAppTheme(){
+  var saved="";try{saved=localStorage.getItem(APP_THEME_KEY)||"";}catch(e){}
+  var theme=saved==="light"||saved==="dark"?saved:
+    (window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");
+  setAppTheme(theme,false);
+}
+function toggleTheme(){setAppTheme(document.documentElement.dataset.theme==="dark"?"light":"dark",true);}
 
 /* ---------- firebase config ---------- */
 const BUILTIN_CFG={
@@ -680,18 +857,42 @@ function init(){
   $("cfgCard").style.display="none";
   $("authCard").style.display="block";
   auth.onAuthStateChanged(u=>{
-    if(u){UID=u.uid;$("gate").style.display="none";$("app").style.display="block";
+    if(u){document.body.classList.remove("auth-gate");UID=u.uid;$("gate").style.display="none";$("app").style.display="block";
       $("whoami").textContent="I lidhur si "+u.email;start();}
-    else{UID=null;$("gate").style.display="flex";$("app").style.display="none";}
+    else{document.body.classList.add("auth-gate");UID=null;$("gate").style.display="flex";$("app").style.display="none";}
   });
 }
 window.addEventListener("load",init);
 
 let AMODE="in";
 function authMode(m){AMODE=m;$("tabIn").classList.toggle("on",m==="in");$("tabUp").classList.toggle("on",m==="up");
-  $("authBtn").textContent=m==="in"?"Hyr":"Krijo llogari";$("authErr").textContent="";}
+  $("authBtn").querySelector(".auth-button-label").textContent=m==="in"?"Hyr":"Krijo llogari";
+  $("pw").autocomplete=m==="up"?"new-password":"current-password";
+  $("forgotBtn").style.display=m==="in"?"inline-flex":"none";
+  $("authErr").style.color="var(--danger-text)";$("authErr").textContent="";}
+function forgotPassword(){
+  var email=$("em").value.trim(),button=$("forgotBtn"),label=button.querySelector(".forgot-label"),message=$("authErr");
+  message.style.color="var(--danger-text)";
+  if(!email){message.textContent="Shkruaj emailin tënd më parë.";$("em").focus();return;}
+  if(!auth||!auth.sendPasswordResetEmail){message.textContent="Hyrja nuk është gati. Rifresko faqen dhe provo përsëri.";return;}
+  button.disabled=true;label.textContent="Po dërgohet...";
+  auth.sendPasswordResetEmail(email).then(function(){
+    message.style.color="var(--success-text)";
+    message.textContent="Nëse ky email ka llogari, do të marrësh një lidhje për vendosjen e fjalëkalimit të ri. Kontrollo edhe dosjen Spam.";
+  }).catch(function(e){
+    var code=e&&e.code||"";
+    if(code==="auth/user-not-found"){
+      message.style.color="var(--success-text)";
+      message.textContent="Nëse ky email ka llogari, do të marrësh një lidhje për vendosjen e fjalëkalimit të ri. Kontrollo edhe dosjen Spam.";
+    }else if(code==="auth/invalid-email")message.textContent="Emaili nuk duket i vlefshëm. Kontrollo adresën.";
+    else if(code==="auth/network-request-failed")message.textContent="Nuk ka lidhje interneti. Provo përsëri.";
+    else if(code==="auth/too-many-requests")message.textContent="U bënë shumë kërkesa. Prit pak dhe provo përsëri.";
+    else message.textContent="Nuk u dërgua dot lidhja. Provo përsëri pas pak.";
+  }).finally(function(){button.disabled=false;label.textContent="Harrove fjalëkalimin?";});
+}
 function doAuth(){
   const e=$("em").value.trim(),p=$("pw").value;
+  $("authErr").style.color="var(--danger-text)";$("authErr").textContent="";
   if(!e||p.length<6){$("authErr").textContent="Email dhe fjalëkalim (min. 6 shkronja).";return;}
   $("authBtn").disabled=true;
   const pr=AMODE==="in"?auth.signInWithEmailAndPassword(e,p):auth.createUserWithEmailAndPassword(e,p);
@@ -1599,7 +1800,7 @@ function renderClientDetail(){
   var prepayments=state.records.filter(function(d){return d.prepaymentOnly;}).sort(function(a,b){return -clientDebtOrder(a,b);});
   $("clientListView").style.display="none";$("clientDetailView").style.display="block";
   var balanceTitle=balance>0?'Klienti më ka borxh':balance<0?'Parapagim i klientit':'Llogaria është shlyer';
-  var balanceColor=balance>0?'#ff8a8a':balance<0?'#5ee89b':'var(--dim)';
+  var balanceColor=balance>0?'var(--danger-text)':balance<0?'var(--success-text)':'var(--dim)';
   var balanceValue=fmt(Math.abs(balance));
   var history=clientHistoryHtml(c);
   $("clientDetail").innerHTML=(CLIENT_MIGRATION_ERROR?'<div class="client-warning">Disa të dhëna të vjetra nuk u lidhën me klientët. Kontrollo lidhjen dhe lejet e Firestore për koleksionin clients.</div>':'')
@@ -2686,16 +2887,16 @@ function renderHome(){
   profiles.forEach(function(c){var state=clientState(c);waiting+=state.netDue;clientCredit+=state.netCredit;});
   var expTot=EXP.reduce(function(s,e){return s+(+e.amount||0);},0),outAll=cashOut+expTot,bal=cashIn-outAll;
   $("balV").textContent=(bal>=0?"+":"\u2212")+fmt(Math.abs(bal));
-  $("balV").style.color=bal>=0?"#5ee89b":"#ff8a8a";
+  $("balV").style.color=bal>=0?"var(--success-text)":"var(--danger-text)";
   $("balNote").textContent=bal>=0?"Je në plus":"Ke dalë me minus";
   $("bIn").textContent=fmt(cashIn);$("bOut").textContent=fmt(outAll);
   var total=cashIn+outAll;
   $("balBar").innerHTML=total>0?'<div style="width:'+(cashIn/total*100)+'%;background:#22c55e"></div>'
     +'<div style="width:'+(outAll/total*100)+'%;background:#ef4444"></div>':"";
   var bits=[];
-  if(waiting>0)bits.push('Klientët të kanë borxh <b style="color:#ff8a8a">'+fmt(waiting)+'</b>');
-  if(ownOwing>0)bits.push('Ti u ke borxh <b style="color:#ff8a8a">'+fmt(ownOwing)+'</b>');
-  if(clientCredit>0)bits.push('Parapagime klientësh <b style="color:#5ee89b">'+fmt(clientCredit)+'</b>');
+  if(waiting>0)bits.push('Klientët të kanë borxh <b style="color:var(--danger-text)">'+fmt(waiting)+'</b>');
+  if(ownOwing>0)bits.push('Ti u ke borxh <b style="color:var(--danger-text)">'+fmt(ownOwing)+'</b>');
+  if(clientCredit>0)bits.push('Parapagime klientësh <b style="color:var(--success-text)">'+fmt(clientCredit)+'</b>');
   $("bPend").innerHTML=bits.length?bits.join(" · "):"Asnjë borxh i hapur.";
 }
 
@@ -3117,6 +3318,7 @@ function pdfRent(y,fullPeriod){
   :`<p><small>Nuk ke regjistruar kapar.</small></p>`}`);
 }
 
+initAppTheme();
 go("home");
 </script>
 </body>
