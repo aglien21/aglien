@@ -597,8 +597,15 @@ body.compact-ui .fab{width:48px;height:48px;right:12px;bottom:calc(72px + env(sa
 body.compact-ui .toast{bottom:96px;padding:8px 14px;font-size:12px}
 body.compact-ui #printBar{gap:8px;padding:8px 10px;padding-top:calc(8px + env(safe-area-inset-top))}
 body.compact-ui #pdfFab{padding:12px 24px;font-size:14px}
+body.compact-ui .vault-check{display:flex;align-items:flex-start;gap:7px;font-size:12px;line-height:1.35;margin:8px 0}
+body.compact-ui .vault-check input{flex:0 0 18px;width:18px;height:18px;min-height:18px;padding:0;margin:1px 0 0}
+body.compact-ui .vault-warning{margin:8px 0;color:var(--warning-text);font-size:11px;line-height:1.4}
+body.compact-ui #vaultRecoveryDisplay{resize:vertical}
 
 @media (pointer:coarse){
+  body.compact-ui .vault-check{min-height:40px;align-items:center}
+  body.compact-ui .vault-check input{min-height:18px}
+
   body.compact-ui .btn{min-height:44px;border-radius:13px}
   body.compact-ui .btn.sm{min-height:40px;padding:7px 9px}
   body.compact-ui .seg button{min-height:40px}
@@ -631,7 +638,7 @@ body.compact-ui #pdfFab{padding:12px 24px;font-size:14px}
       <div class="login-mark" aria-hidden="true"><span>💰</span></div>
       <h1 style="font-size:22px;margin-top:6px">Llogaritë e Mia</h1>
       <p class="muted">Llogaritë, pagesat dhe shënimet — të sinkronizuara në cloud</p>
-      <p class="muted" style="font-size:11px">versioni 10</p>
+      <p class="muted" style="font-size:11px">versioni 11 · enkriptim në pajisje dhe sinkronizim cloud</p>
     </div>
 
     <div class="card" id="cfgCard" style="display:none">
@@ -657,6 +664,58 @@ body.compact-ui #pdfFab{padding:12px 24px;font-size:14px}
       <p id="authErr" role="status" aria-live="polite" style="font-size:13px;margin:10px 0 0"></p>
       
     </div>
+
+    <div class="card" id="vaultCard" style="display:none">
+      <h3 id="vaultTitle">Kasaforta private</h3>
+      <p class="muted" id="vaultLead" style="margin:7px 0 10px"></p>
+
+      <div id="vaultSetup" style="display:none">
+        <p class="vault-warning">Para krijimit të kopjes dhe migrimit, mbylli të gjitha versionet e tjera të aplikacionit dhe publiko rregullat Firestore që pranojnë vetëm rekorde të enkriptuara.</p>
+        <label for="vaultPassNew">Fjalëkalimi privat i kasafortës</label>
+        <input id="vaultPassNew" type="password" autocomplete="new-password" maxlength="512" placeholder="Të paktën 16 karaktere">
+        <label for="vaultPassAgain">Përsërite fjalëkalimin</label>
+        <input id="vaultPassAgain" type="password" autocomplete="new-password" maxlength="512" placeholder="Përsërite fjalëkalimin privat">
+        <button class="btn full" style="margin-top:10px" id="vaultCreateBtn" onclick="vaultCreate()">Krijo kasafortën</button>
+      </div>
+
+      <div id="vaultUnlock" style="display:none">
+        <label for="vaultPassUnlock">Fjalëkalimi privat</label>
+        <input id="vaultPassUnlock" type="password" autocomplete="current-password" maxlength="512" placeholder="Fjalëkalimi i kasafortës">
+        <button class="btn full" style="margin-top:9px" id="vaultUnlockBtn" onclick="vaultUnlock()">Hap kasafortën</button>
+        <button class="btn sec full sm" style="margin-top:7px" onclick="vaultShowRecovery()">Kam kodin e rikuperimit</button>
+      </div>
+
+      <div id="vaultRecover" style="display:none">
+        <label for="vaultRecoveryInput">Kodi i rikuperimit</label>
+        <input id="vaultRecoveryInput" type="text" autocomplete="one-time-code" autocapitalize="characters" maxlength="64" spellcheck="false" placeholder="Kodi i ruajtur jashtë telefonit">
+        <label for="vaultPassRecover">Fjalëkalim i ri privat</label>
+        <input id="vaultPassRecover" type="password" autocomplete="new-password" maxlength="512" placeholder="Të paktën 16 karaktere">
+        <label for="vaultPassRecoverAgain">Përsërite fjalëkalimin e ri</label>
+        <input id="vaultPassRecoverAgain" type="password" autocomplete="new-password" maxlength="512" placeholder="Përsërite fjalëkalimin privat">
+        <button class="btn full" style="margin-top:10px" onclick="vaultRecover()">Rikupero dhe vendos fjalëkalim të ri</button>
+        <button class="btn sec full sm" style="margin-top:7px" onclick="vaultShowUnlock()">Kthehu te hyrja</button>
+      </div>
+
+      <div id="vaultRecoveryStep" style="display:none">
+        <p class="muted" style="margin:0 0 5px">Ruaje këtë kod jashtë telefonit. Pa fjalëkalimin privat ose këtë kod, të dhënat nuk rikuperohen.</p>
+        <textarea id="vaultRecoveryDisplay" rows="3" readonly spellcheck="false" style="font-family:monospace;font-size:14px;letter-spacing:1px"></textarea>
+        <div id="vaultMigrationAck">
+          <p class="vault-warning">Para kopjes rezervë dhe enkriptimit: mbylli kopjet e vjetra në pajisjet e tjera dhe publiko rregullat Firestore të dorëzuara me aplikacionin. Pa rregullat, një version i vjetër mund të shkruajë përsëri tekst të thjeshtë.</p>
+          <label class="vault-check"><input type="checkbox" id="vaultSessionsClosed" onchange="vaultUpdateContinue()"> I mbylla kopjet e vjetra në pajisjet e tjera dhe publikova rregullat Firestore për enkriptim.</label>
+        </div>
+        <label class="vault-check"><input type="checkbox" id="vaultRecoverySaved" onchange="vaultUpdateContinue()"> E ruajta kodin e rikuperimit në vend të sigurt.</label>
+        <div id="vaultBackupControls">
+          <button class="btn sec full sm" id="vaultBackupPrepare" onclick="vaultPrepareBackup()">Përgatit kopjen rezervë JSON</button>
+          <a class="btn sec full sm" id="vaultBackupLink" href="#" download="llogarite-backup-para-enkriptimit.json" style="display:none;margin-top:7px;text-align:center;text-decoration:none" onclick="vaultBackupDownloaded()">Shkarko kopjen rezervë</a>
+          <label class="vault-check"><input type="checkbox" id="vaultBackupSaved" onchange="vaultUpdateContinue()" disabled> E shkarkova dhe e ruajta kopjen rezervë.</label>
+        </div>
+        <p class="vault-warning">Kopja JSON dhe kodi i rikuperimit përmbajnë qasje të ndjeshme. Mbaji vetëm në një vend të sigurt jashtë këtij telefoni.</p>
+        <button class="btn full" id="vaultContinueBtn" onclick="vaultContinue()" disabled>Kripto të gjitha të dhënat dhe vazhdo</button>
+      </div>
+
+      <p id="vaultStatus" role="status" aria-live="polite" class="muted" style="margin:9px 0 0"></p>
+      <button type="button" id="vaultSignOut" class="btn sec full sm" style="display:none;margin-top:8px" onclick="logout()">Dil nga llogaria</button>
+    </div>
   </div>
 </div>
 
@@ -669,6 +728,7 @@ body.compact-ui #pdfFab{padding:12px 24px;font-size:14px}
     <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.9 13A8.7 8.7 0 0 1 11 3.1a9 9 0 1 0 9.9 9.9Z"></path></svg>
     <span class="theme-label">Errët</span>
   </button>
+  <button class="btn sec sm" onclick="lockVault()" title="Blloko të dhënat në këtë pajisje">Blloko</button>
   <button class="btn sec sm" onclick="logout()">Dil</button>
 </header>
 <div class="wrap">
@@ -838,7 +898,7 @@ body.compact-ui #pdfFab{padding:12px 24px;font-size:14px}
     <div class="card">
       <h3>Llogaria</h3>
       <p class="muted" id="whoami" style="margin:8px 0 0"></p>
-      <p class="muted">Të dhënat ruhen në Firestore. Hyr me të njëjtin email nga çdo telefon dhe i gjen aty.</p>
+      <p class="muted">Pas përfundimit të migrimit, përmbajtja e regjistrave ruhet e enkriptuar në Firebase; derisa të konfirmohet migrimi, disa rekorde të vjetra mund të mbeten të lexueshme nga cloud. Për t’i hapur në një pajisje tjetër duhen llogaria jote dhe fjalëkalimi privat i kasafortës.</p>
     </div>
     <div class="card">
       <h3>Monedha</h3>
@@ -848,17 +908,104 @@ body.compact-ui #pdfFab{padding:12px 24px;font-size:14px}
       </div>
     </div>
     <div class="card">
-      <h3>Rregullat e Firestore</h3>
-      <p class="muted">Ngjiti te Firestore → Rules → Publish:</p>
-      <textarea rows="9" readonly style="font-size:12px;font-family:monospace">rules_version = '2';
+      <h3>Kopja rezervë dhe rikthimi</h3>
+      <p class="muted">Zgjidh kopjen JSON para enkriptimit nga kjo llogari. Rikthimi zëvendëson të dhënat aktuale në cloud dhe i enkripton sërish; kodi i kasafortës duhet të jetë i hapur.</p>
+      <label for="vaultRestoreFile">Skedari i kopjes rezervë</label>
+      <input id="vaultRestoreFile" type="file" accept=".json,application/json">
+      <button class="btn sec full sm" id="vaultRestoreBtn" style="margin-top:8px" onclick="vaultRestoreBackup()">Rikthe nga kopja JSON</button>
+      <p id="vaultRestoreStatus" role="status" aria-live="polite" class="muted" style="margin:8px 0 0"></p>
+      <p class="vault-warning">Importohet vetëm kopja e kësaj llogarie (UID-ja verifikohet). Konfirmimi përfundimtar fshin çdo rekord që nuk gjendet në kopje.</p>
+    </div>
+    <div class="card">
+      <h3>Siguria e Firestore</h3>
+      <p class="muted">Para migrimit, publiko këto rregulla te Firebase Console → Firestore Database → Rules. Ato lejojnë leximin e rekordeve të vjetra vetëm për kopjen rezervë, por pranojnë shkrime të reja vetëm në format të enkriptuar.</p>
+      <p class="vault-warning">Kontrollo rregullat ekzistuese dhe bashko çdo leje tjetër që përdor projekti; mos i zëvendëso pa e verifikuar ndikimin.</p>
+      <details style="margin-top:8px"><summary>Shfaq rregullat E2EE për kopjim</summary>
+        <textarea id="e2eeRules" rows="18" readonly spellcheck="false" onclick="this.select()" style="margin-top:8px;font-size:11px;font-family:monospace;white-space:pre;overflow:auto">rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{uid}/{document=**} {
-      allow read, write: if request.auth != null
-        && request.auth.uid == uid;
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function isEncryptedEnvelope() {
+      return request.resource.data.keys().hasAll([
+          '__llogarite_e2ee_v1', 'iv', 'ciphertext'
+        ])
+        && request.resource.data.keys().hasOnly([
+          '__llogarite_e2ee_v1', 'iv', 'ciphertext'
+        ])
+        && request.resource.data.__llogarite_e2ee_v1 == 1
+        && request.resource.data.iv is string
+        && request.resource.data.ciphertext is string;
+    }
+
+    function isWrappedKey(value) {
+      return value is map
+        && value.keys().hasAll(['iv', 'ciphertext'])
+        && value.keys().hasOnly(['iv', 'ciphertext'])
+        && value.iv is string
+        && value.ciphertext is string;
+    }
+
+    function isVaultMetadata() {
+      return request.resource.data.keys().hasAll([
+          'version', 'kdf', 'iterations', 'passwordSalt',
+          'passwordWrap', 'recoveryWrap', 'migrationComplete',
+          'backupConfirmed', 'createdAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'version', 'kdf', 'iterations', 'passwordSalt',
+          'passwordWrap', 'recoveryWrap', 'migrationComplete',
+          'backupConfirmed', 'createdAt', 'backupConfirmedAt',
+          'migrationCompletedAt'
+        ])
+        && request.resource.data.version == 1
+        && request.resource.data.kdf == 'PBKDF2-SHA-256'
+        && request.resource.data.iterations is int
+        && request.resource.data.iterations >= 600000
+        && request.resource.data.iterations <= 1000000
+        && request.resource.data.passwordSalt is string
+        && isWrappedKey(request.resource.data.passwordWrap)
+        && isWrappedKey(request.resource.data.recoveryWrap)
+        && request.resource.data.migrationComplete is bool
+        && request.resource.data.backupConfirmed is bool
+        && request.resource.data.createdAt is int;
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      // Legacy records remain readable by their owner for backup/migration, but
+      // every newly created or updated root document must be an E2EE envelope.
+      allow create, update: if isOwner(userId) && isEncryptedEnvelope();
+      allow delete: if isOwner(userId);
+
+      match /_vault/{docId} {
+        allow read: if isOwner(userId) && docId == 'key-v1';
+        allow create, update: if isOwner(userId)
+          && docId == 'key-v1'
+          && isVaultMetadata();
+        allow delete: if false;
+      }
+
+      match /{collection}/{docId} {
+        function isAppCollection() {
+          return collection in [
+            'clients', 'debts', 'debtHistory', 'rent', 'expenses',
+            'noteFolders', 'notes'
+          ];
+        }
+        allow read: if isOwner(userId) && isAppCollection();
+        // This blocks older app copies from writing plaintext after migration.
+        allow create, update: if isOwner(userId)
+          && isAppCollection()
+          && isEncryptedEnvelope();
+        allow delete: if isOwner(userId) && isAppCollection();
+      }
     }
   }
 }</textarea>
+      </details>
     </div>
     <div class="card">
       <h3>Raporte PDF</h3>
@@ -866,9 +1013,10 @@ service cloud.firestore {
       <button class="btn sec full sm" style="margin-top:10px" onclick="repForm('rent')">🏠 Raporti i qirasë (veçmas)</button>
     </div>
     <div class="card">
-      <h3>Rezervë</h3>
-      <button class="btn sec full sm" style="margin-top:10px" onclick="exportJson()">Shkarko të dhënat (JSON)</button>
-      <p class="muted" style="margin-top:8px">Projekti Firebase: <b>myqo1958</b> (i lidhur).</p>
+      <h3>Kopje e jashtme</h3>
+      <p class="vault-warning">JSON-i i shkarkuar është i pakriptuar dhe përmban përmbajtjen e lexueshme. Ruaje në vend të sigurt dhe mos e ndaj.</p>
+      <button class="btn sec full sm" style="margin-top:10px" onclick="exportJson()">Shkarko të dhënat e hapura (JSON)</button>
+      <p class="muted" style="margin-top:8px">ID e projektit Firebase: <b>myqo1958</b>.</p>
     </div>
   </div>
 
@@ -947,7 +1095,13 @@ function getCfg(){
   return BUILTIN_CFG;
 }
 
-let db,auth,UID=null;
+let db,auth,UID=null,VAULT_KEY=null,VAULT_META=null,VAULT_FLOW_UID="",VAULT_RECOVERY_CODE="",VAULT_BACKUP_URL="",VAULT_BACKUP_DOWNLOADED=false,DB_READY_ERROR=null,VAULT_SESSION_EPOCH=0;
+let DB_READY=Promise.resolve(),VAULT_UNSUBS=[];
+const VAULT_META_COLLECTION="_vault",VAULT_META_DOC="key-v1",VAULT_KDF_ITERATIONS=600000,VAULT_PAGE_SIZE=250;
+const VAULT_COLLECTIONS=["clients","debts","debtHistory","rent","expenses","noteFolders","notes"];
+function vaultAuthValid(epoch,uid){return epoch===VAULT_SESSION_EPOCH&&UID===uid&&!!(auth&&auth.currentUser&&auth.currentUser.uid===uid);}
+function vaultSessionValid(epoch,uid,key){return vaultAuthValid(epoch,uid)&&!!VAULT_KEY&&(!key||VAULT_KEY===key);}
+function vaultAssertSession(epoch,uid,key){if(!vaultSessionValid(epoch,uid,key))throw new Error("Sesioni u mbyll gjatë veprimit. Rihyr për të vazhduar.");}
 function fail(t,m,d){
   $("authCard").style.display="none";
   $("cfgCard").style.display="block";
@@ -963,7 +1117,7 @@ function init(){
   try{
     if(!firebase.apps.length)firebase.initializeApp(getCfg());
     auth=firebase.auth();db=firebase.firestore();
-    db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+    DB_READY=prepareFirestoreCache().catch(function(e){DB_READY_ERROR=e;return false;});
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
   }catch(e){
     fail("Gabim në nisje","Provo ta rifreskosh faqen.",e.message);return;
@@ -971,9 +1125,25 @@ function init(){
   $("cfgCard").style.display="none";
   $("authCard").style.display="block";
   auth.onAuthStateChanged(u=>{
-    if(u){document.body.classList.remove("auth-gate");UID=u.uid;$("gate").style.display="none";$("app").style.display="block";
-      $("whoami").textContent="I lidhur si "+u.email;start();}
-    else{document.body.classList.add("auth-gate");UID=null;$("gate").style.display="flex";$("app").style.display="none";}
+    var epoch=++VAULT_SESSION_EPOCH;
+    stopVaultListeners();
+    VAULT_KEY=null;VAULT_META=null;VAULT_FLOW_UID="";VAULT_RECOVERY_CODE="";
+    if(VAULT_BACKUP_URL){try{URL.revokeObjectURL(VAULT_BACKUP_URL);}catch(e){}}
+    VAULT_BACKUP_URL="";VAULT_BACKUP_DOWNLOADED=false;clearVaultMemory();
+    if(u){
+      UID=u.uid;
+      document.body.classList.add("auth-gate");
+      $("gate").style.display="flex";$("app").style.display="none";
+      $("authCard").style.display="none";$("cfgCard").style.display="none";$("vaultCard").style.display="block";
+      $("vaultSignOut").style.display="block";$("vaultTitle").textContent="Po hapet kasaforta...";
+      $("vaultLead").textContent="Kasaforta mbrohet në pajisje; të dhënat ekzistuese mund të jenë ende të lexueshme në cloud derisa kopja rezervë dhe migrimi të përfundojnë.";$("vaultStatus").textContent="";
+      DB_READY.then(function(){if(!vaultAuthValid(epoch,u.uid))return;if(DB_READY_ERROR)throw DB_READY_ERROR;return vaultEnter(u,epoch);}).catch(function(e){if(vaultAuthValid(epoch,u.uid))vaultFatal(e);});
+    }else{
+      UID=null;document.body.classList.add("auth-gate");
+      $("gate").style.display="flex";$("app").style.display="none";
+      $("vaultCard").style.display="none";$("vaultSignOut").style.display="none";
+      $("cfgCard").style.display="none";$("authCard").style.display="block";
+    }
   });
 }
 window.addEventListener("load",init);
@@ -1023,7 +1193,596 @@ function doAuth(){
       "auth/unauthorized-domain":"Shto këtë domen te Firebase → Authentication → Settings → Authorized domains."};
     $("authErr").textContent=M[c]||err.message;}).finally(()=>$("authBtn").disabled=false);
 }
-function logout(){auth.signOut();}
+function logout(){
+  VAULT_SESSION_EPOCH++;stopVaultListeners();VAULT_KEY=null;VAULT_META=null;clearVaultMemory();
+  document.body.classList.add("auth-gate");$("gate").style.display="flex";$("app").style.display="none";$("authCard").style.display="none";$("vaultCard").style.display="block";
+  $("vaultTitle").textContent="Po mbyllet sesioni...";$("vaultLead").textContent="";$("vaultStatus").textContent="";$("vaultSignOut").style.display="none";
+  if(auth)auth.signOut().catch(function(e){$("vaultTitle").textContent="Sesioni nuk u mbyll";$("vaultStatus").textContent="Provo të dalësh përsëri.";$("vaultSignOut").style.display="block";});
+}
+function lockVault(){VAULT_SESSION_EPOCH++;stopVaultListeners();VAULT_KEY=null;VAULT_META=null;clearVaultMemory();location.reload();}
+
+function prepareFirestoreCache(){
+  return (async function(){
+    var cacheCleared=false;
+    try{cacheCleared=localStorage.getItem("llogarite-e2ee-cache-v1")==="cleared";}catch(e){}
+    if(!cacheCleared){
+      if(!db||typeof db.clearPersistence!=="function")throw new Error("Nuk u pastrua memoria e vjetër e Firestore. Mbyll skedat e tjera të aplikacionit dhe rifresko.");
+      try{await db.clearPersistence();}
+      catch(e){throw new Error("Mbyll të gjitha skedat/pajisjet e hapura të këtij aplikacioni në këtë shfletues, pastaj rifresko që të pastrohet memoria e vjetër. "+(e.message||""));}
+      try{localStorage.setItem("llogarite-e2ee-cache-v1","cleared");}catch(e){}
+    }
+    if(db&&typeof db.enablePersistence==="function"){
+      try{await db.enablePersistence({synchronizeTabs:true});}
+      catch(e){if(e&&e.code!=="failed-precondition"&&e.code!=="unimplemented")console.warn("Offline persistence is unavailable",e);}
+    }
+  })();
+}
+function vaultMetaRef(){return db.collection("users").doc(UID).collection(VAULT_META_COLLECTION).doc(VAULT_META_DOC);}
+function vaultCollectionPage(collectionRef,afterDoc){
+  var query=collectionRef.orderBy(firebase.firestore.FieldPath.documentId()).limit(VAULT_PAGE_SIZE);
+  if(afterDoc)query=query.startAfter(afterDoc);
+  return query.get({source:"server"});
+}
+function vaultCryptoReady(){return !!(window.crypto&&crypto.subtle&&crypto.getRandomValues&&window.TextEncoder&&window.TextDecoder);}
+function vaultRandomBytes(n){var b=new Uint8Array(n);crypto.getRandomValues(b);return b;}
+function vaultBytesToB64(bytes){
+  var out="",step=0x8000;
+  for(var i=0;i<bytes.length;i+=step)out+=String.fromCharCode.apply(null,bytes.subarray(i,Math.min(i+step,bytes.length)));
+  return btoa(out);
+}
+function vaultB64ToBytes(value){
+  var raw=atob(String(value||"")),bytes=new Uint8Array(raw.length);
+  for(var i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+  return bytes;
+}
+function vaultBytesToHex(bytes){return Array.from(bytes).map(function(b){return b.toString(16).padStart(2,"0");}).join("");}
+function vaultNewRecoveryCode(){
+  var hex=vaultBytesToHex(vaultRandomBytes(20)).toUpperCase();
+  return hex.match(/.{1,4}/g).join("-");
+}
+function vaultRecoveryBytes(code){
+  var hex=String(code||"").replace(/[^0-9a-f]/gi,"");
+  if(hex.length!==40)return null;
+  var bytes=new Uint8Array(20);
+  for(var i=0;i<20;i++)bytes[i]=parseInt(hex.slice(i*2,i*2+2),16);
+  return bytes;
+}
+async function vaultRecoveryWrappingKey(code){
+  var bytes=code instanceof Uint8Array?code:vaultRecoveryBytes(code);
+  if(!bytes||bytes.length!==20)throw new Error("Kodi i rikuperimit nuk ka format të saktë.");
+  var digest=await crypto.subtle.digest("SHA-256",bytes);
+  return crypto.subtle.importKey("raw",digest,{name:"AES-GCM"},false,["encrypt","decrypt"]);
+}
+async function vaultDeriveWrappingKey(password,salt,iterations){
+  var material=await crypto.subtle.importKey("raw",new TextEncoder().encode(password),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt:salt,iterations:iterations,hash:"SHA-256"},material,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
+}
+async function vaultWrapRawKey(wrappingKey,rawKey){
+  var iv=vaultRandomBytes(12),cipher=await crypto.subtle.encrypt({name:"AES-GCM",iv:iv},wrappingKey,rawKey);
+  return {iv:vaultBytesToB64(iv),ciphertext:vaultBytesToB64(new Uint8Array(cipher))};
+}
+async function vaultUnwrapRawKey(wrappingKey,wrapped){
+  var clear=await crypto.subtle.decrypt({name:"AES-GCM",iv:vaultB64ToBytes(wrapped.iv)},wrappingKey,vaultB64ToBytes(wrapped.ciphertext));
+  return new Uint8Array(clear);
+}
+async function vaultImportDataKey(raw){
+  return crypto.subtle.importKey("raw",raw,{name:"AES-GCM"},false,["encrypt","decrypt"]);
+}
+const VAULT_ENVELOPE_FIELD="__llogarite_e2ee_v1";
+function vaultIsEnvelope(value){return !!(value&&value[VAULT_ENVELOPE_FIELD]===1&&typeof value.iv==="string"&&typeof value.ciphertext==="string");}
+function vaultIsWrappedKey(value){return !!(value&&typeof value.iv==="string"&&typeof value.ciphertext==="string");}
+function vaultRecordAAD(documentPath){return new TextEncoder().encode("llogarite-e2ee-v1|"+String(documentPath||""));}
+async function vaultEncryptRecord(value,documentPath){
+  if(!VAULT_KEY)throw new Error("Kasaforta është e kyçur.");
+  var json=JSON.stringify(value==null?{}:value);
+  if(typeof json!=="string")throw new Error("Të dhënat nuk u përgatitën për enkriptim.");
+  var clear=new TextEncoder().encode(json);
+  if(clear.length>700*1024)throw new Error("Një rekord është shumë i madh për t'u ruajtur në mënyrë të sigurt. Ndaje në disa rekorde.");
+  var iv=vaultRandomBytes(12),cipher=await crypto.subtle.encrypt({name:"AES-GCM",iv:iv,additionalData:vaultRecordAAD(documentPath)},VAULT_KEY,clear);
+  return {[VAULT_ENVELOPE_FIELD]:1,iv:vaultBytesToB64(iv),ciphertext:vaultBytesToB64(new Uint8Array(cipher))};
+}
+async function vaultDecryptRecord(value,documentPath){
+  if(!VAULT_KEY)throw new Error("Hape kasafortën për të lexuar të dhënat.");
+  if(!vaultIsEnvelope(value))throw new Error("U gjet një rekord i pakriptuar. Të dhënat nuk do të shfaqen; përfundo migrimin e kasafortës.");
+  var clear=await crypto.subtle.decrypt({name:"AES-GCM",iv:vaultB64ToBytes(value.iv),additionalData:vaultRecordAAD(documentPath)},VAULT_KEY,vaultB64ToBytes(value.ciphertext));
+  return JSON.parse(new TextDecoder().decode(clear));
+}
+function vaultDeepMerge(base,patch){
+  var out=Object.assign({},base||{}),src=patch||{};
+  Object.keys(src).forEach(function(key){
+    var a=out[key],b=src[key];
+    if(a&&b&&typeof a==="object"&&typeof b==="object"&&!Array.isArray(a)&&!Array.isArray(b))out[key]=vaultDeepMerge(a,b);
+    else out[key]=b;
+  });
+  return out;
+}
+function vaultErrorText(e){
+  var s=String(e&&e.message||e||"");
+  if(/operationerror|decrypt|authentication tag/i.test(s))return "Fjalëkalimi ose kodi nuk është i saktë, ose të dhënat nuk përputhen me këtë kasafortë.";
+  return s||"Ndodhi një gabim i papritur.";
+}
+function vaultShowPane(id,title,lead){
+  ["vaultSetup","vaultUnlock","vaultRecover","vaultRecoveryStep"].forEach(function(x){$(x).style.display=x===id?"block":"none";});
+  $("vaultTitle").textContent=title;$("vaultLead").textContent=lead||"";$("vaultStatus").textContent="";
+  $("vaultSignOut").style.display="block";
+}
+function vaultShowSetup(){
+  $("vaultPassNew").value="";$("vaultPassAgain").value="";
+  vaultShowPane("vaultSetup","Krijo kasafortën e enkriptuar","Vendos një fjalëkalim privat që nuk përdoret për hyrjen në Firebase. Ai nuk dërgohet te serveri.");
+}
+function vaultShowUnlock(message){
+  $("vaultPassUnlock").value="";
+  vaultShowPane("vaultUnlock","Hap kasafortën private",message||"Shkruaj fjalëkalimin privat për t'i hapur të dhënat në këtë pajisje.");
+}
+function vaultShowRecovery(){
+  $("vaultRecoveryInput").value="";$("vaultPassRecover").value="";$("vaultPassRecoverAgain").value="";
+  vaultShowPane("vaultRecover","Rikupero kasafortën","Përdor kodin e rikuperimit dhe vendos një fjalëkalim të ri privat.");
+}
+function vaultShowRecoveryStep(needsBackup){
+  VAULT_NEED_BACKUP=!!needsBackup;
+  vaultShowPane("vaultRecoveryStep",needsBackup?"Ruaj kodin dhe kopjen rezervë":"Ruaj kodin e rikuperimit","Kodi shfaqet vetëm tani. Ruaje jashtë telefonit, pastaj vazhdo.");
+  $("vaultRecoveryDisplay").value=VAULT_RECOVERY_CODE;
+  $("vaultRecoverySaved").checked=false;
+  $("vaultMigrationAck").style.display=VAULT_META&&!VAULT_META.migrationComplete?"block":"none";
+  $("vaultSessionsClosed").checked=false;
+  $("vaultBackupControls").style.display=needsBackup?"block":"none";
+  $("vaultBackupSaved").checked=false;$("vaultBackupSaved").disabled=true;
+  $("vaultBackupPrepare").disabled=false;$("vaultBackupLink").style.display="none";
+  if(VAULT_BACKUP_URL){URL.revokeObjectURL(VAULT_BACKUP_URL);VAULT_BACKUP_URL="";}
+  VAULT_BACKUP_DOWNLOADED=false;
+  $("vaultContinueBtn").textContent=needsBackup?"Kripto të gjitha të dhënat dhe vazhdo":"Vazhdo në aplikacion";
+  vaultUpdateContinue();
+}
+let VAULT_NEED_BACKUP=false;
+function vaultUpdateContinue(){
+  var keySaved=$("vaultRecoverySaved")&&$("vaultRecoverySaved").checked;
+  var backupSaved=!VAULT_NEED_BACKUP||(VAULT_BACKUP_DOWNLOADED&&$("vaultBackupSaved").checked);
+  var migrationSafe=!VAULT_META||VAULT_META.migrationComplete||($("vaultSessionsClosed")&&$("vaultSessionsClosed").checked);
+  var button=$("vaultContinueBtn");if(button)button.disabled=!(keySaved&&backupSaved&&migrationSafe);
+  var backupButton=$("vaultBackupPrepare");if(backupButton&&VAULT_NEED_BACKUP)backupButton.disabled=!migrationSafe;
+}
+async function vaultEnter(user,epoch){
+  epoch=epoch==null?VAULT_SESSION_EPOCH:epoch;
+  UID=user.uid;VAULT_FLOW_UID=user.uid;
+  if(!vaultCryptoReady())throw new Error("Ky shfletues nuk mbështet Web Crypto. Përdor Safari ose Chrome të përditësuar në një lidhje të sigurt.");
+  var snap=await vaultMetaRef().get();
+  if(!vaultAuthValid(epoch,user.uid))return;
+  if(!snap.exists){VAULT_META=null;vaultShowSetup();return;}
+  VAULT_META=snap.data();
+  if(!VAULT_META||VAULT_META.version!==1||VAULT_META.kdf!=="PBKDF2-SHA-256"||!vaultIsWrappedKey(VAULT_META.passwordWrap)||!vaultIsWrappedKey(VAULT_META.recoveryWrap)||typeof VAULT_META.passwordSalt!=="string"||!Number.isInteger(+VAULT_META.iterations)||+VAULT_META.iterations<VAULT_KDF_ITERATIONS||+VAULT_META.iterations>1000000||typeof VAULT_META.migrationComplete!=="boolean"||typeof VAULT_META.backupConfirmed!=="boolean"||(VAULT_META.migrationComplete&&!VAULT_META.backupConfirmed))throw new Error("Metadatat e kasafortës mungojnë ose nuk njihen. Mos krijo një kasafortë të re; përdor kopjen rezervë/kodin e rikuperimit.");
+  try{if(vaultB64ToBytes(VAULT_META.passwordSalt).length!==16)throw new Error("salt");}catch(e){throw new Error("Kripa e çelësit në metadatat e kasafortës është e pavlefshme. Mos krijo çelës të ri; përdor kopjen rezervë/kodin e rikuperimit.");}
+  vaultShowUnlock(VAULT_META.migrationComplete?"Shkruaj fjalëkalimin privat për t'i hapur të dhënat në këtë pajisje.":"Migrimi i enkriptimit nuk ka përfunduar. Hape kasafortën për të vazhduar në mënyrë të sigurt.");
+}
+async function vaultCheckNoOrphanCiphertext(){
+  var root=await db.collection("users").doc(UID).get({source:"server"});
+  if(root.exists&&vaultIsEnvelope(root.data()))throw new Error("Dokumenti i llogarisë është enkriptuar pa metadatat e kasafortës. Mos krijo çelës të ri; kërko kodin e rikuperimit.");
+  var rootRef=db.collection("users").doc(UID);
+  for(var i=0;i<VAULT_COLLECTIONS.length;i++){
+    var ref=rootRef.collection(VAULT_COLLECTIONS[i]),after=null;
+    while(true){
+      var snap=await vaultCollectionPage(ref,after);
+      if(snap.docs.some(function(d){return vaultIsEnvelope(d.data());}))throw new Error("Disa rekorde janë tashmë të enkriptuara, por nuk u gjet çelësi i kasafortës. Mos vazhdo me çelës të ri.");
+      if(!snap.docs.length||snap.docs.length<VAULT_PAGE_SIZE)break;
+      after=snap.docs[snap.docs.length-1];
+    }
+  }
+}
+async function vaultCreate(){
+  var button=$("vaultCreateBtn"),pass=$("vaultPassNew").value,again=$("vaultPassAgain").value,sessionEpoch=VAULT_SESSION_EPOCH,sessionUid=UID;
+  if(!vaultAuthValid(sessionEpoch,sessionUid))return;
+  if(pass.length<16){$("vaultStatus").textContent="Përdor të paktën 16 karaktere; një frazë e gjatë me disa fjalë është më e lehtë për t'u mbajtur mend.";return;}
+  if(pass!==again){$("vaultStatus").textContent="Fjalëkalimet nuk përputhen.";return;}
+  button.disabled=true;$("vaultStatus").textContent="Po krijohet çelësi privat...";
+  try{
+    await vaultCheckNoOrphanCiphertext();
+    if(!vaultAuthValid(sessionEpoch,sessionUid))return;
+    var rawDataKey=vaultRandomBytes(32),dataKey=await vaultImportDataKey(rawDataKey),salt=vaultRandomBytes(16);
+    var wrappingKey=await vaultDeriveWrappingKey(pass,salt,VAULT_KDF_ITERATIONS);
+    var passwordWrap=await vaultWrapRawKey(wrappingKey,rawDataKey),recoveryCode=vaultNewRecoveryCode();
+    var recoveryKey=await vaultRecoveryWrappingKey(recoveryCode);
+    var recoveryWrap=await vaultWrapRawKey(recoveryKey,rawDataKey);
+    VAULT_META={version:1,kdf:"PBKDF2-SHA-256",iterations:VAULT_KDF_ITERATIONS,passwordSalt:vaultBytesToB64(salt),passwordWrap:passwordWrap,recoveryWrap:recoveryWrap,migrationComplete:false,backupConfirmed:false,createdAt:Date.now()};
+    if(!vaultAuthValid(sessionEpoch,sessionUid))return;
+    var metaRef=vaultMetaRef();
+    await db.runTransaction(async function(tx){
+      if(!vaultAuthValid(sessionEpoch,sessionUid))throw new Error("Sesioni u mbyll gjatë krijimit të kasafortës.");
+      var current=await tx.get(metaRef);
+      if(current.exists)throw new Error("Kasaforta u krijua tashmë në një pajisje tjetër. Rifresko faqen dhe hape kasafortën ekzistuese.");
+      tx.set(metaRef,VAULT_META);
+    });
+    if(!vaultAuthValid(sessionEpoch,sessionUid))return;
+    VAULT_KEY=dataKey;VAULT_RECOVERY_CODE=recoveryCode;
+    $("vaultPassNew").value="";$("vaultPassAgain").value="";
+    vaultShowRecoveryStep(true);
+  }catch(e){if(!vaultAuthValid(sessionEpoch,sessionUid))return;$("vaultStatus").textContent="Kasaforta nuk u krijua: "+vaultErrorText(e);button.disabled=false;}
+}
+async function vaultUnlock(){
+  var button=$("vaultUnlockBtn"),pass=$("vaultPassUnlock").value,sessionEpoch=VAULT_SESSION_EPOCH,sessionUid=UID;
+  if(!vaultAuthValid(sessionEpoch,sessionUid))return;
+  if(!pass){$("vaultStatus").textContent="Shkruaj fjalëkalimin privat.";return;}
+  button.disabled=true;$("vaultStatus").textContent="Po hapet kasaforta...";
+  try{
+    var wrappingKey=await vaultDeriveWrappingKey(pass,vaultB64ToBytes(VAULT_META.passwordSalt),+VAULT_META.iterations||VAULT_KDF_ITERATIONS);
+    if(!vaultAuthValid(sessionEpoch,sessionUid))return;
+    var raw=await vaultUnwrapRawKey(wrappingKey,VAULT_META.passwordWrap);
+    if(!vaultAuthValid(sessionEpoch,sessionUid))return;
+    var importedKey=await vaultImportDataKey(raw);
+    if(!vaultAuthValid(sessionEpoch,sessionUid))return;
+    VAULT_KEY=importedKey;
+    $("vaultPassUnlock").value="";
+    if(VAULT_META.backupConfirmed){
+      $("vaultStatus").textContent=VAULT_META.migrationComplete?"Po verifikohet enkriptimi i të dhënave...":"Po vazhdohet enkriptimi i të dhënave...";
+      await vaultEnsureMigration();if(!vaultSessionValid(sessionEpoch,sessionUid,VAULT_KEY))return;await vaultStartApp(sessionEpoch);return;
+    }
+    VAULT_RECOVERY_CODE=vaultNewRecoveryCode();
+    var recKey=await vaultRecoveryWrappingKey(VAULT_RECOVERY_CODE);if(!vaultSessionValid(sessionEpoch,sessionUid,VAULT_KEY))return;
+    var recoveryWrap=await vaultWrapRawKey(recKey,raw);if(!vaultSessionValid(sessionEpoch,sessionUid,VAULT_KEY))return;
+    VAULT_META.recoveryWrap=recoveryWrap;
+    await vaultMetaRef().update({recoveryWrap:recoveryWrap});if(!vaultSessionValid(sessionEpoch,sessionUid,VAULT_KEY))return;
+    vaultShowRecoveryStep(true);
+  }catch(e){if(!vaultAuthValid(sessionEpoch,sessionUid))return;VAULT_KEY=null;$("vaultStatus").textContent="Kasaforta nuk u hap: "+vaultErrorText(e);button.disabled=false;}
+}
+async function vaultRecover(){
+  var code=vaultRecoveryBytes($("vaultRecoveryInput").value),pass=$("vaultPassRecover").value,again=$("vaultPassRecoverAgain").value,sessionEpoch=VAULT_SESSION_EPOCH,sessionUid=UID;
+  if(!vaultAuthValid(sessionEpoch,sessionUid))return;
+  if(!code){$("vaultStatus").textContent="Kodi i rikuperimit nuk ka format të saktë.";return;}
+  if(pass.length<16){$("vaultStatus").textContent="Fjalëkalimi i ri duhet të ketë të paktën 16 karaktere.";return;}
+  if(pass!==again){$("vaultStatus").textContent="Fjalëkalimet e reja nuk përputhen.";return;}
+  var button=$("vaultRecover").querySelector("button.btn.full");button.disabled=true;$("vaultStatus").textContent="Po rikuperohet çelësi...";
+  try{
+    var recoveryKey=await vaultRecoveryWrappingKey(code);if(!vaultAuthValid(sessionEpoch,sessionUid))return;
+    var raw=await vaultUnwrapRawKey(recoveryKey,VAULT_META.recoveryWrap);if(!vaultAuthValid(sessionEpoch,sessionUid))return;
+    var dataKey=await vaultImportDataKey(raw);if(!vaultAuthValid(sessionEpoch,sessionUid))return;VAULT_KEY=dataKey;
+    var salt=vaultRandomBytes(16),newWrapKey=await vaultDeriveWrappingKey(pass,salt,VAULT_KDF_ITERATIONS);if(!vaultSessionValid(sessionEpoch,sessionUid,dataKey))return;
+    var passwordWrap=await vaultWrapRawKey(newWrapKey,raw);if(!vaultSessionValid(sessionEpoch,sessionUid,dataKey))return;
+    VAULT_META.passwordSalt=vaultBytesToB64(salt);VAULT_META.iterations=VAULT_KDF_ITERATIONS;VAULT_META.passwordWrap=passwordWrap;
+    VAULT_RECOVERY_CODE=vaultNewRecoveryCode();
+    var newRecoveryKey=await vaultRecoveryWrappingKey(VAULT_RECOVERY_CODE);if(!vaultSessionValid(sessionEpoch,sessionUid,dataKey))return;
+    VAULT_META.recoveryWrap=await vaultWrapRawKey(newRecoveryKey,raw);if(!vaultSessionValid(sessionEpoch,sessionUid,dataKey))return;
+    await vaultMetaRef().update({passwordSalt:VAULT_META.passwordSalt,iterations:VAULT_META.iterations,passwordWrap:VAULT_META.passwordWrap,recoveryWrap:VAULT_META.recoveryWrap});if(!vaultSessionValid(sessionEpoch,sessionUid,dataKey))return;
+    $("vaultRecoveryInput").value="";$("vaultPassRecover").value="";$("vaultPassRecoverAgain").value="";
+    vaultShowRecoveryStep(!VAULT_META.migrationComplete&&!VAULT_META.backupConfirmed);
+  }catch(e){if(!vaultAuthValid(sessionEpoch,sessionUid))return;VAULT_KEY=null;$("vaultStatus").textContent="Rikuperimi dështoi: "+vaultErrorText(e);button.disabled=false;}
+}
+function vaultBackupPayload(bundle){
+  return {format:bundle.format,uid:bundle.uid,exportedAt:bundle.exportedAt,root:bundle.root,collections:bundle.collections};
+}
+async function vaultBackupDigest(bundle){
+  var bytes=new TextEncoder().encode(JSON.stringify(vaultBackupPayload(bundle)));
+  return vaultBytesToHex(new Uint8Array(await crypto.subtle.digest("SHA-256",bytes)));
+}
+async function vaultValidateBackupBundle(bundle){
+  if(!bundle||!(bundle.format==="llogarite-backup-before-e2ee-v1"||bundle.format==="llogarite-backup-before-e2ee-v2"))throw new Error("Formati i kopjes rezervë nuk njihet.");
+  if(bundle.uid!==UID)throw new Error("Kjo kopje rezervë i përket një llogarie tjetër.");
+  if(!bundle.root||typeof bundle.root!=="object"||Array.isArray(bundle.root)||vaultIsEnvelope(bundle.root))throw new Error("Dokumenti i llogarisë në kopje nuk është i vlefshëm.");
+  if(new TextEncoder().encode(JSON.stringify(bundle.root)).length>700*1024)throw new Error("Dokumenti i llogarisë në kopje është shumë i madh për enkriptim.");
+  if(!bundle.collections||typeof bundle.collections!=="object"||Array.isArray(bundle.collections))throw new Error("Mungojnë koleksionet në kopjen rezervë.");
+  var expected=VAULT_COLLECTIONS.slice().sort(),found=Object.keys(bundle.collections).sort();
+  if(expected.length!==found.length||expected.some(function(name,i){return name!==found[i];}))throw new Error("Kopja nuk përmban saktësisht shtatë koleksionet e pritshme.");
+  var count=0;
+  for(var i=0;i<expected.length;i++){
+    var items=bundle.collections[expected[i]],seen=new Set();
+    if(!Array.isArray(items))throw new Error("Të dhënat e “"+expected[i]+"” nuk janë listë.");
+    items.forEach(function(item){
+      if(!item||typeof item.id!=="string"||!item.id||item.id.indexOf("/")>=0||new TextEncoder().encode(item.id).length>1500||!item.data||typeof item.data!=="object"||Array.isArray(item.data)||vaultIsEnvelope(item.data))throw new Error("U gjet një rekord i pavlefshëm te “"+expected[i]+"”.");
+      if(new TextEncoder().encode(JSON.stringify(item.data)).length>700*1024)throw new Error("Rekordi “"+item.id+"” te “"+expected[i]+"” është shumë i madh për enkriptim.");
+      if(seen.has(item.id))throw new Error("ID e përsëritur në kopjen rezervë: "+item.id);
+      seen.add(item.id);count++;
+    });
+  }
+  if(bundle.format==="llogarite-backup-before-e2ee-v2"){
+    if(!bundle.integrity||bundle.integrity.algorithm!=="SHA-256"||typeof bundle.integrity.digest!=="string")throw new Error("Mungon verifikimi i integritetit të kopjes.");
+    if(await vaultBackupDigest(bundle)!==bundle.integrity.digest)throw new Error("Kontrolli i integritetit dështoi: kopja mund të jetë ndryshuar ose dëmtuar.");
+  }
+  return count;
+}
+async function vaultReadLegacyBundle(){
+  var sessionEpoch=VAULT_SESSION_EPOCH,sessionUid=UID,rootRef=db.collection("users").doc(UID);
+  if(!vaultAuthValid(sessionEpoch,sessionUid))throw new Error("Sesioni u mbyll gjatë leximit të kopjes.");
+  var rootSnap=await rootRef.get({source:"server"});
+  if(!vaultAuthValid(sessionEpoch,sessionUid))throw new Error("Sesioni u mbyll gjatë leximit të kopjes.");
+  var bundle={format:"llogarite-backup-before-e2ee-v2",uid:sessionUid,exportedAt:new Date().toISOString(),root:rootSnap.exists?rootSnap.data():{},collections:{}};
+  for(var i=0;i<VAULT_COLLECTIONS.length;i++){
+    var name=VAULT_COLLECTIONS[i],collectionRef=rootRef.collection(name),after=null,records=[];
+    while(true){
+      var snap=await vaultCollectionPage(collectionRef,after);
+      if(!vaultAuthValid(sessionEpoch,sessionUid))throw new Error("Sesioni u mbyll gjatë leximit të kopjes.");
+      records=records.concat(snap.docs.map(function(d){return {id:d.id,data:d.data()};}));
+      if(!snap.docs.length||snap.docs.length<VAULT_PAGE_SIZE)break;
+      after=snap.docs[snap.docs.length-1];
+    }
+    bundle.collections[name]=records;
+  }
+  bundle.integrity={algorithm:"SHA-256",digest:await vaultBackupDigest(bundle)};
+  if(!vaultAuthValid(sessionEpoch,sessionUid))throw new Error("Sesioni u mbyll gjatë leximit të kopjes.");
+  return bundle;
+}
+async function vaultApplyBackupBundle(bundle,confirmed){
+  var sessionEpoch=VAULT_SESSION_EPOCH,sessionUid=UID,sessionKey=VAULT_KEY;
+  if(!sessionKey||!VAULT_META||!VAULT_META.migrationComplete||!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))throw new Error("Hape kasafortën e plotësisht të migruar përpara rikthimit.");
+  if(confirmed!==true)throw new Error("Rikthimi kërkon konfirmim të qartë.");
+  var count=await vaultValidateBackupBundle(bundle);vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+  var userRef=db.collection("users").doc(sessionUid),stopped=false;
+  try{
+    stopVaultListeners();stopped=true;
+    for(var i=0;i<VAULT_COLLECTIONS.length;i++){
+      var name=VAULT_COLLECTIONS[i],collectionRef=userRef.collection(name),target=bundle.collections[name],targetIds=new Set(target.map(function(x){return x.id;})),current=[],after=null;
+      while(true){
+        var page=await vaultCollectionPage(collectionRef,after);vaultAssertSession(sessionEpoch,sessionUid,sessionKey);current=current.concat(page.docs);
+        if(!page.docs.length||page.docs.length<VAULT_PAGE_SIZE)break;
+        after=page.docs[page.docs.length-1];
+      }
+      var ops=[];
+      current.forEach(function(doc){if(!targetIds.has(doc.id))ops.push({kind:"delete",ref:doc.ref});});
+      for(var j=0;j<target.length;j++){
+        vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+        var ref=collectionRef.doc(target[j].id),envelope=await vaultEncryptRecord(target[j].data,ref.path);
+        vaultAssertSession(sessionEpoch,sessionUid,sessionKey);ops.push({kind:"set",ref:ref,data:envelope});
+      }
+      for(var at=0;at<ops.length;at+=400){
+        vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+        var batch=db.batch();ops.slice(at,at+400).forEach(function(op){if(op.kind==="delete")batch.delete(op.ref);else batch.set(op.ref,op.data);});
+        await batch.commit();vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+      }
+      $("vaultRestoreStatus").textContent="U rikthye “"+name+"” ("+target.length+" rekorde).";
+    }
+    var rootEnvelope=await vaultEncryptRecord(bundle.root,userRef.path);vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+    await userRef.set(rootEnvelope);vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+    await vaultVerifyMigration();vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+    $("vaultRestoreStatus").textContent="U rikthyen dhe u enkriptuan të gjitha të dhënat nga kopja (“"+count+"” rekorde).";
+    return count;
+  }finally{if(stopped&&vaultSessionValid(sessionEpoch,sessionUid,sessionKey))start();}
+}
+async function vaultRestoreBackup(){
+  var input=$("vaultRestoreFile"),button=$("vaultRestoreBtn"),status=$("vaultRestoreStatus"),file=input.files&&input.files[0],restoreStarted=false,sessionEpoch=VAULT_SESSION_EPOCH,sessionUid=UID,sessionKey=VAULT_KEY;
+  if(!sessionKey||!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;
+  if(!file){status.textContent="Zgjidh fillimisht skedarin JSON të kopjes rezervë.";return;}
+  button.disabled=true;status.textContent="Po verifikohet kopja rezervë...";
+  try{
+    var bundle=JSON.parse(await file.text()),count=await vaultValidateBackupBundle(bundle);
+    if(!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;
+    if(!confirm("Kjo do të ZËVENDËSOJË në cloud regjistrat aktualë me kopjen nga "+bundle.exportedAt+" ("+count+" rekorde) dhe do t'i enkriptojë sërish. Veprimi nuk kthehet pas. Vazhdo?")){
+      status.textContent="Rikthimi u anulua.";return;
+    }
+    if(!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;
+    restoreStarted=true;status.textContent="Po rikthehen dhe enkriptohen të dhënat...";
+    await vaultApplyBackupBundle(bundle,true);
+  }catch(e){if(vaultSessionValid(sessionEpoch,sessionUid,sessionKey))status.textContent=restoreStarted?"Rikthimi u ndërpre dhe mund të jetë i pjesshëm. Provo përsëri me të njëjtën kopje rezervë; "+vaultErrorText(e):"Rikthimi dështoi para ndryshimeve: "+vaultErrorText(e);}
+  finally{if(vaultSessionValid(sessionEpoch,sessionUid,sessionKey))button.disabled=false;input.value="";}
+}
+async function vaultPrepareBackup(){
+  var button=$("vaultBackupPrepare"),sessionEpoch=VAULT_SESSION_EPOCH,sessionUid=UID;
+  if(!vaultAuthValid(sessionEpoch,sessionUid))return;
+  if(VAULT_META&&!VAULT_META.migrationComplete&&!$("vaultSessionsClosed").checked){$("vaultStatus").textContent="Mbylli versionet e tjera dhe publiko rregullat Firestore para kopjes rezervë.";return;}
+  button.disabled=true;$("vaultStatus").textContent="Po lexohet kopja rezervë nga cloud...";
+  try{
+    var bundle=await vaultReadLegacyBundle(),count=await vaultValidateBackupBundle(bundle);
+    if(!vaultAuthValid(sessionEpoch,sessionUid))return;
+    var blob=new Blob([JSON.stringify(bundle,null,2)],{type:"application/json"});
+    if(VAULT_BACKUP_URL)URL.revokeObjectURL(VAULT_BACKUP_URL);
+    VAULT_BACKUP_URL=URL.createObjectURL(blob);
+    var link=$("vaultBackupLink");link.href=VAULT_BACKUP_URL;link.download="llogarite-backup-para-enkriptimit-"+new Date().toISOString().slice(0,10)+".json";link.style.display="flex";
+    $("vaultStatus").textContent="Kopja u përgatit dhe u verifikua ("+count+" rekorde). SHA-256: "+bundle.integrity.digest+". Shkarko dhe ruaje para migrimit.";
+  }catch(e){if(!vaultAuthValid(sessionEpoch,sessionUid))return;$("vaultStatus").textContent="Kopja rezervë nuk u përgatit: "+vaultErrorText(e);button.disabled=false;}
+}
+function vaultBackupDownloaded(){
+  if(!vaultAuthValid(VAULT_SESSION_EPOCH,UID))return;
+  VAULT_BACKUP_DOWNLOADED=true;$("vaultBackupSaved").disabled=false;
+  $("vaultStatus").textContent="Shkarkimi u nis. Kontrollo që skedari të jetë ruajtur para se të vazhdosh.";
+  vaultUpdateContinue();
+}
+async function vaultContinue(){
+  if($("vaultContinueBtn").disabled)return;
+  var button=$("vaultContinueBtn"),sessionEpoch=VAULT_SESSION_EPOCH,sessionUid=UID,sessionKey=VAULT_KEY;
+  if(!sessionKey||!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;
+  button.disabled=true;
+  try{
+    if(VAULT_NEED_BACKUP&&!VAULT_META.backupConfirmed){
+      VAULT_META.backupConfirmed=true;VAULT_META.backupConfirmedAt=Date.now();
+      await vaultMetaRef().update({backupConfirmed:true,backupConfirmedAt:VAULT_META.backupConfirmedAt});
+      if(!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;
+    }
+    if(!VAULT_META.migrationComplete)button.textContent="Po kriptohen të dhënat...";
+    await vaultEnsureMigration();
+    if(!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;
+    await vaultStartApp(sessionEpoch);
+  }catch(e){
+    if(!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;
+    $("vaultStatus").textContent="Enkriptimi nuk përfundoi. Kopja rezervë nuk u prek; provo sërish kur të kesh internet. "+vaultErrorText(e);
+    button.disabled=false;vaultUpdateContinue();
+  }
+}
+async function vaultMigrateAll(){
+  var sessionEpoch=VAULT_SESSION_EPOCH,sessionUid=UID,sessionKey=VAULT_KEY;
+  vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+  var userRef=db.collection("users").doc(sessionUid),rootSnap=await userRef.get({source:"server"});
+  vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+  if(rootSnap.exists){
+    var rootData=rootSnap.data();
+    if(vaultIsEnvelope(rootData)){await vaultDecryptRecord(rootData,userRef.path);vaultAssertSession(sessionEpoch,sessionUid,sessionKey);}
+    else{var rootEnvelope=await vaultEncryptRecord(rootData,userRef.path);vaultAssertSession(sessionEpoch,sessionUid,sessionKey);await userRef.set(rootEnvelope);vaultAssertSession(sessionEpoch,sessionUid,sessionKey);}
+  }
+  for(var i=0;i<VAULT_COLLECTIONS.length;i++){
+    var name=VAULT_COLLECTIONS[i],collectionRef=userRef.collection(name),after=null,total=0,done=0;
+    while(true){
+      var snapshot=await vaultCollectionPage(collectionRef,after),ops=[];vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+      for(var j=0;j<snapshot.docs.length;j++){
+        var doc=snapshot.docs[j],data=doc.data();vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+        if(vaultIsEnvelope(data)){await vaultDecryptRecord(data,doc.ref.path);vaultAssertSession(sessionEpoch,sessionUid,sessionKey);continue;}
+        var envelope=await vaultEncryptRecord(data,doc.ref.path);vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+        ops.push({ref:doc.ref,data:envelope});
+      }
+      if(ops.length){
+        vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+        var batch=db.batch();ops.forEach(function(op){batch.set(op.ref,op.data);});
+        await batch.commit();vaultAssertSession(sessionEpoch,sessionUid,sessionKey);done+=ops.length;
+      }
+      total+=snapshot.docs.length;
+      $("vaultStatus").textContent="Po kriptohet “"+name+"” — "+done+" nga "+total+" rekorde...";
+      if(!snapshot.docs.length||snapshot.docs.length<VAULT_PAGE_SIZE)break;
+      after=snapshot.docs[snapshot.docs.length-1];
+    }
+    $("vaultStatus").textContent="U përpunua: "+name+" ("+total+" rekorde).";
+  }
+  vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+  await vaultVerifyMigration();
+}
+async function vaultVerifyMigration(){
+  var sessionEpoch=VAULT_SESSION_EPOCH,sessionUid=UID,sessionKey=VAULT_KEY;
+  vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+  var userRef=db.collection("users").doc(sessionUid),rootSnap=await userRef.get({source:"server"});
+  vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+  if(rootSnap.exists){
+    var rootData=rootSnap.data();
+    if(!vaultIsEnvelope(rootData))throw new Error("Dokumenti i llogarisë ende përmban tekst të thjeshtë.");
+    await vaultDecryptRecord(rootData,userRef.path);vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+  }
+  for(var i=0;i<VAULT_COLLECTIONS.length;i++){
+    var name=VAULT_COLLECTIONS[i],collectionRef=userRef.collection(name),after=null;
+    while(true){
+      var snapshot=await vaultCollectionPage(collectionRef,after);vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+      for(var j=0;j<snapshot.docs.length;j++){
+        var value=snapshot.docs[j].data();
+        if(!vaultIsEnvelope(value))throw new Error("U gjet të paktën një rekord pa enkriptim te “"+name+"”.");
+        await vaultDecryptRecord(value,snapshot.docs[j].ref.path);vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+      }
+      if(!snapshot.docs.length||snapshot.docs.length<VAULT_PAGE_SIZE)break;
+      after=snapshot.docs[snapshot.docs.length-1];
+    }
+  }
+}
+async function vaultFinishMigration(){
+  var sessionEpoch=VAULT_SESSION_EPOCH,sessionUid=UID,sessionKey=VAULT_KEY;
+  vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+  if(!VAULT_META||!VAULT_META.backupConfirmed)throw new Error("Kopja rezervë duhet të konfirmohet para migrimit.");
+  await vaultMigrateAll();vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+  VAULT_META.migrationComplete=true;VAULT_META.migrationCompletedAt=Date.now();
+  await vaultMetaRef().update({migrationComplete:true,migrationCompletedAt:VAULT_META.migrationCompletedAt});vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+}
+async function vaultEnsureMigration(){
+  var sessionEpoch=VAULT_SESSION_EPOCH,sessionUid=UID,sessionKey=VAULT_KEY;
+  vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+  if(!VAULT_META||!VAULT_META.backupConfirmed)throw new Error("Kopja rezervë duhet të konfirmohet para hapjes së aplikacionit.");
+  if(!VAULT_META.migrationComplete){await vaultFinishMigration();vaultAssertSession(sessionEpoch,sessionUid,sessionKey);return;}
+  try{await vaultVerifyMigration();vaultAssertSession(sessionEpoch,sessionUid,sessionKey);}
+  catch(error){
+    vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+    VAULT_META.migrationComplete=false;await vaultMetaRef().update({migrationComplete:false});vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+    await vaultFinishMigration();vaultAssertSession(sessionEpoch,sessionUid,sessionKey);
+  }
+}
+async function vaultStartApp(epoch){
+  if(!vaultAuthValid(epoch,UID)||!VAULT_KEY||VAULT_FLOW_UID!==UID)throw new Error("Llogaria u mbyll; hape sërish për të vazhduar.");
+  if(!VAULT_META||!VAULT_META.backupConfirmed||!VAULT_META.migrationComplete)throw new Error("Migrimi dhe kopja rezervë duhet të përfundojnë para hapjes së aplikacionit.");
+  document.body.classList.remove("auth-gate");$("gate").style.display="none";$("vaultCard").style.display="none";$("app").style.display="block";
+  $("whoami").textContent="I lidhur si "+(auth.currentUser&&auth.currentUser.email||"")+" · të dhënat janë të enkriptuara në cloud";
+  VAULT_FLOW_UID=UID;start();
+}
+function vaultFatal(error){
+  console.error("Private vault could not be opened",error);
+  VAULT_SESSION_EPOCH++;stopVaultListeners();VAULT_KEY=null;VAULT_RECOVERY_CODE="";clearVaultMemory();
+  document.body.classList.add("auth-gate");$("gate").style.display="flex";$("app").style.display="none";$("authCard").style.display="none";$("vaultCard").style.display="block";
+  $("vaultTitle").textContent="Kasaforta nuk u hap";$("vaultLead").textContent="Të dhënat mbeten të fshehura.";
+  ["vaultSetup","vaultUnlock","vaultRecover","vaultRecoveryStep"].forEach(function(x){$(x).style.display="none";});
+  $("vaultStatus").textContent=vaultErrorText(error);$("vaultSignOut").style.display="block";
+}
+function vaultSnapshotError(error,callback){if(callback)callback(error);else console.error("Encrypted Firestore snapshot failed",error);}
+function vaultWrapDoc(rawRef){
+  var wrapped={id:rawRef.id,__vaultRawRef:rawRef,
+    set:function(data,options){return vaultWriteDoc(rawRef,"set",data,options);},
+    update:function(data){return vaultWriteDoc(rawRef,"update",data);},
+    delete:function(){if(!vaultSessionValid(VAULT_SESSION_EPOCH,UID,VAULT_KEY))return Promise.reject(new Error("Kasaforta është e kyçur."));return rawRef.delete();},
+    get:function(options){
+      var epoch=VAULT_SESSION_EPOCH,uid=UID,key=VAULT_KEY;
+      if(!key||!vaultSessionValid(epoch,uid,key))return Promise.reject(new Error("Kasaforta është e kyçur."));
+      return rawRef.get(options).then(async function(s){
+        if(!vaultSessionValid(epoch,uid,key))throw new Error("Sesioni u mbyll gjatë leximit.");
+        var clear=s.exists?await vaultDecryptRecord(s.data(),rawRef.path):{};
+        if(!vaultSessionValid(epoch,uid,key))throw new Error("Sesioni u mbyll gjatë leximit.");
+        return {id:s.id,exists:s.exists,data:function(){return clear;}};
+      });
+    },
+    onSnapshot:function(callback,error){
+      var epoch=VAULT_SESSION_EPOCH,uid=UID,key=VAULT_KEY,version=0,closed=false;
+      if(!key)return function(){};
+      var unsub=rawRef.onSnapshot(function(s){
+        if(closed||!vaultSessionValid(epoch,uid,key))return;
+        var current=++version;
+        Promise.resolve().then(async function(){var clear=s.exists?await vaultDecryptRecord(s.data(),rawRef.path):{};return {id:s.id,exists:s.exists,data:function(){return clear;}};})
+          .then(function(value){if(!closed&&current===version&&vaultSessionValid(epoch,uid,key))callback(value);})
+          .catch(function(e){if(!closed&&current===version&&vaultSessionValid(epoch,uid,key))vaultSnapshotError(e,error);});
+      },function(e){if(!closed&&vaultSessionValid(epoch,uid,key))vaultSnapshotError(e,error);});
+      return function(){closed=true;version++;unsub();};
+    },
+    collection:function(name){return vaultWrapCollection(rawRef.collection(name));}
+  };
+  return wrapped;
+}
+function vaultWrapCollection(rawCollection){
+  return {
+    doc:function(id){return vaultWrapDoc(id==null?rawCollection.doc():rawCollection.doc(id));},
+    add:function(data){var ref=rawCollection.doc();return vaultWriteDoc(ref,"set",data).then(function(){return vaultWrapDoc(ref);});},
+    get:function(options){
+      var epoch=VAULT_SESSION_EPOCH,uid=UID,key=VAULT_KEY;
+      if(!key||!vaultSessionValid(epoch,uid,key))return Promise.reject(new Error("Kasaforta është e kyçur."));
+      return rawCollection.get(options).then(async function(s){
+        if(!vaultSessionValid(epoch,uid,key))throw new Error("Sesioni u mbyll gjatë leximit.");
+        var docs=await Promise.all(s.docs.map(async function(d){var clear=await vaultDecryptRecord(d.data(),d.ref.path);return {id:d.id,data:function(){return clear;}};}));
+        if(!vaultSessionValid(epoch,uid,key))throw new Error("Sesioni u mbyll gjatë leximit.");
+        return {docs:docs};
+      });
+    },
+    onSnapshot:function(callback,error){
+      var epoch=VAULT_SESSION_EPOCH,uid=UID,key=VAULT_KEY,version=0,closed=false;
+      if(!key)return function(){};
+      var unsub=rawCollection.onSnapshot(function(s){
+        if(closed||!vaultSessionValid(epoch,uid,key))return;
+        var current=++version;
+        Promise.all(s.docs.map(async function(d){var clear=await vaultDecryptRecord(d.data(),d.ref.path);return {id:d.id,data:function(){return clear;}};}))
+          .then(function(docs){if(!closed&&current===version&&vaultSessionValid(epoch,uid,key))callback({docs:docs});})
+          .catch(function(e){if(!closed&&current===version&&vaultSessionValid(epoch,uid,key))vaultSnapshotError(e,error);});
+      },function(e){if(!closed&&vaultSessionValid(epoch,uid,key))vaultSnapshotError(e,error);});
+      return function(){closed=true;version++;unsub();};
+    }
+  };
+}
+async function vaultWriteDoc(rawRef,kind,data,options){
+  var epoch=VAULT_SESSION_EPOCH,uid=UID,key=VAULT_KEY;
+  if(!key||!vaultSessionValid(epoch,uid,key))throw new Error("Kasaforta është e kyçur.");
+  var payload=data==null?{}:data,merge=kind==="update"||(options&&options.merge);
+  if(merge){
+    var snap=await rawRef.get(),existing={};
+    if(!vaultSessionValid(epoch,uid,key))throw new Error("Sesioni u mbyll gjatë ruajtjes.");
+    if(kind==="update"&&!snap.exists)throw new Error("Rekordi për ndryshim nuk u gjet.");
+    if(snap.exists)existing=await vaultDecryptRecord(snap.data(),rawRef.path);
+    payload=vaultDeepMerge(existing,payload);
+  }
+  var envelope=await vaultEncryptRecord(payload,rawRef.path);
+  if(!vaultSessionValid(epoch,uid,key))throw new Error("Sesioni u mbyll gjatë ruajtjes.");
+  return rawRef.set(envelope);
+}
+function vaultBatch(){
+  var operations=[];
+  return {
+    set:function(ref,data,options){if(!ref||!ref.__vaultRawRef)throw new Error("Batch kërkon një dokument të kasafortës.");operations.push({kind:"set",ref:ref.__vaultRawRef,data:data,options:options||{}});return this;},
+    update:function(ref,data){if(!ref||!ref.__vaultRawRef)throw new Error("Batch kërkon një dokument të kasafortës.");operations.push({kind:"update",ref:ref.__vaultRawRef,data:data});return this;},
+    delete:function(ref){if(!ref||!ref.__vaultRawRef)throw new Error("Batch kërkon një dokument të kasafortës.");operations.push({kind:"delete",ref:ref.__vaultRawRef});return this;},
+    commit:async function(){
+      var epoch=VAULT_SESSION_EPOCH,uid=UID,key=VAULT_KEY;
+      if(!key||!vaultSessionValid(epoch,uid,key))throw new Error("Kasaforta është e kyçur.");
+      var prepared=await Promise.all(operations.map(async function(op){
+        if(!vaultSessionValid(epoch,uid,key))throw new Error("Sesioni u mbyll gjatë ruajtjes.");
+        if(op.kind==="delete")return op;
+        var payload=op.data==null?{}:op.data,merge=op.kind==="update"||(op.options&&op.options.merge);
+        if(merge){var snap=await op.ref.get(),existing={};if(op.kind==="update"&&!snap.exists)throw new Error("Rekordi për ndryshim nuk u gjet.");if(snap.exists)existing=await vaultDecryptRecord(snap.data(),op.ref.path);payload=vaultDeepMerge(existing,payload);}
+        return {kind:"set",ref:op.ref,data:await vaultEncryptRecord(payload,op.ref.path)};
+      }));
+      if(!vaultSessionValid(epoch,uid,key))throw new Error("Sesioni u mbyll gjatë ruajtjes.");
+      var batch=db.batch();prepared.forEach(function(op){if(op.kind==="delete")batch.delete(op.ref);else batch.set(op.ref,op.data);});
+      return batch.commit();
+    }
+  };
+}
 
 /* ---------- state ---------- */
 let DEBTS=[],DEBT_HISTORY=[],DEBT_HISTORY_ERROR=null,DEBT_HISTORY_LOADED=false;
@@ -1033,7 +1792,24 @@ let ARCHIVE_PURGE_BUSY=false,ARCHIVE_PURGE_DONE_UID="";
 let RENT=[],EXP=[],FOLDERS=[],NOTES=[],SET={currency:"LEK",rent:0};
 let YEAR=new Date().getFullYear(), MIDX=new Date().getMonth(), MYEAR=new Date().getFullYear();
 let VIEW="home", DF="open", DTYPE="in", OPEN_FOLDER_ID=null, NOTE_EDIT=null, FOLDER_DELETE_BUSY=false, DEBT_OPEN_GROUPS=Object.create(null);
-const col=n=>db.collection("users").doc(UID).collection(n);
+function clearVaultMemory(){
+  CLIENTS=[];DEBTS=[];DEBT_HISTORY=[];DEBT_HISTORY_ERROR=null;CLIENTS_LOADED=false;DEBTS_LOADED=false;DEBT_HISTORY_LOADED=false;
+  CLIENT_MIGRATION_BUSY=false;CLIENT_MIGRATION_ERROR=null;CLIENT_DETAIL_ID=null;CLIENT_CREDIT_BUSY.clear();CLIENT_LIST_FILTER="all";
+  ARCHIVE_PURGE_BUSY=false;ARCHIVE_PURGE_DONE_UID="";RENT=[];EXP=[];FOLDERS=[];NOTES=[];SET={currency:"LEK",rent:0};CUR="LEK";
+  VIEW="home";DF="open";DTYPE="in";OPEN_FOLDER_ID=null;NOTE_EDIT=null;FOLDER_DELETE_BUSY=false;DEBT_OPEN_GROUPS=Object.create(null);
+  try{
+    if($("sheet"))$("sheet").innerHTML="";if($("modal"))$("modal").classList.remove("on");
+    if($("printArea"))$("printArea").innerHTML="";if($("printBar"))$("printBar").style.display="none";document.body.classList.remove("printing");
+    ["pw","vaultPassNew","vaultPassAgain","vaultPassUnlock","vaultRecoveryInput","vaultPassRecover","vaultPassRecoverAgain","vaultRecoveryDisplay","vaultRestoreFile"].forEach(function(id){if($(id))$(id).value="";});
+    ["vaultRecoverySaved","vaultSessionsClosed","vaultBackupSaved"].forEach(function(id){if($(id))$(id).checked=false;});
+    if($("vaultBackupSaved"))$("vaultBackupSaved").disabled=true;if($("vaultBackupLink")){$("vaultBackupLink").style.display="none";$("vaultBackupLink").href="#";}
+    if($("vaultContinueBtn"))$("vaultContinueBtn").disabled=true;
+    if($("vaultStatus"))$("vaultStatus").textContent="";if($("vaultRestoreStatus"))$("vaultRestoreStatus").textContent="";
+    render();
+  }catch(e){}
+}
+const userDoc=()=>vaultWrapDoc(db.collection("users").doc(UID));
+const col=n=>userDoc().collection(n);
 
 function debtHistoryGroupRef(name,type){
   var display=String(name||"").trim()||"Pa emër",direction=type==="out"?"out":"in";
@@ -1087,7 +1863,7 @@ function debtHistoryEventsForExisting(d,events){
   return events;
 }
 function commitDebtAudit(changes,events){
-  var batch=db.batch();
+  var batch=vaultBatch();
   (changes||[]).forEach(function(change){
     var ref=col(change.collection||"debts").doc(change.id);
     if(change.op==="set")batch.set(ref,change.data);
@@ -1118,7 +1894,7 @@ function commitCloudChanges(changes){
   changes=changes||[];var at=0,chunkSize=450;
   function next(){
     if(at>=changes.length)return Promise.resolve();
-    var batch=db.batch(),slice=changes.slice(at,at+chunkSize);at+=slice.length;
+    var batch=vaultBatch(),slice=changes.slice(at,at+chunkSize);at+=slice.length;
     slice.forEach(function(change){
       var ref=col(change.collection||"debts").doc(change.id);
       if(change.op==="delete")batch.delete(ref);
@@ -1208,23 +1984,27 @@ function deleteDebtPermanently(id){
   return commitCloudChanges(changes).then(function(){applyLocalHistoryChanges(changes);});
 }
 
+function stopVaultListeners(){
+  VAULT_UNSUBS.splice(0).forEach(function(unsub){try{if(typeof unsub==="function")unsub();}catch(e){}});
+}
 function start(){
+  stopVaultListeners();
   CLIENTS=[];DEBTS=[];DEBT_HISTORY=[];CLIENTS_LOADED=false;DEBTS_LOADED=false;DEBT_HISTORY_LOADED=false;
   CLIENT_MIGRATION_BUSY=false;CLIENT_MIGRATION_ERROR=null;CLIENT_DETAIL_ID=null;CLIENT_CREDIT_BUSY.clear();
   ARCHIVE_PURGE_BUSY=false;ARCHIVE_PURGE_DONE_UID="";
-  db.collection("users").doc(UID).onSnapshot(d=>{
+  VAULT_UNSUBS.push(userDoc().onSnapshot(d=>{
     SET=Object.assign({currency:"LEK",rent:0},d.data()||{});
     CUR=SET.currency||"LEK";$("curInp").value=CUR;
     if(document.activeElement!==$("rentAmt"))$("rentAmt").value=SET.rent||"";
     render();
-  });
-  col("clients").onSnapshot(s=>{CLIENTS=s.docs.map(d=>({id:d.id,...d.data()}));CLIENTS_LOADED=true;syncLegacyClients();render();},e=>{CLIENTS_LOADED=true;CLIENT_MIGRATION_ERROR=e;console.warn("Clients could not be read",e);render();});
-  col("debts").onSnapshot(s=>{DEBTS=s.docs.map(d=>({id:d.id,...d.data()}));DEBTS_LOADED=true;maybePurgeArchivedDebtHistory();syncLegacyClients();render();});
-  col("debtHistory").onSnapshot(s=>{DEBT_HISTORY_LOADED=true;DEBT_HISTORY_ERROR=null;DEBT_HISTORY=s.docs.map(d=>({id:d.id,...d.data()}));maybePurgeArchivedDebtHistory();syncLegacyClients();render();},e=>{DEBT_HISTORY_LOADED=true;DEBT_HISTORY_ERROR=e;console.warn("Debt history could not be read",e);render();});
-  col("rent").onSnapshot(s=>{RENT=s.docs.map(d=>({id:d.id,...d.data()}));render();});
-  col("expenses").onSnapshot(s=>{EXP=s.docs.map(d=>({id:d.id,...d.data()}));render();});
-  col("noteFolders").onSnapshot(s=>{FOLDERS=s.docs.map(d=>({id:d.id,...d.data()}));render();});
-  col("notes").onSnapshot(s=>{NOTES=s.docs.map(d=>({id:d.id,...d.data()}));render();});
+  },e=>vaultSnapshotError(e)));
+  VAULT_UNSUBS.push(col("clients").onSnapshot(s=>{CLIENTS=s.docs.map(d=>({id:d.id,...d.data()}));CLIENTS_LOADED=true;syncLegacyClients();render();},e=>{CLIENTS_LOADED=true;CLIENT_MIGRATION_ERROR=e;console.warn("Clients could not be read",e);render();}));
+  VAULT_UNSUBS.push(col("debts").onSnapshot(s=>{DEBTS=s.docs.map(d=>({id:d.id,...d.data()}));DEBTS_LOADED=true;maybePurgeArchivedDebtHistory();syncLegacyClients();render();},e=>vaultSnapshotError(e)));
+  VAULT_UNSUBS.push(col("debtHistory").onSnapshot(s=>{DEBT_HISTORY_LOADED=true;DEBT_HISTORY_ERROR=null;DEBT_HISTORY=s.docs.map(d=>({id:d.id,...d.data()}));maybePurgeArchivedDebtHistory();syncLegacyClients();render();},e=>{DEBT_HISTORY_LOADED=true;DEBT_HISTORY_ERROR=e;console.warn("Debt history could not be read",e);render();}));
+  VAULT_UNSUBS.push(col("rent").onSnapshot(s=>{RENT=s.docs.map(d=>({id:d.id,...d.data()}));render();},e=>vaultSnapshotError(e)));
+  VAULT_UNSUBS.push(col("expenses").onSnapshot(s=>{EXP=s.docs.map(d=>({id:d.id,...d.data()}));render();},e=>vaultSnapshotError(e)));
+  VAULT_UNSUBS.push(col("noteFolders").onSnapshot(s=>{FOLDERS=s.docs.map(d=>({id:d.id,...d.data()}));render();},e=>vaultSnapshotError(e)));
+  VAULT_UNSUBS.push(col("notes").onSnapshot(s=>{NOTES=s.docs.map(d=>({id:d.id,...d.data()}));render();},e=>vaultSnapshotError(e)));
 }
 
 /* ---------- nav ---------- */
@@ -1740,7 +2520,7 @@ function syncLegacyClients(){
   var at=0;
   function nextChunk(){
     if(at>=jobs.length)return Promise.resolve();
-    var batch=db.batch(),slice=jobs.slice(at,at+400);at+=slice.length;
+    var batch=vaultBatch(),slice=jobs.slice(at,at+400);at+=slice.length;
     slice.forEach(function(job){
       if(job.kind==="client")batch.set(col("clients").doc(job.id),job.data,{merge:true});
       else batch.update(col("debts").doc(job.id),job.data);
@@ -2470,11 +3250,11 @@ const rentOf=(y,m)=>RENT.find(r=>r.id===rentKey(y,m));
 const rentPaid=r=>(r?.payments||[]).reduce((s,p)=>s+(+p.amount||0),0);
 
 function saveRentAmt(){
-  db.collection("users").doc(UID).set({rent:+$("rentAmt").value||0},{merge:true});toast("U ruajt");
+  userDoc().set({rent:+$("rentAmt").value||0},{merge:true});toast("U ruajt");
 }
 function saveRentStart(){
   var v=$("rentStart").value||"";
-  db.collection("users").doc(UID).set({rentStart:v},{merge:true});toast("U ruajt");
+  userDoc().set({rentStart:v},{merge:true});toast("U ruajt");
 }
 
 /* muaji i parë që llogaritet: fillimi i qirasë, ose muaji më i hershëm me të dhëna */
@@ -2509,7 +3289,7 @@ function arrearsTotal(){
   return unpaidMonths().reduce(function(s,x){return s+x.rest;},0);
 }
 function saveCur(){
-  db.collection("users").doc(UID).set({currency:($("curInp").value.trim()||"LEK")},{merge:true});toast("U ruajt");
+  userDoc().set({currency:($("curInp").value.trim()||"LEK")},{merge:true});toast("U ruajt");
 }
 
 function rentPayForm(y,m){
@@ -2628,7 +3408,7 @@ async function bulkSave(){
   var meth=$("b_m").querySelector(".on").dataset.m;
   var dt=$("b_d").value, no=$("b_no").value.trim(), ts=Date.now();
   var groupId="rent-bulk-"+ts+"-"+Math.random().toString(36).slice(2,8);
-  var batch=db.batch();
+  var batch=vaultBatch();
   res.plan.forEach(function(x,i){
     var r=RENT.find(function(q){return q.id===x.key;});
     var ps=(r&&r.payments?r.payments.slice():[]);
@@ -2669,12 +3449,12 @@ function depSave(){
     status:$("d_s").querySelector(".on").dataset.m,
     note:$("d_no").value.trim()};
   if(!o.amount){alert("Vendos shum\u00ebn e kaparit.");return;}
-  db.collection("users").doc(UID).set({deposit:o},{merge:true});
+  userDoc().set({deposit:o},{merge:true});
   closeM();toast("Kapari u ruajt");
 }
 function depDel(){
   if(!confirm("T\u00eb fshihet kapari?"))return;
-  db.collection("users").doc(UID).set({deposit:null},{merge:true});
+  userDoc().set({deposit:null},{merge:true});
   closeM();toast("U fshi");
 }
 
