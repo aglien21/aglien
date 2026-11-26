@@ -681,6 +681,7 @@ body.compact-ui #vaultRecoveryDisplay{resize:vertical}
       <div id="vaultUnlock" style="display:none">
         <label for="vaultPassUnlock">Fjalëkalimi privat</label>
         <input id="vaultPassUnlock" type="password" autocomplete="current-password" maxlength="512" placeholder="Fjalëkalimi i kasafortës">
+        <p class="muted" style="font-size:12px;line-height:1.45;margin:7px 0">Fjalëkalimi i kasafortës kërkohet një herë në çdo profil të ri të shfletuesit. Pastaj çelësi mbahet lokalisht për hyrje të lehtë. Nëse dëshiron që kjo pajisje ta kërkojë sërish, shko te Cilësimet → Llogaria → Hiq çelësin e ruajtur.</p>
         <button class="btn full" style="margin-top:9px" id="vaultUnlockBtn" onclick="vaultUnlock()">Hap kasafortën</button>
         <button class="btn sec full sm" style="margin-top:7px" onclick="vaultShowRecovery()">Kam kodin e rikuperimit</button>
       </div>
@@ -699,6 +700,7 @@ body.compact-ui #vaultRecoveryDisplay{resize:vertical}
       <div id="vaultRecoveryStep" style="display:none">
         <p class="muted" style="margin:0 0 5px">Ruaje këtë kod jashtë telefonit. Pa fjalëkalimin privat ose këtë kod, të dhënat nuk rikuperohen.</p>
         <textarea id="vaultRecoveryDisplay" rows="3" readonly spellcheck="false" style="font-family:monospace;font-size:14px;letter-spacing:1px"></textarea>
+        <p class="muted" style="font-size:12px;line-height:1.45;margin:7px 0">Pas përfundimit, çelësi ruhet në këtë profil të shfletuesit që hyrja e përditshme të bëhet me emailin dhe fjalëkalimin e zakonshëm. Nëse dëshiron që pajisja ta kërkojë sërish fjalëkalimin e kasafortës, përdor Cilësimet → Llogaria → Hiq çelësin e ruajtur.</p>
         <div id="vaultMigrationAck">
           <p class="vault-warning">Para kopjes rezervë dhe enkriptimit: mbylli kopjet e vjetra në pajisjet e tjera dhe publiko rregullat Firestore të dorëzuara me aplikacionin. Pa rregullat, një version i vjetër mund të shkruajë përsëri tekst të thjeshtë.</p>
           <label class="vault-check"><input type="checkbox" id="vaultSessionsClosed" onchange="vaultUpdateContinue()"> I mbylla kopjet e vjetra në pajisjet e tjera dhe publikova rregullat Firestore për enkriptim.</label>
@@ -728,8 +730,7 @@ body.compact-ui #vaultRecoveryDisplay{resize:vertical}
     <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.9 13A8.7 8.7 0 0 1 11 3.1a9 9 0 1 0 9.9 9.9Z"></path></svg>
     <span class="theme-label">Errët</span>
   </button>
-  <button class="btn sec sm" onclick="lockVault()" title="Blloko të dhënat në këtë pajisje">Blloko</button>
-  <button class="btn sec sm" onclick="logout()">Dil</button>
+  <button class="btn sec sm" onclick="logout()" title="Dil nga llogaria; çelësi mbahet në këtë pajisje për hyrjen tjetër.">Dil</button>
 </header>
 <div class="wrap">
 
@@ -898,7 +899,20 @@ body.compact-ui #vaultRecoveryDisplay{resize:vertical}
     <div class="card">
       <h3>Llogaria</h3>
       <p class="muted" id="whoami" style="margin:8px 0 0"></p>
-      <p class="muted">Pas përfundimit të migrimit, përmbajtja e regjistrave ruhet e enkriptuar në Firebase; derisa të konfirmohet migrimi, disa rekorde të vjetra mund të mbeten të lexueshme nga cloud. Për t’i hapur në një pajisje tjetër duhen llogaria jote dhe fjalëkalimi privat i kasafortës.</p>
+      <p class="muted">Pas përfundimit të migrimit, përmbajtja e regjistrave ruhet e enkriptuar në Firebase; derisa të konfirmohet migrimi, disa rekorde të vjetra mund të mbeten të lexueshme nga cloud. Në një pajisje të re, zhbllokoje kasafortën një herë me fjalëkalimin e saj.</p>
+    </div>
+    <div class="card">
+      <h3>Kjo pajisje</h3>
+      <p class="muted">Për hyrje të lehtë, çelësi mbahet lokalisht në këtë profil të shfletuesit. Ky veprim e heq çelësin lokal; hyrja tjetër do të kërkojë fjalëkalimin e kasafortës. Nuk ndryshon ose fshin të dhënat e enkriptuara në cloud.</p>
+      <button class="btn sec full sm" id="forgetVaultDeviceBtn" style="margin-top:8px" onclick="lockVault()">Hiq çelësin e ruajtur</button>
+    </div>
+    <div class="card">
+      <h3>Kodi i rikuperimit</h3>
+      <p class="muted">Nëse e humbe kodin, por e di fjalëkalimin privat të kasafortës, krijo një kod të ri këtu. Kodi i vjetër do të bëhet i pavlefshëm. Ruaje kodin e ri jashtë telefonit; nuk ruhet i lexueshëm në Firebase.</p>
+      <label for="vaultRotatePass">Fjalëkalimi privat aktual</label>
+      <input id="vaultRotatePass" type="password" autocomplete="current-password" maxlength="512" placeholder="Fjalëkalimi i kasafortës">
+      <button class="btn sec full sm" id="vaultRotateRecoveryBtn" style="margin-top:8px" onclick="vaultRotateRecoveryCode()">Krijo kod të ri rikuperimi</button>
+      <p id="vaultRotateStatus" role="status" aria-live="polite" class="muted" style="margin:8px 0 0"></p>
     </div>
     <div class="card">
       <h3>Monedha</h3>
@@ -1095,7 +1109,7 @@ function getCfg(){
   return BUILTIN_CFG;
 }
 
-let db,auth,UID=null,VAULT_KEY=null,VAULT_META=null,VAULT_FLOW_UID="",VAULT_RECOVERY_CODE="",VAULT_BACKUP_URL="",VAULT_BACKUP_DOWNLOADED=false,DB_READY_ERROR=null,VAULT_SESSION_EPOCH=0;
+let db,auth,UID=null,VAULT_KEY=null,VAULT_META=null,VAULT_FLOW_UID="",VAULT_RECOVERY_CODE="",VAULT_BACKUP_URL="",VAULT_BACKUP_DOWNLOADED=false,DB_READY_ERROR=null,VAULT_SESSION_EPOCH=0,VAULT_SKIP_DEVICE_UNLOCK_UID="",VAULT_PENDING_RECOVERY_WRAP=null,VAULT_PENDING_RECOVERY_CODE="";
 let DB_READY=Promise.resolve(),VAULT_UNSUBS=[];
 const VAULT_META_COLLECTION="_vault",VAULT_META_DOC="key-v1",VAULT_KDF_ITERATIONS=600000,VAULT_PAGE_SIZE=250;
 const VAULT_COLLECTIONS=["clients","debts","debtHistory","rent","expenses","noteFolders","notes"];
@@ -1147,6 +1161,15 @@ function init(){
   });
 }
 window.addEventListener("load",init);
+window.addEventListener("storage",function(event){
+  var uid=UID,user=auth&&auth.currentUser,value=event.newValue||"";
+  if(event.key!==VAULT_DEVICE_LOCK_MARKER||!uid||!VAULT_KEY||!user||user.uid!==uid||(value!==String(uid)&&value.indexOf(String(uid)+"|")!==0))return;
+  var epoch=++VAULT_SESSION_EPOCH;
+  VAULT_SKIP_DEVICE_UNLOCK_UID=String(uid);stopVaultListeners();VAULT_KEY=null;VAULT_META=null;VAULT_RECOVERY_CODE="";clearVaultMemory();
+  document.body.classList.add("auth-gate");$("gate").style.display="flex";$("app").style.display="none";$("authCard").style.display="none";$("vaultCard").style.display="block";
+  $("vaultTitle").textContent="Kasaforta u bllokua në një skedë tjetër";$("vaultLead").textContent="Shkruaj fjalëkalimin privat për ta hapur përsëri.";
+  vaultEnter(user,epoch).catch(function(e){if(vaultAuthValid(epoch,uid))vaultFatal(e);});
+});
 
 let AMODE="in";
 function authMode(m){AMODE=m;$("tabIn").classList.toggle("on",m==="in");$("tabUp").classList.toggle("on",m==="up");
@@ -1196,10 +1219,22 @@ function doAuth(){
 function logout(){
   VAULT_SESSION_EPOCH++;stopVaultListeners();VAULT_KEY=null;VAULT_META=null;clearVaultMemory();
   document.body.classList.add("auth-gate");$("gate").style.display="flex";$("app").style.display="none";$("authCard").style.display="none";$("vaultCard").style.display="block";
-  $("vaultTitle").textContent="Po mbyllet sesioni...";$("vaultLead").textContent="";$("vaultStatus").textContent="";$("vaultSignOut").style.display="none";
+  $("vaultTitle").textContent="Po mbyllet sesioni...";$("vaultLead").textContent="Kjo pajisje mbetet e besuar. Për të hequr çelësin lokal, përdor Cilësimet → Llogaria → Hiq çelësin e ruajtur.";$("vaultStatus").textContent="";$("vaultSignOut").style.display="none";
   if(auth)auth.signOut().catch(function(e){$("vaultTitle").textContent="Sesioni nuk u mbyll";$("vaultStatus").textContent="Provo të dalësh përsëri.";$("vaultSignOut").style.display="block";});
 }
-function lockVault(){VAULT_SESSION_EPOCH++;stopVaultListeners();VAULT_KEY=null;VAULT_META=null;clearVaultMemory();location.reload();}
+async function lockVault(){
+  var uid=UID,user=auth&&auth.currentUser;
+  if(!uid||!user)return;
+  var epoch=++VAULT_SESSION_EPOCH,markerSet=vaultDeviceRequirePassword(uid),removed=false;
+  VAULT_SKIP_DEVICE_UNLOCK_UID=String(uid);stopVaultListeners();VAULT_KEY=null;VAULT_META=null;VAULT_RECOVERY_CODE="";clearVaultMemory();
+  document.body.classList.add("auth-gate");$("gate").style.display="flex";$("app").style.display="none";$("authCard").style.display="none";$("vaultCard").style.display="block";
+  $("vaultTitle").textContent="Po bllokohet kasaforta...";$("vaultLead").textContent="Çelësi i ruajtur po hiqet nga ky shfletues.";$("vaultStatus").textContent="";$("vaultSignOut").style.display="block";
+  try{removed=await vaultDeviceKeyDelete(uid);}catch(e){console.warn("Could not remove remembered device key",e);}
+  if(!vaultAuthValid(epoch,uid))return;
+  try{await vaultEnter(user,epoch);}catch(e){if(vaultAuthValid(epoch,uid))vaultFatal(e);return;}
+  if(!vaultAuthValid(epoch,uid))return;
+  if(!removed||!markerSet)$("vaultStatus").textContent="U bllokua kjo faqe, por ruajtja lokale nuk u konfirmua. Mbyll edhe skedat e tjera të aplikacionit para se të largohesh.";
+}
 
 function prepareFirestoreCache(){
   return (async function(){
@@ -1268,6 +1303,83 @@ async function vaultUnwrapRawKey(wrappingKey,wrapped){
 async function vaultImportDataKey(raw){
   return crypto.subtle.importKey("raw",raw,{name:"AES-GCM"},false,["encrypt","decrypt"]);
 }
+const VAULT_DEVICE_DB="llogarite-vault-device-v1",VAULT_DEVICE_STORE="keys",VAULT_DEVICE_LOCK_MARKER="llogarite-vault-require-password-v1";
+function vaultDeviceKeyValid(key){
+  var usages=key&&key.usages?Array.from(key.usages):[];
+  return !!(key&&key.type==="secret"&&key.algorithm&&key.algorithm.name==="AES-GCM"&&!key.extractable&&usages.indexOf("encrypt")!==-1&&usages.indexOf("decrypt")!==-1);
+}
+function vaultDeviceOpenDb(){
+  return new Promise(function(resolve,reject){
+    if(!window.indexedDB){reject(new Error("Ky shfletues nuk mbështet IndexedDB."));return;}
+    var request;
+    try{request=window.indexedDB.open(VAULT_DEVICE_DB,1);}catch(e){reject(e);return;}
+    request.onupgradeneeded=function(){var db=request.result;if(!db.objectStoreNames.contains(VAULT_DEVICE_STORE))db.createObjectStore(VAULT_DEVICE_STORE);};
+    request.onsuccess=function(){var db=request.result;db.onversionchange=function(){db.close();};resolve(db);};
+    request.onerror=function(){reject(request.error||new Error("Memoria lokale e pajisjes nuk u hap."));};
+    request.onblocked=function(){reject(new Error("Mbyll skedat e tjera të aplikacionit dhe provo sërish."));};
+  });
+}
+function vaultDeviceKeyRecord(uid){
+  return vaultDeviceOpenDb().then(function(idb){
+    return new Promise(function(resolve,reject){
+      var tx,request,result=null;
+      function close(){try{idb.close();}catch(e){}}
+      try{tx=idb.transaction(VAULT_DEVICE_STORE,"readonly");request=tx.objectStore(VAULT_DEVICE_STORE).get(uid);}catch(e){close();reject(e);return;}
+      request.onsuccess=function(){result=request.result||null;};
+      request.onerror=function(){close();reject(request.error||new Error("Çelësi lokal nuk u lexua."));};
+      tx.oncomplete=function(){close();resolve(result);};
+      tx.onerror=function(){close();reject(tx.error||new Error("Çelësi lokal nuk u lexua."));};
+      tx.onabort=function(){close();reject(tx.error||new Error("Leximi i çelësit lokal u ndërpre."));};
+    });
+  });
+}
+function vaultDeviceKeyDelete(uid){
+  if(!uid)return Promise.resolve(false);
+  return vaultDeviceOpenDb().then(function(idb){
+    return new Promise(function(resolve,reject){
+      var tx;
+      function close(){try{idb.close();}catch(e){}}
+      try{tx=idb.transaction(VAULT_DEVICE_STORE,"readwrite");tx.objectStore(VAULT_DEVICE_STORE).delete(uid);}catch(e){close();reject(e);return;}
+      tx.oncomplete=function(){close();resolve(true);};
+      tx.onerror=function(){close();reject(tx.error||new Error("Çelësi i ruajtur në këtë pajisje nuk u hoq."));};
+      tx.onabort=function(){close();reject(tx.error||new Error("Heqja e çelësit lokal u ndërpre."));};
+    });
+  });
+}
+function vaultDeviceCheckText(uid,createdAt){return "llogarite-vault-device-v1|"+uid+"|"+String(createdAt==null?"":createdAt);}
+async function vaultDeviceKeyGet(uid,createdAt){
+  var record=await vaultDeviceKeyRecord(uid),stamp=String(createdAt==null?"":createdAt);
+  if(!record)return null;
+  if(record.version!==1||record.createdAt!==stamp||!vaultDeviceKeyValid(record.key)){await vaultDeviceKeyDelete(uid);return null;}
+  try{
+    var clear=await crypto.subtle.decrypt({name:"AES-GCM",iv:vaultB64ToBytes(record.iv)},record.key,vaultB64ToBytes(record.check));
+    if(new TextDecoder().decode(clear)!==vaultDeviceCheckText(uid,stamp))throw new Error("Local key check failed");
+    return record.key;
+  }catch(e){await vaultDeviceKeyDelete(uid);return null;}
+}
+async function vaultDeviceKeyStore(uid,createdAt,key){
+  if(!uid||!vaultDeviceKeyValid(key))throw new Error("Çelësi nuk mund të ruhet në këtë pajisje.");
+  var stamp=String(createdAt==null?"":createdAt),iv=vaultRandomBytes(12);
+  var check=await crypto.subtle.encrypt({name:"AES-GCM",iv:iv},key,new TextEncoder().encode(vaultDeviceCheckText(uid,stamp)));
+  var record={version:1,createdAt:stamp,key:key,iv:vaultBytesToB64(iv),check:vaultBytesToB64(new Uint8Array(check))};
+  var idb=await vaultDeviceOpenDb();
+  await new Promise(function(resolve,reject){
+    var tx;
+    function close(){try{idb.close();}catch(e){}}
+    try{tx=idb.transaction(VAULT_DEVICE_STORE,"readwrite");tx.objectStore(VAULT_DEVICE_STORE).put(record,uid);}catch(e){close();reject(e);return;}
+    tx.oncomplete=function(){close();resolve();};
+    tx.onerror=function(){close();reject(tx.error||new Error("Çelësi nuk u ruajt në këtë pajisje."));};
+    tx.onabort=function(){close();reject(tx.error||new Error("Ruajtja e çelësit lokal u ndërpre."));};
+  });
+}
+function vaultDeviceRequiresPassword(uid){
+  try{var marker=uid?localStorage.getItem(VAULT_DEVICE_LOCK_MARKER):null;return !!marker&&(marker===String(uid)||marker.indexOf(String(uid)+"|")===0);}catch(e){return false;}
+}
+function vaultDeviceRequirePassword(uid){try{if(uid)localStorage.setItem(VAULT_DEVICE_LOCK_MARKER,String(uid)+"|"+Date.now()+"|"+Math.random().toString(36).slice(2));return true;}catch(e){return false;}}
+function vaultDeviceAllowAutoUnlock(uid){
+  if(uid&&VAULT_SKIP_DEVICE_UNLOCK_UID===String(uid))VAULT_SKIP_DEVICE_UNLOCK_UID="";
+  try{if(vaultDeviceRequiresPassword(uid))localStorage.removeItem(VAULT_DEVICE_LOCK_MARKER);return true;}catch(e){return false;}
+}
 const VAULT_ENVELOPE_FIELD="__llogarite_e2ee_v1";
 function vaultIsEnvelope(value){return !!(value&&value[VAULT_ENVELOPE_FIELD]===1&&typeof value.iv==="string"&&typeof value.ciphertext==="string");}
 function vaultIsWrappedKey(value){return !!(value&&typeof value.iv==="string"&&typeof value.ciphertext==="string");}
@@ -1311,7 +1423,7 @@ function vaultShowSetup(){
   vaultShowPane("vaultSetup","Krijo kasafortën e enkriptuar","Vendos një fjalëkalim privat që nuk përdoret për hyrjen në Firebase. Ai nuk dërgohet te serveri.");
 }
 function vaultShowUnlock(message){
-  $("vaultPassUnlock").value="";
+  $("vaultPassUnlock").value="";$("vaultUnlockBtn").disabled=false;
   vaultShowPane("vaultUnlock","Hap kasafortën private",message||"Shkruaj fjalëkalimin privat për t'i hapur të dhënat në këtë pajisje.");
 }
 function vaultShowRecovery(){
@@ -1330,7 +1442,7 @@ function vaultShowRecoveryStep(needsBackup){
   $("vaultBackupPrepare").disabled=false;$("vaultBackupLink").style.display="none";
   if(VAULT_BACKUP_URL){URL.revokeObjectURL(VAULT_BACKUP_URL);VAULT_BACKUP_URL="";}
   VAULT_BACKUP_DOWNLOADED=false;
-  $("vaultContinueBtn").textContent=needsBackup?"Kripto të gjitha të dhënat dhe vazhdo":"Vazhdo në aplikacion";
+  $("vaultContinueBtn").textContent=VAULT_PENDING_RECOVERY_WRAP?"Ruaj kodin e ri dhe vazhdo":(needsBackup?"Kripto të gjitha të dhënat dhe vazhdo":"Vazhdo në aplikacion");
   vaultUpdateContinue();
 }
 let VAULT_NEED_BACKUP=false;
@@ -1351,7 +1463,32 @@ async function vaultEnter(user,epoch){
   VAULT_META=snap.data();
   if(!VAULT_META||VAULT_META.version!==1||VAULT_META.kdf!=="PBKDF2-SHA-256"||!vaultIsWrappedKey(VAULT_META.passwordWrap)||!vaultIsWrappedKey(VAULT_META.recoveryWrap)||typeof VAULT_META.passwordSalt!=="string"||!Number.isInteger(+VAULT_META.iterations)||+VAULT_META.iterations<VAULT_KDF_ITERATIONS||+VAULT_META.iterations>1000000||typeof VAULT_META.migrationComplete!=="boolean"||typeof VAULT_META.backupConfirmed!=="boolean"||(VAULT_META.migrationComplete&&!VAULT_META.backupConfirmed))throw new Error("Metadatat e kasafortës mungojnë ose nuk njihen. Mos krijo një kasafortë të re; përdor kopjen rezervë/kodin e rikuperimit.");
   try{if(vaultB64ToBytes(VAULT_META.passwordSalt).length!==16)throw new Error("salt");}catch(e){throw new Error("Kripa e çelësit në metadatat e kasafortës është e pavlefshme. Mos krijo çelës të ri; përdor kopjen rezervë/kodin e rikuperimit.");}
+  if(VAULT_SKIP_DEVICE_UNLOCK_UID===String(user.uid)||vaultDeviceRequiresPassword(user.uid)){
+    vaultShowUnlock("Kjo pajisje u bllokua. Shkruaj fjalëkalimin privat për ta hapur përsëri.");
+    return;
+  }
+  var rememberedKey=null,deviceStoreIssue="";
+  try{rememberedKey=await vaultDeviceKeyGet(user.uid,VAULT_META.createdAt);}catch(e){deviceStoreIssue="Nuk u lexua dot çelësi i ruajtur në këtë pajisje; pas hyrjes mund të kërkohet sërish fjalëkalimi.";console.warn("Remembered vault key unavailable",e);}
+  if(!vaultAuthValid(epoch,user.uid))return;
+  if(rememberedKey&&VAULT_META.backupConfirmed){
+    VAULT_KEY=rememberedKey;
+    $("vaultTitle").textContent="Po hapet kasaforta...";$("vaultLead").textContent="Po verifikohet çelësi i ruajtur në këtë pajisje.";
+    try{
+      await vaultEnsureMigration();
+      if(!vaultSessionValid(epoch,user.uid,rememberedKey))return;
+      await vaultStartApp(epoch);return;
+    }catch(e){
+      if(!vaultAuthValid(epoch,user.uid))return;
+      VAULT_KEY=null;
+      try{await vaultDeviceKeyDelete(user.uid);}catch(ignore){}
+      if(!vaultAuthValid(epoch,user.uid))return;
+      vaultShowUnlock("Hapja automatike nuk u krye. Shkruaj fjalëkalimin privat të kasafortës.");
+      $("vaultStatus").textContent="Çelësi i ruajtur nuk e hapi kasafortën: "+vaultErrorText(e);
+      return;
+    }
+  }
   vaultShowUnlock(VAULT_META.migrationComplete?"Shkruaj fjalëkalimin privat për t'i hapur të dhënat në këtë pajisje.":"Migrimi i enkriptimit nuk ka përfunduar. Hape kasafortën për të vazhduar në mënyrë të sigurt.");
+  if(deviceStoreIssue)$("vaultStatus").textContent=deviceStoreIssue;
 }
 async function vaultCheckNoOrphanCiphertext(){
   var root=await db.collection("users").doc(UID).get({source:"server"});
@@ -1391,7 +1528,7 @@ async function vaultCreate(){
       tx.set(metaRef,VAULT_META);
     });
     if(!vaultAuthValid(sessionEpoch,sessionUid))return;
-    VAULT_KEY=dataKey;VAULT_RECOVERY_CODE=recoveryCode;
+    VAULT_KEY=dataKey;VAULT_RECOVERY_CODE=recoveryCode;vaultDeviceAllowAutoUnlock(sessionUid);
     $("vaultPassNew").value="";$("vaultPassAgain").value="";
     vaultShowRecoveryStep(true);
   }catch(e){if(!vaultAuthValid(sessionEpoch,sessionUid))return;$("vaultStatus").textContent="Kasaforta nuk u krijua: "+vaultErrorText(e);button.disabled=false;}
@@ -1408,7 +1545,7 @@ async function vaultUnlock(){
     if(!vaultAuthValid(sessionEpoch,sessionUid))return;
     var importedKey=await vaultImportDataKey(raw);
     if(!vaultAuthValid(sessionEpoch,sessionUid))return;
-    VAULT_KEY=importedKey;
+    VAULT_KEY=importedKey;vaultDeviceAllowAutoUnlock(sessionUid);
     $("vaultPassUnlock").value="";
     if(VAULT_META.backupConfirmed){
       $("vaultStatus").textContent=VAULT_META.migrationComplete?"Po verifikohet enkriptimi i të dhënave...":"Po vazhdohet enkriptimi i të dhënave...";
@@ -1432,7 +1569,7 @@ async function vaultRecover(){
   try{
     var recoveryKey=await vaultRecoveryWrappingKey(code);if(!vaultAuthValid(sessionEpoch,sessionUid))return;
     var raw=await vaultUnwrapRawKey(recoveryKey,VAULT_META.recoveryWrap);if(!vaultAuthValid(sessionEpoch,sessionUid))return;
-    var dataKey=await vaultImportDataKey(raw);if(!vaultAuthValid(sessionEpoch,sessionUid))return;VAULT_KEY=dataKey;
+    var dataKey=await vaultImportDataKey(raw);if(!vaultAuthValid(sessionEpoch,sessionUid))return;VAULT_KEY=dataKey;vaultDeviceAllowAutoUnlock(sessionUid);
     var salt=vaultRandomBytes(16),newWrapKey=await vaultDeriveWrappingKey(pass,salt,VAULT_KDF_ITERATIONS);if(!vaultSessionValid(sessionEpoch,sessionUid,dataKey))return;
     var passwordWrap=await vaultWrapRawKey(newWrapKey,raw);if(!vaultSessionValid(sessionEpoch,sessionUid,dataKey))return;
     VAULT_META.passwordSalt=vaultBytesToB64(salt);VAULT_META.iterations=VAULT_KDF_ITERATIONS;VAULT_META.passwordWrap=passwordWrap;
@@ -1443,6 +1580,31 @@ async function vaultRecover(){
     $("vaultRecoveryInput").value="";$("vaultPassRecover").value="";$("vaultPassRecoverAgain").value="";
     vaultShowRecoveryStep(!VAULT_META.migrationComplete&&!VAULT_META.backupConfirmed);
   }catch(e){if(!vaultAuthValid(sessionEpoch,sessionUid))return;VAULT_KEY=null;$("vaultStatus").textContent="Rikuperimi dështoi: "+vaultErrorText(e);button.disabled=false;}
+}
+async function vaultRotateRecoveryCode(){
+  var button=$("vaultRotateRecoveryBtn"),pass=$("vaultRotatePass").value,sessionEpoch=VAULT_SESSION_EPOCH,sessionUid=UID,sessionKey=VAULT_KEY;
+  if(!vaultSessionValid(sessionEpoch,sessionUid,sessionKey)||!VAULT_META||!VAULT_META.migrationComplete){$("vaultRotateStatus").textContent="Hape kasafortën dhe përfundo migrimin para se të ndryshosh kodin.";return;}
+  if(!pass){$("vaultRotateStatus").textContent="Shkruaj fjalëkalimin privat aktual të kasafortës.";return;}
+  button.disabled=true;$("vaultRotateStatus").textContent="Po verifikohet fjalëkalimi dhe po krijohet kod i ri...";
+  try{
+    var wrappingKey=await vaultDeriveWrappingKey(pass,vaultB64ToBytes(VAULT_META.passwordSalt),+VAULT_META.iterations||VAULT_KDF_ITERATIONS);
+    if(!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;
+    var raw=await vaultUnwrapRawKey(wrappingKey,VAULT_META.passwordWrap);
+    if(!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;
+    var candidate=await vaultImportDataKey(raw),probe=vaultRandomBytes(32),iv=vaultRandomBytes(12);
+    var encrypted=await crypto.subtle.encrypt({name:"AES-GCM",iv:iv},sessionKey,probe);
+    var verified= new Uint8Array(await crypto.subtle.decrypt({name:"AES-GCM",iv:iv},candidate,encrypted));
+    if(verified.length!==probe.length||verified.some(function(b,i){return b!==probe[i];}))throw new Error("Fjalëkalimi nuk përputhet me çelësin e hapur.");
+    if(!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;
+    var newCode=vaultNewRecoveryCode(),recoveryKey=await vaultRecoveryWrappingKey(newCode);
+    if(!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;
+    var newWrap=await vaultWrapRawKey(recoveryKey,raw);
+    if(!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;
+    VAULT_PENDING_RECOVERY_WRAP=newWrap;VAULT_PENDING_RECOVERY_CODE=newCode;VAULT_RECOVERY_CODE=newCode;
+    $("vaultRotatePass").value="";$("vaultRotateStatus").textContent="";button.disabled=false;
+    document.body.classList.add("auth-gate");$("gate").style.display="flex";$("app").style.display="none";$("authCard").style.display="none";$("cfgCard").style.display="none";$("vaultCard").style.display="block";
+    vaultShowRecoveryStep(false);
+  }catch(e){if(!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;$("vaultRotateStatus").textContent="Kodi i ri nuk u krijua: "+vaultErrorText(e);button.disabled=false;}
 }
 function vaultBackupPayload(bundle){
   return {format:bundle.format,uid:bundle.uid,exportedAt:bundle.exportedAt,root:bundle.root,collections:bundle.collections};
@@ -1577,6 +1739,13 @@ async function vaultContinue(){
   if(!sessionKey||!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;
   button.disabled=true;
   try{
+    if(VAULT_PENDING_RECOVERY_WRAP){
+      $("vaultStatus").textContent="Po ruhet kodi i ri i rikuperimit...";
+      var pendingWrap=VAULT_PENDING_RECOVERY_WRAP;
+      await vaultMetaRef().update({recoveryWrap:pendingWrap});
+      if(!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;
+      VAULT_META.recoveryWrap=pendingWrap;VAULT_RECOVERY_CODE=VAULT_PENDING_RECOVERY_CODE;VAULT_PENDING_RECOVERY_WRAP=null;VAULT_PENDING_RECOVERY_CODE="";
+    }
     if(VAULT_NEED_BACKUP&&!VAULT_META.backupConfirmed){
       VAULT_META.backupConfirmed=true;VAULT_META.backupConfirmedAt=Date.now();
       await vaultMetaRef().update({backupConfirmed:true,backupConfirmedAt:VAULT_META.backupConfirmedAt});
@@ -1588,7 +1757,7 @@ async function vaultContinue(){
     await vaultStartApp(sessionEpoch);
   }catch(e){
     if(!vaultSessionValid(sessionEpoch,sessionUid,sessionKey))return;
-    $("vaultStatus").textContent="Enkriptimi nuk përfundoi. Kopja rezervë nuk u prek; provo sërish kur të kesh internet. "+vaultErrorText(e);
+    $("vaultStatus").textContent=VAULT_PENDING_RECOVERY_WRAP?"Kodi i ri nuk u ruajt; kodi i vjetër mbetet aktiv. Kodi i ri është ende i shfaqur. Provo përsëri. "+vaultErrorText(e):"Enkriptimi nuk përfundoi. Kopja rezervë nuk u prek; provo sërish kur të kesh internet. "+vaultErrorText(e);
     button.disabled=false;vaultUpdateContinue();
   }
 }
@@ -1672,11 +1841,16 @@ async function vaultEnsureMigration(){
   }
 }
 async function vaultStartApp(epoch){
-  if(!vaultAuthValid(epoch,UID)||!VAULT_KEY||VAULT_FLOW_UID!==UID)throw new Error("Llogaria u mbyll; hape sërish për të vazhduar.");
+  var sessionUid=UID,sessionKey=VAULT_KEY;
+  if(!vaultAuthValid(epoch,sessionUid)||!sessionKey||VAULT_FLOW_UID!==sessionUid)throw new Error("Llogaria u mbyll; hape sërish për të vazhduar.");
   if(!VAULT_META||!VAULT_META.backupConfirmed||!VAULT_META.migrationComplete)throw new Error("Migrimi dhe kopja rezervë duhet të përfundojnë para hapjes së aplikacionit.");
+  var rememberIssue="";
+  try{await vaultDeviceKeyStore(sessionUid,VAULT_META.createdAt,sessionKey);}catch(e){rememberIssue="Nuk u ruajt dot çelësi në këtë shfletues; mund të të kërkohet sërish fjalëkalimi.";console.warn("Could not remember this device",e);}
+  if(!vaultSessionValid(epoch,sessionUid,sessionKey)){try{await vaultDeviceKeyDelete(sessionUid);}catch(ignore){}return;}
   document.body.classList.remove("auth-gate");$("gate").style.display="none";$("vaultCard").style.display="none";$("app").style.display="block";
   $("whoami").textContent="I lidhur si "+(auth.currentUser&&auth.currentUser.email||"")+" · të dhënat janë të enkriptuara në cloud";
-  VAULT_FLOW_UID=UID;start();
+  VAULT_FLOW_UID=sessionUid;start();
+  if(rememberIssue)toast(rememberIssue);
 }
 function vaultFatal(error){
   console.error("Private vault could not be opened",error);
@@ -1793,6 +1967,7 @@ let RENT=[],EXP=[],FOLDERS=[],NOTES=[],SET={currency:"LEK",rent:0};
 let YEAR=new Date().getFullYear(), MIDX=new Date().getMonth(), MYEAR=new Date().getFullYear();
 let VIEW="home", DF="open", DTYPE="in", OPEN_FOLDER_ID=null, NOTE_EDIT=null, FOLDER_DELETE_BUSY=false, DEBT_OPEN_GROUPS=Object.create(null);
 function clearVaultMemory(){
+  VAULT_PENDING_RECOVERY_WRAP=null;VAULT_PENDING_RECOVERY_CODE="";
   CLIENTS=[];DEBTS=[];DEBT_HISTORY=[];DEBT_HISTORY_ERROR=null;CLIENTS_LOADED=false;DEBTS_LOADED=false;DEBT_HISTORY_LOADED=false;
   CLIENT_MIGRATION_BUSY=false;CLIENT_MIGRATION_ERROR=null;CLIENT_DETAIL_ID=null;CLIENT_CREDIT_BUSY.clear();CLIENT_LIST_FILTER="all";
   ARCHIVE_PURGE_BUSY=false;ARCHIVE_PURGE_DONE_UID="";RENT=[];EXP=[];FOLDERS=[];NOTES=[];SET={currency:"LEK",rent:0};CUR="LEK";
@@ -1800,11 +1975,11 @@ function clearVaultMemory(){
   try{
     if($("sheet"))$("sheet").innerHTML="";if($("modal"))$("modal").classList.remove("on");
     if($("printArea"))$("printArea").innerHTML="";if($("printBar"))$("printBar").style.display="none";document.body.classList.remove("printing");
-    ["pw","vaultPassNew","vaultPassAgain","vaultPassUnlock","vaultRecoveryInput","vaultPassRecover","vaultPassRecoverAgain","vaultRecoveryDisplay","vaultRestoreFile"].forEach(function(id){if($(id))$(id).value="";});
+    ["pw","vaultPassNew","vaultPassAgain","vaultPassUnlock","vaultRecoveryInput","vaultPassRecover","vaultPassRecoverAgain","vaultRecoveryDisplay","vaultRotatePass","vaultRestoreFile"].forEach(function(id){if($(id))$(id).value="";});
     ["vaultRecoverySaved","vaultSessionsClosed","vaultBackupSaved"].forEach(function(id){if($(id))$(id).checked=false;});
     if($("vaultBackupSaved"))$("vaultBackupSaved").disabled=true;if($("vaultBackupLink")){$("vaultBackupLink").style.display="none";$("vaultBackupLink").href="#";}
     if($("vaultContinueBtn"))$("vaultContinueBtn").disabled=true;
-    if($("vaultStatus"))$("vaultStatus").textContent="";if($("vaultRestoreStatus"))$("vaultRestoreStatus").textContent="";
+    if($("vaultStatus"))$("vaultStatus").textContent="";if($("vaultRestoreStatus"))$("vaultRestoreStatus").textContent="";if($("vaultRotateStatus"))$("vaultRotateStatus").textContent="";
     render();
   }catch(e){}
 }

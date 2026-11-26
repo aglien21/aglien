@@ -1,0 +1,84 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function isEncryptedEnvelope() {
+      return request.resource.data.keys().hasAll([
+          '__llogarite_e2ee_v1', 'iv', 'ciphertext'
+        ])
+        && request.resource.data.keys().hasOnly([
+          '__llogarite_e2ee_v1', 'iv', 'ciphertext'
+        ])
+        && request.resource.data.__llogarite_e2ee_v1 == 1
+        && request.resource.data.iv is string
+        && request.resource.data.ciphertext is string;
+    }
+
+    function isWrappedKey(value) {
+      return value is map
+        && value.keys().hasAll(['iv', 'ciphertext'])
+        && value.keys().hasOnly(['iv', 'ciphertext'])
+        && value.iv is string
+        && value.ciphertext is string;
+    }
+
+    function isVaultMetadata() {
+      return request.resource.data.keys().hasAll([
+          'version', 'kdf', 'iterations', 'passwordSalt',
+          'passwordWrap', 'recoveryWrap', 'migrationComplete',
+          'backupConfirmed', 'createdAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'version', 'kdf', 'iterations', 'passwordSalt',
+          'passwordWrap', 'recoveryWrap', 'migrationComplete',
+          'backupConfirmed', 'createdAt', 'backupConfirmedAt',
+          'migrationCompletedAt'
+        ])
+        && request.resource.data.version == 1
+        && request.resource.data.kdf == 'PBKDF2-SHA-256'
+        && request.resource.data.iterations is int
+        && request.resource.data.iterations >= 600000
+        && request.resource.data.iterations <= 1000000
+        && request.resource.data.passwordSalt is string
+        && isWrappedKey(request.resource.data.passwordWrap)
+        && isWrappedKey(request.resource.data.recoveryWrap)
+        && request.resource.data.migrationComplete is bool
+        && request.resource.data.backupConfirmed is bool
+        && request.resource.data.createdAt is int;
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      // Legacy records remain readable by their owner for backup/migration, but
+      // every newly created or updated root document must be an E2EE envelope.
+      allow create, update: if isOwner(userId) && isEncryptedEnvelope();
+      allow delete: if isOwner(userId);
+
+      match /_vault/{docId} {
+        allow read: if isOwner(userId) && docId == 'key-v1';
+        allow create, update: if isOwner(userId)
+          && docId == 'key-v1'
+          && isVaultMetadata();
+        allow delete: if false;
+      }
+
+      match /{collection}/{docId} {
+        function isAppCollection() {
+          return collection in [
+            'clients', 'debts', 'debtHistory', 'rent', 'expenses',
+            'noteFolders', 'notes'
+          ];
+        }
+        allow read: if isOwner(userId) && isAppCollection();
+        // This blocks older app copies from writing plaintext after migration.
+        allow create, update: if isOwner(userId)
+          && isAppCollection()
+          && isEncryptedEnvelope();
+        allow delete: if isOwner(userId) && isAppCollection();
+      }
+    }
+  }
+}
